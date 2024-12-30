@@ -79,9 +79,13 @@ export class AuthComponent {
       'Authorization': `Bearer ${prompt('What is your security token?')}`
     });
     this.http.get<{weather?: string, error?: string}>('http://localhost:8080/weather', {headers})
-      .subscribe(weather => {
-        if (weather.weather) alert(weather.weather);
-        if (weather.error) alert(weather.error);
-      });
+      .subscribe({
+        next: weather => {
+          if (weather.weather) alert(weather.weather);
+          if (weather.error) alert(weather.error);
+        },
+        error: error => {
+          alert(error.message);
+        }});
   }
 }
