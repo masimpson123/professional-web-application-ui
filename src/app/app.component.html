@@ -1,8 +1,4 @@
-Welcome to the professional web application of Michael Austin Simpson.<br />
-<button (click)="signUp()">Sign up</button><br />
-<button (click)="signIn()">Sign in</button><br />
-<button (click)="signOut()">Sign out</button><br />
-<button (click)="fetchWeather()">Fetch weather</button><br />
-{{weather | async | json}}
-
+<button routerLink="/root">Root</button>
+<button routerLink="/auth">End user authentication</button>
+<hr />
 <router-outlet />
