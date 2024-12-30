@@ -39,9 +39,11 @@ export class AuthComponent {
   }
   signUp() {
     console.log('signUp');
-    let email = prompt("Please enter an email for your new account:") ?? '';
-    let password = prompt("Please enter a new password for your new account:") ?? '';
-    createUserWithEmailAndPassword(auth, email, 'bingo1')
+    let email = prompt("Please enter an email for your new account:");
+    if (email === null) return;
+    let password = prompt("Please enter a new password for your new account:");
+    if (password === null) return;
+    createUserWithEmailAndPassword(auth, email, password)
       .then(() => {
         alert('Your account was successfully created. You are now signed in.');
       })
@@ -51,8 +53,10 @@ export class AuthComponent {
   }
   signIn() {
     console.log('signIn');
-    let email = prompt("What is your email?") ?? '';
-    let password = prompt("What is your password?") ?? '';
+    let email = prompt("What is your email?");
+    if (email === null) return;
+    let password = prompt("What is your password?");
+    if (password === null) return;
     signInWithEmailAndPassword(auth, email, password)
       .then(() => {
         alert('You are now signed in.');
@@ -74,9 +78,11 @@ export class AuthComponent {
   }
   fetchWeather() {
     console.log('fetchWeather');
+    let securityToken = prompt('What is your security token?');
+    if (securityToken === null) return;
     const headers = new HttpHeaders({
       'Content-Type': 'application/json',
-      'Authorization': `Bearer ${prompt('What is your security token?')}`
+      'Authorization': `Bearer ${securityToken}`
     });
     this.http.get<{weather?: string, error?: string}>('http://localhost:8080/weather', {headers})
       .subscribe({
