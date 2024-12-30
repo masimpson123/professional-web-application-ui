@@ -1,3 +1,7 @@
+https://msio-205823180568.us-central1.run.app
+https://endpoint-one-2-205823180568.us-central1.run.app
+https://endpoint-one-2-205823180568.us-central1.run.app/weather
+
 cd /Users/livingroom/Desktop/client-2025
 ng serve
 

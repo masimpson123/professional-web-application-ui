@@ -1,21 +1,20 @@
-import { Component } from '@angular/core';
+import { Component, OnDestroy } from '@angular/core';
 import { initializeApp } from 'firebase/app';
 import {
   onAuthStateChanged,
   signInWithEmailAndPassword,
   getAuth,
   signOut,
-  createUserWithEmailAndPassword
+  createUserWithEmailAndPassword,
+  Unsubscribe
 } from 'firebase/auth';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { Observable } from 'rxjs';
 import { CommonModule } from '@angular/common';
 
-const firebaseConfig = {
-    apiKey: "AIzaSyAAFqGwaHCiin9O3PJJfK59rulwJabe1sM",
-};
-
-const app = initializeApp(firebaseConfig);
+console.log('initializeFile');
+const app = initializeApp({
+  apiKey: "AIzaSyAAFqGwaHCiin9O3PJJfK59rulwJabe1sM",
+});
 const auth = getAuth(app);
 
 @Component({
@@ -24,19 +23,24 @@ const auth = getAuth(app);
   templateUrl: './auth.component.html',
   styleUrl: './auth.component.css'
 })
-export class AuthComponent {
+export class AuthComponent implements OnDestroy {
   token = '';
+  stopListeningForAuthEvents: Unsubscribe;
+  
   constructor(private http: HttpClient) {
-    onAuthStateChanged(auth, async (user) => {
-      console.log('authStateChange');
-      if (user) {
-        console.log(user);
-        this.token = await user.getIdToken();
-      } else {
-        console.log('NO USER');
-      }
+    console.log('initializeInstance');
+    this.stopListeningForAuthEvents = 
+      onAuthStateChanged(auth, async (user) => {
+        console.log('authStateChange');
+        if (user) this.token = await user.getIdToken();
     });
   }
+  
+  ngOnDestroy() {
+    console.log('destroyInstance');
+    this.stopListeningForAuthEvents();
+  }
+  
   signUp() {
     console.log('signUp');
     let email = prompt("Please enter an email for your new account:");
@@ -51,6 +55,7 @@ export class AuthComponent {
         alert(error);
       });
   }
+  
   signIn() {
     console.log('signIn');
     let email = prompt("What is your email?");
@@ -65,6 +70,7 @@ export class AuthComponent {
         alert(error);
       });
   }
+  
   signOut() {
     console.log('signOut');
     this.token = '';
@@ -76,6 +82,7 @@ export class AuthComponent {
         alert(error);
       });
   }
+  
   fetchWeather() {
     console.log('fetchWeather');
     let securityToken = prompt('What is your security token?');
@@ -84,7 +91,9 @@ export class AuthComponent {
       'Content-Type': 'application/json',
       'Authorization': `Bearer ${securityToken}`
     });
-    this.http.get<{weather?: string, error?: string}>('http://localhost:8080/weather', {headers})
+    // http://localhost:8080/weather
+    // https://endpoint-one-2-205823180568.us-central1.run.app/weather
+    this.http.get<{weather?: string, error?: string}>('https://endpoint-one-2-205823180568.us-central1.run.app/weather', {headers})
       .subscribe({
         next: weather => {
           if (weather.weather) alert(weather.weather);
