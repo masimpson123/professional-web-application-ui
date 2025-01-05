@@ -26,3 +26,12 @@ docker push us-central1-docker.pkg.dev/endpoint-one/endpoint-one/client2025:<mmd
 ! https://medium.com/@larry_nguyen/how-to-deploy-angular-application-on-google-cloud-run-c6d472e07bd5
 
 Revoking firebase id tokens (ie not refresh tokens), requires a manual solution.
+
+gcloud -v
+gcloud components update
+gcloud auth list
+gcloud auth login
+gcloud auth print-access-token
+gcloud auth revoke
+gcloud config set account 'masimpson123@gmail.com'
+gcloud config set project 'endpoint-one'
