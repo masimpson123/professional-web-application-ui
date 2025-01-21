@@ -13,14 +13,11 @@ export class WebsocketComponent {
     this.client = new Client({
       brokerURL: 'ws://localhost:8080/websocket-broker',
       onConnect: () => {
-        console.log('connection established');
-        this.client.subscribe('/websocket-output', message =>
-          console.log(`Received: ${message.body}`)
-        );
+        this.client.subscribe('/websocket-output', message => {
+          alert(message);
+        });
       },
-      onDisconnect() {
-        console.log('connection removed');
-      },
+      onDisconnect() {},
     });
   }
   connect() {
