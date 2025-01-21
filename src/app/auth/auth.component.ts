@@ -11,12 +11,6 @@ import {
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { CommonModule } from '@angular/common';
 
-console.log('initializeFirebase');
-const app = initializeApp({
-  apiKey: "AIzaSyAAFqGwaHCiin9O3PJJfK59rulwJabe1sM",
-});
-const auth = getAuth(app);
-
 @Component({
   selector: 'app-auth',
   imports: [CommonModule],
@@ -28,26 +22,28 @@ export class AuthComponent implements OnDestroy {
   stopListeningForAuthEvents: Unsubscribe;
   
   constructor(private http: HttpClient) {
-    console.log('initializeAuthComponentInstance');
+    if (!(window as any).msiofa) {
+      console.log('INITIALIZE');
+      (window as any).msiofa = getAuth(initializeApp({
+        apiKey: "AIzaSyAAFqGwaHCiin9O3PJJfK59rulwJabe1sM",
+      }));
+    }
     this.stopListeningForAuthEvents = 
-      onAuthStateChanged(auth, async (user) => {
-        console.log('authStateChange');
+      onAuthStateChanged((window as any).msiofa, async (user) => {
         if (user) this.token = await user.getIdToken();
     });
   }
   
   ngOnDestroy() {
-    console.log('destroyInstance');
     this.stopListeningForAuthEvents();
   }
   
   signUp() {
-    console.log('signUp');
     let email = prompt("Please enter an email for your new account:");
     if (email === null) return;
     let password = prompt("Please enter a new password for your new account:");
     if (password === null) return;
-    createUserWithEmailAndPassword(auth, email, password)
+    createUserWithEmailAndPassword((window as any).msiofa, email, password)
       .then(() => {
         alert('Your account was successfully created. You are now signed in.');
       })
@@ -57,12 +53,11 @@ export class AuthComponent implements OnDestroy {
   }
   
   signIn() {
-    console.log('signIn');
     let email = prompt("What is your email?");
     if (email === null) return;
     let password = prompt("What is your password?");
     if (password === null) return;
-    signInWithEmailAndPassword(auth, email, password)
+    signInWithEmailAndPassword((window as any).msiofa, email, password)
       .then(() => {
         alert('You are now signed in.');
       })
@@ -72,9 +67,8 @@ export class AuthComponent implements OnDestroy {
   }
   
   signOut() {
-    console.log('signOut');
     this.token = '';
-    signOut(auth)
+    signOut((window as any).msiofa)
       .then(() => {
         alert('You are now signed out.');
       })
@@ -84,7 +78,6 @@ export class AuthComponent implements OnDestroy {
   }
   
   fetchWeather() {
-    console.log('fetchWeather');
     let securityToken = prompt('What is your security token?');
     if (securityToken === null) return;
     const headers = new HttpHeaders({
