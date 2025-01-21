@@ -11,7 +11,7 @@ import {
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { CommonModule } from '@angular/common';
 
-console.log('initializeFile');
+console.log('initializeFirebase');
 const app = initializeApp({
   apiKey: "AIzaSyAAFqGwaHCiin9O3PJJfK59rulwJabe1sM",
 });
@@ -28,7 +28,7 @@ export class AuthComponent implements OnDestroy {
   stopListeningForAuthEvents: Unsubscribe;
   
   constructor(private http: HttpClient) {
-    console.log('initializeInstance');
+    console.log('initializeAuthComponentInstance');
     this.stopListeningForAuthEvents = 
       onAuthStateChanged(auth, async (user) => {
         console.log('authStateChange');
