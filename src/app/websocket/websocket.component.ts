@@ -1,23 +1,28 @@
 import { Component } from '@angular/core';
+import { CommonModule } from '@angular/common';
 import { Client } from '@stomp/stompjs';
 
 @Component({
   selector: 'app-websocket',
-  imports: [],
+  imports: [CommonModule],
   templateUrl: './websocket.component.html',
   styleUrl: './websocket.component.css'
 })
 export class WebsocketComponent {
   client: Client;
+  websocketResponse = "";
   constructor() {
     this.client = new Client({
       brokerURL: 'ws://localhost:8080/websocket-broker',
       onConnect: () => {
         this.client.subscribe('/websocket-output', message => {
-          alert(message);
+          this.websocketResponse = message.body;
         });
+        alert("A websocket connection has been established.");
       },
-      onDisconnect() {},
+      onDisconnect() {
+        alert("The websocket connection has been destroyed.");
+      },
     });
   }
   connect() {
@@ -26,11 +31,11 @@ export class WebsocketComponent {
   disconnect() {
     this.client.deactivate();
   }
-  sendMessage() {
+  sendMessage(message: string) {
     try {
       this.client.publish({
         destination: "/websocket-input",
-        body: JSON.stringify({'name': 'mike'})
+        body: message
       });
     } catch (error) {
       alert(error);
