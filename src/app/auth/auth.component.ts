@@ -23,7 +23,6 @@ export class AuthComponent implements OnDestroy {
   
   constructor(private http: HttpClient) {
     if (!(window as any).msiofa) {
-      console.log('INITIALIZE');
       (window as any).msiofa = getAuth(initializeApp({
         apiKey: "AIzaSyAAFqGwaHCiin9O3PJJfK59rulwJabe1sM",
       }));
