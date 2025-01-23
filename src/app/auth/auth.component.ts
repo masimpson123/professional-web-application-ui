@@ -85,7 +85,6 @@ export class AuthComponent implements OnDestroy {
       'Authorization': `Bearer ${securityToken}`
     });
     // http://localhost:8080/weather
-    // https://endpoint-one-2-205823180568.us-central1.run.app/weather
     this.http.get<{weather?: string, error?: string}>('https://endpoint-one-2-205823180568.us-central1.run.app/weather', {headers})
       .subscribe({
         next: weather => {

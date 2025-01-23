@@ -13,7 +13,8 @@ export class WebsocketComponent {
   websocketResponse = "";
   constructor() {
     this.client = new Client({
-      brokerURL: 'ws://localhost:8080/websocket-broker',
+      // brokerURL: 'ws://localhost:8080/websocket-broker',
+      brokerURL: 'ws://endpoint-one-2-205823180568.us-central1.run.app/websocket-broker',
       onConnect: () => {
         this.client.subscribe('/websocket-output', message => {
           this.websocketResponse = message.body;
