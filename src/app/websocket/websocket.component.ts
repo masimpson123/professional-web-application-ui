@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Client } from '@stomp/stompjs';
 
@@ -8,7 +8,7 @@ import { Client } from '@stomp/stompjs';
   templateUrl: './websocket.component.html',
   styleUrl: './websocket.component.css'
 })
-export class WebsocketComponent {
+export class WebsocketComponent implements OnDestroy {
   client: Client;
   websocketResponse = "";
   constructor() {
@@ -26,6 +26,9 @@ export class WebsocketComponent {
         alert("The websocket connection has been destroyed.");
       },
     });
+  }
+  ngOnDestroy() {
+    this.disconnect();
   }
   connect() {
     this.client.activate();
