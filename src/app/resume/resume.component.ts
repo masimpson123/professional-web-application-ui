@@ -1,4 +1,5 @@
 import { Component } from '@angular/core';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-resume',
@@ -7,7 +8,8 @@ import { Component } from '@angular/core';
   styleUrl: './resume.component.css'
 })
 export class ResumeComponent {
-  constructor() {
+  constructor(private router: Router) {
     window.open('./assets/simpsonResume2025.pdf', '_blank');
+    this.router.navigate(['root']);
   }
 }
