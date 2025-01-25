@@ -1,6 +1,7 @@
 This WebSocket study was created using Cloud Run, Docker, Angular, TypeScript, Spring, Java, and Stomp.<br />
-<button (click)="connect()">CONNECT</button><br />
+<button [disabled]="connecting" (click)="connect()">CONNECT</button><br />
 <textarea #message>Hello, websocket!</textarea><br />
-<button (click)="sendMessage(message.value)">SEND MESSAGE</button><br />
+<button [disabled]="connecting" (click)="sendMessage(message.value)">SEND MESSAGE</button><br />
 <span *ngIf="websocketResponse">The websocket service has responded with <b>{{ websocketResponse }}</b>.<br /></span>
-<button (click)="disconnect()">DISCONNECT</button><br />
+<button [disabled]="connecting" (click)="disconnect()">DISCONNECT</button><br />
+<span *ngIf="connecting">Connecting...</span>

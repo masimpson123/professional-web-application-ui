@@ -11,6 +11,7 @@ import { Client } from '@stomp/stompjs';
 export class WebsocketComponent implements OnDestroy {
   client: Client;
   websocketResponse = "";
+  connecting = false;
   constructor() {
     this.client = new Client({
       reconnectDelay: 0,
@@ -20,9 +21,18 @@ export class WebsocketComponent implements OnDestroy {
         this.client.subscribe('/websocket-output', message => {
           this.websocketResponse = message.body;
         });
+        this.connecting = false;
         alert("A websocket connection has been established.");
       },
-      onDisconnect() {
+      onStompError: () => {
+        this.connecting = false;
+        alert("A STOMP error has occurred.");
+      },
+      onWebSocketError: () => {
+        this.connecting = false;
+        alert("A WebSocket error has occurred.");
+      },
+      onDisconnect: () => {
         alert("The websocket connection has been destroyed.");
       },
     });
@@ -31,6 +41,7 @@ export class WebsocketComponent implements OnDestroy {
     this.disconnect();
   }
   connect() {
+    this.connecting = true;
     this.client.activate();
   }
   disconnect() {

@@ -19,6 +19,7 @@ import { CommonModule } from '@angular/common';
 })
 export class AuthComponent implements OnDestroy {
   token = '';
+  loading = false;
   stopListeningForAuthEvents: Unsubscribe;
   
   constructor(private http: HttpClient) {
@@ -83,14 +84,18 @@ export class AuthComponent implements OnDestroy {
       'Content-Type': 'application/json',
       'Authorization': `Bearer ${securityToken}`
     });
+    this.loading = true;
     // http://localhost:8080/weather
-    this.http.get<{weather?: string, error?: string}>('https://endpoint-one-2-205823180568.us-central1.run.app/weather', {headers})
+    this.http.get<{weather?: string, error?: string}>(
+      'https://endpoint-one-2-205823180568.us-central1.run.app/weather', {headers})
       .subscribe({
         next: weather => {
+          this.loading = false;
           if (weather.weather) alert(weather.weather);
           if (weather.error) alert(weather.error);
         },
         error: error => {
+          this.loading = false;
           alert(error.message);
         }});
   }
