@@ -35,3 +35,8 @@ gcloud auth print-access-token
 gcloud auth revoke
 gcloud config set account 'masimpson123@gmail.com'
 gcloud config set project 'endpoint-one'
+
+major.minor.patch
+^ latest minor
+~ latest patch
+19.x should install the latest version 19 package and be compatible with all version 19 packages
