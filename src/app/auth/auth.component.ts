@@ -76,8 +76,8 @@ export class AuthComponent implements OnDestroy {
         alert(error);
       });
   }
-  
-  fetchWeather() {
+
+  fetchWeather(advanced: boolean) {
     let securityToken = prompt('What is your security token?');
     if (securityToken === null) return;
     const headers = new HttpHeaders({
@@ -86,13 +86,43 @@ export class AuthComponent implements OnDestroy {
     });
     this.loading = true;
     // http://localhost:8080/weather
+    // https://endpoint-one-2-205823180568.us-central1.run.app/weather
     this.http.get<{weather?: string, error?: string}>(
-      'https://endpoint-one-2-205823180568.us-central1.run.app/weather', {headers})
+      'https://endpoint-one-2-205823180568.us-central1.run.app/weather' + (advanced ? '-advanced' : ''), {headers})
       .subscribe({
         next: weather => {
           this.loading = false;
           if (weather.weather) alert(weather.weather);
           if (weather.error) alert(weather.error);
+        },
+        error: error => {
+          this.loading = false;
+          alert(error.message);
+        }});
+  }
+
+  requestAdvancedUsageClaim() {
+    let securityToken = prompt('What is your security token?');
+    if (securityToken === null) return;
+    const headers = new HttpHeaders({
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${securityToken}`
+    });
+    this.loading = true;
+    // http://localhost:8080/request-advanced-usage-claim
+    // https://endpoint-one-2-205823180568.us-central1.run.app/request-advanced-usage-claim
+    this.http.get<{response?: string, error?: string}>(
+      'https://endpoint-one-2-205823180568.us-central1.run.app/request-advanced-usage-claim', {headers})
+      .subscribe({
+        next: response => {
+          // this should sign the user out and sign the user back in.
+          this.loading = false;
+          if (response.response) {
+            alert(response.response);
+            alert("You will be signed out because this new claim invalidates your security token.");
+            this.signOut();
+          }
+          if (response.error) alert(response.error);
         },
         error: error => {
           this.loading = false;

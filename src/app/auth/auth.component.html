@@ -5,5 +5,7 @@
     Your security token is <b><code>{{token}}</code></b>.
 </p>
 <button [disabled]="loading" (click)="signOut()">Sign out</button><br />
-<button [disabled]="loading" (click)="fetchWeather()">Fetch weather</button><br />
+<button [disabled]="loading" (click)="fetchWeather(false)">Fetch weather data</button><br />
+<button [disabled]="loading" (click)="requestAdvancedUsageClaim()">Request advanced usage claim</button><br />
+<button [disabled]="loading" (click)="fetchWeather(true)">Fetch advanced weather data</button><br />
 <p *ngIf="loading">Loading...</p>
