@@ -87,12 +87,12 @@ export class AuthComponent implements OnDestroy {
     this.loading = true;
     // http://localhost:8080/weather
     // https://endpoint-one-2-205823180568.us-central1.run.app/weather
-    this.http.get<{weather?: string, error?: string}>(
+    this.http.get<{response?: string, error?: string}>(
       'https://endpoint-one-2-205823180568.us-central1.run.app/weather' + (advanced ? '-advanced' : ''), {headers})
       .subscribe({
         next: weather => {
           this.loading = false;
-          if (weather.weather) alert(weather.weather);
+          if (weather.response) alert(weather.response);
           if (weather.error) alert(weather.error);
         },
         error: error => {
