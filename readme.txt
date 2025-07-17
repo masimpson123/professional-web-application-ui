@@ -4,6 +4,7 @@ https://endpoint-one-2-205823180568.us-central1.run.app/weather
 
 cd /Users/livingroom/Desktop/client-2025
 ng serve
+ng g component
 
 console.cloud.google.com
 masimpson123@gmail.com
