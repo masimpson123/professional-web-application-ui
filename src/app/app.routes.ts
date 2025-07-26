@@ -5,6 +5,7 @@ import { CubeComponent } from './cube/cube.component';
 import { WebsocketComponent } from './websocket/websocket.component';
 import { ResumeComponent } from './resume/resume.component';
 import { DataStreamComponent } from './data-stream/data-stream.component';
+import { AiComponent } from './ai/ai.component';
 
 export const routes: Routes = [
     {path: 'auth', component: AuthComponent},
@@ -12,6 +13,7 @@ export const routes: Routes = [
     {path: 'root', component: RootComponent},
     {path: 'websocket', component: WebsocketComponent},
     {path: 'data-stream', component: DataStreamComponent},
+    {path: 'ai', component: AiComponent},
     {path: 'resume', component: ResumeComponent},
     {path: '**', component: RootComponent},
 ];
