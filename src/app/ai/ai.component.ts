@@ -19,7 +19,7 @@ export class AiComponent {
     this.conversation.push(query)
       // http://localhost:8080/ai
       // https://endpoint-one-2-205823180568.us-central1.run.app/ai
-    fetch("http://localhost:8080/ai", {
+    fetch("https://endpoint-one-2-205823180568.us-central1.run.app/ai", {
       method: 'POST',
       headers: {'Content-Type': 'application/json'},
       body: JSON.stringify(
