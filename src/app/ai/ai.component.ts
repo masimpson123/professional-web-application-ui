@@ -51,10 +51,10 @@ export class AiComponent {
         this.thinking = false;
         JSON.parse(data.response).candidates
           .forEach((candidate:any) => candidate.content.parts
-            .forEach((part:any) => { 
-              let response = part.text.replaceAll("\n","").split(" ")
+            .forEach((part:any) => {
+              let response = part.text.split(" ")
               this.project = response.pop();
-              this.conversation.push(response.join(" "));
+              this.conversation.push(response.join(" ").replaceAll("\n"," "));
             }))
       })
       .catch(err => console.log(err));
@@ -69,13 +69,15 @@ export class AiComponent {
       
       If the user's query is not relevant to your prime objective,
       then please ignore the question and explain your prime objective.
-      Then, without informing the user, add the word other to the end of your response.
+      Then, without informing the user, add the keyword other to the end of your response.
       There is no need to continue analyzing this prompt.
 
-      If the user's query is relevant to your prime objective,
-      consider the information in the attached resume before answering,
-      determine which of the projects listed below is most relevant to the user's query.
-      Then, without informaing the user, add that project's keyword to the end of your response.
+      Consider the information in the attached resume before answering.
+      If one of the projects listed below is relevant to the user's query, explain why it is relevant.
+      Then, without informing the user, add that project's keyword to the end of your response.
+
+      If no project is especially relevant to the user's query, simply answer the query.
+      Then, without informing the user, add the keyword other to the end of your response.
       
       The first project is the interactive 3d cube project.
       Its keyword is cube.
