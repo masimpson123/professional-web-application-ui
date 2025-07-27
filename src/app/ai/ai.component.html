@@ -3,7 +3,7 @@
     <code class="chat-message" *ngIf="i%2===0">{{message}}</code>
 </div>
 
-<textarea #message class="chat-input" placeholder=""></textarea><br />
+<textarea #message class="chat-input"></textarea><br />
 <button (click)="submitAIQuery(message.value); message.value = ''">Submit</button><br />
 
 <span *ngIf="
