@@ -2,6 +2,10 @@ https://msio-205823180568.us-central1.run.app
 https://endpoint-one-2-205823180568.us-central1.run.app
 https://endpoint-one-2-205823180568.us-central1.run.app/weather
 
+Gemini
+https://ai.google.dev/gemini-api/docs
+https://aistudio.google.com/apikey
+
 cd /Users/livingroom/Desktop/client-2025
 ng serve
 ng g component
