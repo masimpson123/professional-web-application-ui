@@ -79,10 +79,11 @@ export class AiComponent {
       If no project is especially relevant to the user's query, simply answer the query.
       Then, without informing the user, add the keyword other to the end of your response.
       
-      The first project is the interactive 3d cube project.
+      The first project is the interactive cube project.
       Its keyword is cube.
-      It is an interactive 3d cube that was developed using the threejs library.
-      It was made while developing interactive, 3d maps of data centers at Google.
+      It is an interactive 3 dimensional cube that was developed using the threejs library.
+      It was made while developing interactive, 3 dimensional maps of data centers at Google that were used for wayfinding and data center layout optimization.
+      It demonstrates an ability to develop advanced data visualizations.
       
       The second project is the data stream project.
       Its keyword is data.
