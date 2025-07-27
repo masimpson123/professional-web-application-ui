@@ -15,7 +15,9 @@ import { WebsocketComponent } from '../websocket/websocket.component';
 export class AiComponent {
   conversation: string[] = ["Hello, I am an AI assistant that can help you navigate this web application and better understand Michael as a professional. Please input your query below."];
   project = "";
+  thinking = false;
   submitAIQuery(query:string) {
+    this.thinking = true;
     this.conversation.push(query)
       // http://localhost:8080/ai
       // https://endpoint-one-2-205823180568.us-central1.run.app/ai
@@ -46,6 +48,7 @@ export class AiComponent {
     })
       .then(response => response.json())
       .then(data => {
+        this.thinking = false;
         JSON.parse(data.response).candidates
           .forEach((candidate:any) => candidate.content.parts
             .forEach((part:any) => { 

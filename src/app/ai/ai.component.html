@@ -3,8 +3,12 @@
     <code class="chat-message" *ngIf="i%2===0">{{message}}</code>
 </div>
 
+<i class="chat-message" *ngIf="thinking">Thinking...</i>
 <textarea #message class="chat-input"></textarea><br />
-<button (click)="submitAIQuery(message.value); message.value = ''">Submit</button><br />
+<button
+    [disabled]="thinking"
+    (click)="submitAIQuery(message.value); message.value = ''"
+>Submit</button>
 
 <span *ngIf="
     project.includes('cube') ||
@@ -12,6 +16,7 @@
     project.includes('auth') ||
     project.includes('socket')
 ">
+    <br>
     <br>
     <hr>
     <br>
