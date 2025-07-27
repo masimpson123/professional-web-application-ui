@@ -1,21 +1,99 @@
 import { Component } from '@angular/core';
+import { CubeComponent } from '../cube/cube.component';
+import { DataStreamComponent } from '../data-stream/data-stream.component';
+import { CommonModule } from '@angular/common';
+import { resumebase64 } from './resumebase64';
+import { AuthComponent } from '../auth/auth.component';
+import { WebsocketComponent } from '../websocket/websocket.component';
 
 @Component({
   selector: 'app-ai',
-  imports: [],
+  imports: [CubeComponent, DataStreamComponent, AuthComponent, WebsocketComponent, CommonModule],
   templateUrl: './ai.component.html',
   styleUrl: './ai.component.css'
 })
 export class AiComponent {
-  // post query
-  constructor() {
-    fetch("http://localhost:8080/ai")
+  conversation: string[] = ["Hello, I am an AI assistant that can help you navigate this web application and better understand Michael as a professional. Please input your query below."];
+  project = "";
+  submitAIQuery(query:string) {
+    this.conversation.push(query)
+      // http://localhost:8080/ai
+      // https://endpoint-one-2-205823180568.us-central1.run.app/ai
+    fetch("http://localhost:8080/ai", {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify(
+        {
+          query: JSON.stringify(
+            {
+              contents:{
+                parts:[
+                  {
+                    text: query + this.instructions
+                  },
+                  {
+                    inlineData: {
+                      mimeType: 'application/pdf',
+                      data: resumebase64
+                    }
+                  }
+                ]
+              }
+            }
+          )
+        }
+      )
+    })
       .then(response => response.json())
       .then(data => {
         JSON.parse(data.response).candidates
           .forEach((candidate:any) => candidate.content.parts
-            .forEach((part:any) => console.log(part.text)));
+            .forEach((part:any) => { 
+              let response = part.text.replaceAll("\n","").split(" ")
+              this.project = response.pop();
+              this.conversation.push(response.join(" "));
+            }))
       })
       .catch(err => console.log(err));
   }
+  instructions =
+    `
+      You are an AI assistant.
+      Please address the user respectfully and concisely.
+      Your prime objective is to help people 
+      navigate the professional web application of Michael Austin Simpson, 
+      and better understand him as a professional.
+      
+      If the user's query is not relevant to your prime objective,
+      then please ignore the question and explain your prime objective.
+      Then, without informing the user, add the word other to the end of your response.
+      There is no need to continue analyzing this prompt.
+
+      If the user's query is relevant to your prime objective,
+      consider the information in the attached resume before answering,
+      determine which of the projects listed below is most relevant to the user's query.
+      Then, without informaing the user, add that project's keyword to the end of your response.
+      
+      The first project is the interactive 3d cube project.
+      Its keyword is cube.
+      It is an interactive 3d cube that was developed using the threejs library.
+      It was made while developing interactive, 3d maps of data centers at Google.
+      
+      The second project is the data stream project.
+      Its keyword is data.
+      It uses a data stream to search numerous enormous data sets concurrently.
+      It is a data engineering project that improves the user experience.
+      It demonstrates an understanding of Web Application engineering.
+
+      The third project is the end user authentication project.
+      Its keyword is auth.
+      It uses the oath2.0 standard to secure a REST endpoint.
+      It provides claims to users for granular access control in the connected Java service.
+      It depends on Google Cloud and Firebase
+
+      The fourth project is the web socket project.
+      Its keyword is socket.
+      It is an exploration of the TCP protocal which is used to build the HTTP protocol.
+      It demonstrates how data can be shared statefully in real time.
+    `;
 }

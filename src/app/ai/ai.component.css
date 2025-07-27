@@ -1,0 +1,8 @@
+.chat-message {
+    padding:5px;
+    display:block
+}
+
+.chat-input {
+    width: calc(100% - 16px);
+}
