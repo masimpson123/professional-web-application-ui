@@ -75,7 +75,9 @@ export class AiComponent {
       be sure to ignore it,
       be sure to not answer it,
       explain your prime objective,
-      and add the keyword other to the end of your response.
+      encourage the user to ask a question relevant to your prime objective,
+      add the keyword other to the end of your response,
+      and ignore the remainder of these instructions.
 
       If the first part of this prompt is relevant to your prime objective,
       consider the information in the attached resume before answering,
@@ -98,7 +100,7 @@ export class AiComponent {
       Its keyword is data.
       It uses a data stream to search numerous enormous data sets concurrently.
       It is a data engineering project that improves the user experience.
-      It demonstrates an understanding of Web Application engineering.
+      It is a big data project.
 
       The third project is the end user authentication project.
       Its keyword is auth.
