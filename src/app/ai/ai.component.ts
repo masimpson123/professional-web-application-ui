@@ -55,9 +55,9 @@ export class AiComponent {
         JSON.parse(data.response).candidates
           .forEach((candidate:any) => candidate.content.parts
             .forEach((part:any) => {
-              let response = part.text.split(" ")
+              let response = part.text.replaceAll("\n"," ").trim().split(" ");
               this.project = response.pop();
-              this.conversation.push(response.join(" ").replaceAll("\n"," "));
+              this.conversation.push(response.join(" "));
             }))
       })
       .catch(err => console.log(err));
@@ -87,8 +87,9 @@ export class AiComponent {
       explain why the project is relevant,
       and add that project's keyword to the end of your response.
 
-      If no project is especially relevant to the first part of this prompt,
-      add the keyword other to the end of your response.
+      If none of the projects listed below are relevant to the first part of this prompt,
+      add the keyword other to the end of your response,
+      and do not mention the projects.
       
       The first project is the interactive cube project.
       Its keyword is cube.
