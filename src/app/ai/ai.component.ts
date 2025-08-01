@@ -90,6 +90,8 @@ export class AiComponent {
       If none of the projects listed below are relevant to the first part of this prompt,
       add the keyword other to the end of your response,
       and do not mention the projects.
+
+      Be sure to add only one keyword to the end of your response.
       
       The first project is the interactive cube project.
       Its keyword is cube.
