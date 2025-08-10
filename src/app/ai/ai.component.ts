@@ -71,7 +71,7 @@ export class AiComponent {
       navigate the professional web application of Michael Austin Simpson, 
       and better understand him as a professional.
       
-      If the first part of this prompt is not entirely relevant to your prime objective,
+      If the first part of this prompt is not relevant to your prime objective,
       be sure to ignore it,
       be sure to not answer it,
       explain your prime objective,
