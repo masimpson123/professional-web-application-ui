@@ -6,6 +6,7 @@ import { WebsocketComponent } from './websocket/websocket.component';
 import { ResumeComponent } from './resume/resume.component';
 import { DataStreamComponent } from './data-stream/data-stream.component';
 import { AiComponent } from './ai/ai.component';
+import { FormComponent } from './form/form.component';
 
 export const routes: Routes = [
     {path: 'auth', component: AuthComponent},
@@ -15,5 +16,6 @@ export const routes: Routes = [
     {path: 'data-stream', component: DataStreamComponent},
     {path: 'ai', component: AiComponent},
     {path: 'resume', component: ResumeComponent},
+    {path: 'form', component: FormComponent},
     {path: '**', component: RootComponent},
 ];
