@@ -4,6 +4,7 @@ import { Component } from '@angular/core';
   selector: 'app-root',
   imports: [],
   templateUrl: './root.component.html',
-  styleUrl: './root.component.css'
+  styleUrl: './root.component.css',
+  standalone: true
 })
 export class RootComponent {}

@@ -5,7 +5,8 @@ import * as THREE from "three";
   selector: 'app-cube',
   imports: [],
   templateUrl: './cube.component.html',
-  styleUrl: './cube.component.css'
+  styleUrl: './cube.component.css',
+  standalone: true
 })
 export class CubeComponent implements AfterViewInit {
 

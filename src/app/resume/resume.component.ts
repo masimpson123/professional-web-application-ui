@@ -5,7 +5,8 @@ import { Router } from '@angular/router';
   selector: 'app-resume',
   imports: [],
   templateUrl: './resume.component.html',
-  styleUrl: './resume.component.css'
+  styleUrl: './resume.component.css',
+  standalone: true
 })
 export class ResumeComponent {
   constructor(private router: Router) {

@@ -10,7 +10,8 @@ import { WebsocketComponent } from '../websocket/websocket.component';
   selector: 'app-ai',
   imports: [CubeComponent, DataStreamComponent, AuthComponent, WebsocketComponent, CommonModule],
   templateUrl: './ai.component.html',
-  styleUrl: './ai.component.css'
+  styleUrl: './ai.component.css',
+  standalone: true
 })
 export class AiComponent {
   conversation: string[] = ["Hello, I am an AI assistant that can help you navigate this web application and better understand Michael as a professional. Please input your query below."];

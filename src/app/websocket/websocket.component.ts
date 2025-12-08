@@ -6,7 +6,8 @@ import { Client } from '@stomp/stompjs';
   selector: 'app-websocket',
   imports: [CommonModule],
   templateUrl: './websocket.component.html',
-  styleUrl: './websocket.component.css'
+  styleUrl: './websocket.component.css',
+  standalone: true
 })
 export class WebsocketComponent implements OnDestroy {
   client: Client;

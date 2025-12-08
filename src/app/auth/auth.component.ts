@@ -15,7 +15,8 @@ import { CommonModule } from '@angular/common';
   selector: 'app-auth',
   imports: [CommonModule],
   templateUrl: './auth.component.html',
-  styleUrl: './auth.component.css'
+  styleUrl: './auth.component.css',
+  standalone: true
 })
 export class AuthComponent implements OnDestroy {
   token = '';

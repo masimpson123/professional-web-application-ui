@@ -8,7 +8,8 @@ import { debounceTime, tap } from 'rxjs';
   selector: 'app-data-stream',
   imports: [FormsModule, CommonModule],
   templateUrl: './data-stream.component.html',
-  styleUrl: './data-stream.component.css'
+  styleUrl: './data-stream.component.css',
+  standalone: true
 })
 export class DataStreamComponent {
   searchInput = model('');
