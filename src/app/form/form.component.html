@@ -1,1 +1,11 @@
-<p>form works!</p>
+<form [formGroup]="securityForm" (ngSubmit)="onSubmit()">
+  <label for="first-name">Security term: </label>
+  <input id="first-name" type="text" formControlName="securityTerm" />
+  <br />
+  <label for="last-name">Security token: </label>
+  <input id="last-name" type="text" formControlName="securityToken" />
+  <br />
+  <button type="submit" [disabled]="!securityForm.valid">Submit</button>
+</form>
+
+<p>Value: {{ securityForm.valueChanges | async | json }}</p>
