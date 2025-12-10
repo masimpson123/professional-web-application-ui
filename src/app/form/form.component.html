@@ -1,10 +1,15 @@
+<app-welcome></app-welcome>
+<app-user-intake
+    [(securityFormGroup)]="securityForm"
+></app-user-intake>
+<app-security-intake
+    [(securityFormGroup)]="securityForm"
+></app-security-intake>
+<app-confirmation></app-confirmation>
+
+<!-- two form groups for each part of the form -->
+
 <form [formGroup]="securityForm" (ngSubmit)="onSubmit()">
-  <label for="first-name">Security term: </label>
-  <input id="first-name" type="text" formControlName="securityTerm" />
-  <br />
-  <label for="last-name">Security token: </label>
-  <input id="last-name" type="text" formControlName="securityToken" />
-  <br />
   <button type="submit" [disabled]="!securityForm.valid">Submit</button>
 </form>
 
