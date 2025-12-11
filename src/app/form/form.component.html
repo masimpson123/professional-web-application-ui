@@ -1,16 +1,17 @@
-<app-welcome></app-welcome>
+<app-welcome *ngIf="currentStep === 1"></app-welcome>
 <app-user-intake
-    [(securityFormGroup)]="securityForm"
+  *ngIf="currentStep === 2"
+  [(securityFormGroup)]="securityForm"
 ></app-user-intake>
 <app-security-intake
-    [(securityFormGroup)]="securityForm"
+  *ngIf="currentStep === 3"
+  [(securityFormGroup)]="securityForm"
 ></app-security-intake>
-<app-confirmation></app-confirmation>
+<app-confirmation
+  *ngIf="currentStep === 4"
+></app-confirmation>
 
-<!-- two form groups for each part of the form -->
-
-<form [formGroup]="securityForm" (ngSubmit)="onSubmit()">
-  <button type="submit" [disabled]="!securityForm.valid">Submit</button>
-</form>
+<button (click)="previous()">PREVIOUS</button>
+<button (click)="next()">NEXT</button>
 
 <p>Value: {{ securityForm.valueChanges | async | json }}</p>
