@@ -1,27 +1,45 @@
-<div *ngFor="let message of conversation; let i = index">
-    <b class="chat-message" *ngIf="i%2===1">{{message}}</b>
-    <code class="chat-message" *ngIf="i%2===0">{{message}}</code>
-</div>
+@for (message of conversation; track message; let i = $index) {
+  <div>
+    @if (i%2===1) {
+      <b class="chat-message">{{message}}</b>
+    }
+    @if (i%2===0) {
+      <code class="chat-message">{{message}}</code>
+    }
+  </div>
+}
 
-<i class="chat-message" *ngIf="thinking">Thinking...</i>
+@if (thinking) {
+  <i class="chat-message">Thinking...</i>
+}
 <textarea #message class="chat-input"></textarea><br />
 <button
-    [disabled]="thinking"
-    (click)="submitAIQuery(message.value); message.value = ''"
+  [disabled]="thinking"
+  (click)="submitAIQuery(message.value); message.value = ''"
 >Submit</button>
 
-<span *ngIf="
-    project.includes('cube') ||
-    project.includes('data') ||
-    project.includes('auth') ||
-    project.includes('socket')
-">
+@if (
+  project.includes('cube') ||
+  project.includes('data') ||
+  project.includes('auth') ||
+  project.includes('socket')
+  ) {
+  <span>
     <br>
-    <br>
-    <hr>
-    <br>
-    <app-cube *ngIf="project.includes('cube')"></app-cube>
-    <app-data-stream *ngIf="project.includes('data')"></app-data-stream>
-    <app-auth *ngIf="project.includes('auth')"></app-auth>
-    <app-websocket *ngIf="project.includes('socket')"></app-websocket>
-</span>
+      <br>
+        <hr>
+          <br>
+            @if (project.includes('cube')) {
+              <app-cube></app-cube>
+            }
+            @if (project.includes('data')) {
+              <app-data-stream></app-data-stream>
+            }
+            @if (project.includes('auth')) {
+              <app-auth></app-auth>
+            }
+            @if (project.includes('socket')) {
+              <app-websocket></app-websocket>
+            }
+          </span>
+        }

@@ -9,11 +9,11 @@ import {
   Unsubscribe
 } from 'firebase/auth';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { CommonModule } from '@angular/common';
+
 
 @Component({
   selector: 'app-auth',
-  imports: [CommonModule],
+  imports: [],
   templateUrl: './auth.component.html',
   styleUrl: './auth.component.css',
   standalone: true

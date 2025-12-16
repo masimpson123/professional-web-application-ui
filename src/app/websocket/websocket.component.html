@@ -2,6 +2,10 @@
 <button [disabled]="connecting" (click)="connect()">CONNECT</button><br />
 <textarea #message>Hello, websocket!</textarea><br />
 <button [disabled]="connecting" (click)="sendMessage(message.value)">SEND MESSAGE</button><br />
-<p *ngIf="websocketResponse">The websocket service has responded with <b>{{ websocketResponse }}</b>.</p>
+@if (websocketResponse) {
+  <p>The websocket service has responded with <b>{{ websocketResponse }}</b>.</p>
+}
 <button [disabled]="connecting" (click)="disconnect()">DISCONNECT</button><br />
-<p *ngIf="connecting">Connecting...</p>
+@if (connecting) {
+  <p>Connecting...</p>
+}

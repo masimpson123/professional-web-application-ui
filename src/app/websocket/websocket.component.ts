@@ -1,10 +1,10 @@
 import { Component, OnDestroy } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { Client } from '@stomp/stompjs';
 
 @Component({
   selector: 'app-websocket',
-  imports: [CommonModule],
+  imports: [],
   templateUrl: './websocket.component.html',
   styleUrl: './websocket.component.css',
   standalone: true

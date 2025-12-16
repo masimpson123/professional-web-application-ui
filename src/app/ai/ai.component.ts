@@ -1,14 +1,14 @@
 import { Component } from '@angular/core';
 import { CubeComponent } from '../cube/cube.component';
 import { DataStreamComponent } from '../data-stream/data-stream.component';
-import { CommonModule } from '@angular/common';
+
 import { resumebase64 } from './resumebase64';
 import { AuthComponent } from '../auth/auth.component';
 import { WebsocketComponent } from '../websocket/websocket.component';
 
 @Component({
   selector: 'app-ai',
-  imports: [CubeComponent, DataStreamComponent, AuthComponent, WebsocketComponent, CommonModule],
+  imports: [CubeComponent, DataStreamComponent, AuthComponent, WebsocketComponent],
   templateUrl: './ai.component.html',
   styleUrl: './ai.component.css',
   standalone: true

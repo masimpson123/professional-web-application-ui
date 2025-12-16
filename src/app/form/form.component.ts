@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
 import { FormGroup, FormControl, ReactiveFormsModule } from '@angular/forms';
-import { AsyncPipe, JsonPipe, NgIf } from '@angular/common';
+import { AsyncPipe, JsonPipe } from '@angular/common';
 import { ConfirmationComponent } from './confirmation/confirmation.component';
 import { WelcomeComponent } from './welcome/welcome.component';
 import { UserIntakeComponent } from './user-intake/user-intake.component';
@@ -8,7 +8,7 @@ import { SecurityIntakeComponent } from './security-intake/security-intake.compo
 
 @Component({
   selector: 'app-form',
-  imports: [NgIf, ReactiveFormsModule, AsyncPipe, JsonPipe, ConfirmationComponent, WelcomeComponent, UserIntakeComponent, SecurityIntakeComponent],
+  imports: [ReactiveFormsModule, AsyncPipe, JsonPipe, ConfirmationComponent, WelcomeComponent, UserIntakeComponent, SecurityIntakeComponent],
   templateUrl: './form.component.html',
   styleUrl: './form.component.css',
   standalone: true

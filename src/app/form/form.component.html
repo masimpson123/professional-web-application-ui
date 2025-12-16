@@ -1,15 +1,20 @@
-<app-welcome *ngIf="currentStep === 1"></app-welcome>
-<app-user-intake
-  *ngIf="currentStep === 2"
-  [(securityFormGroup)]="securityForm"
-></app-user-intake>
-<app-security-intake
-  *ngIf="currentStep === 3"
-  [(securityFormGroup)]="securityForm"
-></app-security-intake>
-<app-confirmation
-  *ngIf="currentStep === 4"
-></app-confirmation>
+@if (currentStep === 1) {
+  <app-welcome></app-welcome>
+}
+@if (currentStep === 2) {
+  <app-user-intake
+    [(securityFormGroup)]="securityForm"
+  ></app-user-intake>
+}
+@if (currentStep === 3) {
+  <app-security-intake
+    [(securityFormGroup)]="securityForm"
+  ></app-security-intake>
+}
+@if (currentStep === 4) {
+  <app-confirmation
+  ></app-confirmation>
+}
 
 <button (click)="previous()">PREVIOUS</button>
 <button (click)="next()">NEXT</button>

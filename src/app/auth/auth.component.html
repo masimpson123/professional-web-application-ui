@@ -1,11 +1,15 @@
 <p>This end user authentication study was created with Cloud Run, Docker, Angular, TypeScript, Spring, Java, Firebase, and Identity Platform.</p>
 <button [disabled]="loading" (click)="signUp()">Sign up</button><br />
 <button [disabled]="loading" (click)="signIn()">Sign in</button><br />
-<p *ngIf="token">
+@if (token) {
+  <p>
     Your security token is <b><code>{{token}}</code></b>.
-</p>
+  </p>
+}
 <button [disabled]="loading" (click)="signOut()">Sign out</button><br />
 <button [disabled]="loading" (click)="fetchWeather(false)">Fetch weather data</button><br />
 <button [disabled]="loading" (click)="requestAdvancedUsageClaim()">Request advanced usage claim</button><br />
 <button [disabled]="loading" (click)="fetchWeather(true)">Fetch advanced weather data</button><br />
-<p *ngIf="loading">Loading...</p>
+@if (loading) {
+  <p>Loading...</p>
+}
