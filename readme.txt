@@ -6,7 +6,7 @@ Gemini
 https://ai.google.dev/gemini-api/docs
 https://aistudio.google.com/apikey
 
-cd /Users/livingroom/Desktop/client-2025
+cd /Users/livingroom/Desktop/client-2026
 ng serve
 ng g component
 
@@ -15,16 +15,16 @@ masimpson123@gmail.com
 msio-u7qjhl7iia-uc.a.run.app
 
 # BUILD IMAGE
-cd /Users/livingroom/Desktop/client-2025
+cd /Users/livingroom/Desktop/client-2026
 open docker desktop or run the docker daemon some other way
-docker build --platform linux/amd64 -t client2025 .
+docker build --platform linux/amd64 -t client2026 .
 
 # RUN IMAGE
 ensure host port and container port are both 8080
 
 # UPLOAD TO GCP
-docker tag client2025 us-central1-docker.pkg.dev/endpoint-one/endpoint-one/client2025:<mmddyy>
-docker push us-central1-docker.pkg.dev/endpoint-one/endpoint-one/client2025:<mmddyy>
+docker tag client2026 us-central1-docker.pkg.dev/endpoint-one/endpoint-one/client2026:<mmddyy>
+docker push us-central1-docker.pkg.dev/endpoint-one/endpoint-one/client2026:<mmddyy>
 
 ! GitHub has excellent SSH documentation
 ! brew upgrade google-cloud-sdk

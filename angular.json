@@ -3,7 +3,7 @@
   "version": 1,
   "newProjectRoot": "projects",
   "projects": {
-    "client-2025": {
+    "client-2026": {
       "projectType": "application",
       "schematics": {},
       "root": "",
@@ -13,7 +13,7 @@
         "build": {
           "builder": "@angular/build:application",
           "options": {
-            "outputPath": "dist/client-2025",
+            "outputPath": "dist/client-2026",
             "index": "src/index.html",
             "browser": "src/main.ts",
             "polyfills": [
@@ -60,10 +60,10 @@
           "builder": "@angular/build:dev-server",
           "configurations": {
             "production": {
-              "buildTarget": "client-2025:build:production"
+              "buildTarget": "client-2026:build:production"
             },
             "development": {
-              "buildTarget": "client-2025:build:development"
+              "buildTarget": "client-2026:build:development"
             }
           },
           "defaultConfiguration": "development"

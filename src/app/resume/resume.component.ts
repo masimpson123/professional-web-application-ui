@@ -10,7 +10,7 @@ import { Router } from '@angular/router';
 })
 export class ResumeComponent {
   constructor(private router: Router) {
-    window.open('./assets/simpsonResume2025.pdf', '_blank');
+    window.open('./assets/simpsonResume2026.pdf', '_blank');
     this.router.navigate(['root']);
   }
 }
