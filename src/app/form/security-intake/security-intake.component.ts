@@ -9,7 +9,7 @@ import { FormGroup, ReactiveFormsModule } from '@angular/forms';
 })
 export class SecurityIntakeComponent {
   @Input() securityFormGroup!: FormGroup;
-  @Output() securityFormGroupChange = new EventEmitter<FormGroup>(); // For two-way binding
+  @Output() securityFormGroupChange = new EventEmitter<FormGroup>();
 
   ngOnInit() {
     this.securityFormGroup.valueChanges.subscribe(() => {

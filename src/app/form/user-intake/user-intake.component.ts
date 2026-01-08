@@ -16,4 +16,7 @@ export class UserIntakeComponent {
       this.securityFormGroupChange.emit(this.securityFormGroup);
     });
   }
+  get userName() {
+    return this.securityFormGroup.get('userIntake.usersName');
+  }
 }

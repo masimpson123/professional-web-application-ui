@@ -18,5 +18,4 @@
 
 <button (click)="previous()">PREVIOUS</button>
 <button (click)="next()">NEXT</button>
-
-<p>{{ securityForm.valueChanges | async | json }}</p>
+<button (click)="submit()" [disabled]="!securityForm.valid">SUBMIT</button>

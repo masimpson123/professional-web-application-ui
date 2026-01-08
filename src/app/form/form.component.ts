@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { FormGroup, FormControl, ReactiveFormsModule } from '@angular/forms';
+import { FormGroup, FormControl, ReactiveFormsModule, AbstractControl, ValidatorFn, ValidationErrors, Validators } from '@angular/forms';
 import { AsyncPipe, JsonPipe } from '@angular/common';
 import { ConfirmationComponent } from './confirmation/confirmation.component';
 import { WelcomeComponent } from './welcome/welcome.component';
@@ -17,17 +17,14 @@ export class FormComponent {
   currentStep = 1;
   securityForm = new FormGroup({
     userIntake: new FormGroup({
-      usersName: new FormControl('Mike'),
+      usersName: new FormControl('Mike', [Validators.required, forbiddenCharacterSequenceValidator(new RegExp('q'))]),
       usersPetsName: new FormControl('Speck')
     }),
     securityIntake: new FormGroup({
-      securityTerm: new FormControl(':)'),
+      securityTerm: new FormControl(':)', Validators.required),
       securityToken: new FormControl('jwt-1234')
     })
   });
-  onSubmit() {
-    console.log(this.securityForm.value);
-  }
   next() {
     if ( this.currentStep === 4 ) return;
     this.currentStep++;
@@ -36,4 +33,14 @@ export class FormComponent {
     if ( this.currentStep === 1 ) return;
     this.currentStep--;
   }
+  submit() {
+    alert(JSON.stringify(this.securityForm.value));
+  }
+}
+
+export function forbiddenCharacterSequenceValidator(nameRe: RegExp): ValidatorFn {
+  return (control: AbstractControl): ValidationErrors | null => {
+    const forbidden = nameRe.test(control.value);
+    return forbidden ? {forbiddenCharacterSequence: {value: control.value}} : null;
+  };
 }
