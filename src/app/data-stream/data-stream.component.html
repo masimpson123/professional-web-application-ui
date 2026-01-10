@@ -1,16 +1,17 @@
-This search service was created with Angular, Spring Boot, RxJS, the Fetch API, the StreamingResponseBody class, and the CompletableFuture class. It searches multiple data stores concurrently and returns the results as they are found. <br>
+This search service was developed with Angular, Spring Boot, RxJS, the Fetch API, the StreamingResponseBody class, and the CompletableFuture class. It searches multiple data stores concurrently and returns the results as they are found.
 <br>
-  <input type="text" [(ngModel)]="searchInput" />
-  <ol>
-    @for (result of results; track result; let i = $index) {
-      <li>
-        @for (item of result | keyvalue; track item) {
-          <div>
-            Dataset: {{ item.key | titlecase }} <br>
-            Results: {{ item.value }}
-          </div>
-        }
-        <br>
-        </li>
+<br>
+<input type="text" [(ngModel)]="searchInput" />
+<ol>
+  @for (result of results; track result; let i = $index) {
+    <li>
+      @for (item of result | keyvalue; track item) {
+        <div>
+          Dataset: {{ item.key | titlecase }} <br>
+          Results: {{ item.value }}
+        </div>
       }
-    </ol>
+      <br>
+    </li>
+  }
+</ol>

@@ -1,16 +1,16 @@
 <div [formGroup]="securityFormGroup">
     <div formGroupName="userIntake">
     <label for="users-name">User's name: </label>
-    <input id="users-name" type="text" formControlName="usersName" />
+    <input id="users-name" type="text" formControlName="usersName" placeholder="Mike" />
     @if((userName?.dirty || userName?.touched) && userName?.hasError('required')) {
         <div>User name field is required!</div>
     }
     @if((userName?.dirty || userName?.touched) && userName?.hasError('forbiddenCharacterSequence')) {
-        <div>q is not allowed!</div>
+        <div>"q" is not allowed!</div>
     }
     <br />
     <label for="users-pets-name">User's pet's name: </label>
-    <input id="users-pets-name" type="text" formControlName="usersPetsName" />
+    <input id="users-pets-name" type="text" formControlName="usersPetsName" placeholder="Speck" />
     <br />
     </div>
 </div>

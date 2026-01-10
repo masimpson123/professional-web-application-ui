@@ -1,6 +1,5 @@
 import { Component } from '@angular/core';
 import { FormGroup, FormControl, ReactiveFormsModule, AbstractControl, ValidatorFn, ValidationErrors, Validators } from '@angular/forms';
-import { AsyncPipe, JsonPipe } from '@angular/common';
 import { ConfirmationComponent } from './confirmation/confirmation.component';
 import { WelcomeComponent } from './welcome/welcome.component';
 import { UserIntakeComponent } from './user-intake/user-intake.component';
@@ -8,7 +7,7 @@ import { SecurityIntakeComponent } from './security-intake/security-intake.compo
 
 @Component({
   selector: 'app-form',
-  imports: [ReactiveFormsModule, AsyncPipe, JsonPipe, ConfirmationComponent, WelcomeComponent, UserIntakeComponent, SecurityIntakeComponent],
+  imports: [ReactiveFormsModule, ConfirmationComponent, WelcomeComponent, UserIntakeComponent, SecurityIntakeComponent],
   templateUrl: './form.component.html',
   styleUrl: './form.component.css',
   standalone: true
@@ -17,12 +16,12 @@ export class FormComponent {
   currentStep = 1;
   securityForm = new FormGroup({
     userIntake: new FormGroup({
-      usersName: new FormControl('Mike', [Validators.required, forbiddenCharacterSequenceValidator(new RegExp('q'))]),
-      usersPetsName: new FormControl('Speck')
+      usersName: new FormControl('', [Validators.required, forbiddenCharacterSequenceValidator(new RegExp('q'))]),
+      usersPetsName: new FormControl('')
     }),
     securityIntake: new FormGroup({
-      securityTerm: new FormControl(':)', Validators.required),
-      securityToken: new FormControl('jwt-1234')
+      securityTerm: new FormControl('', Validators.required),
+      securityToken: new FormControl('')
     })
   });
   next() {
@@ -38,9 +37,7 @@ export class FormComponent {
   }
 }
 
-export function forbiddenCharacterSequenceValidator(nameRe: RegExp): ValidatorFn {
-  return (control: AbstractControl): ValidationErrors | null => {
-    const forbidden = nameRe.test(control.value);
-    return forbidden ? {forbiddenCharacterSequence: {value: control.value}} : null;
-  };
-}
+export const forbiddenCharacterSequenceValidator =
+  (nameRe: RegExp): ValidatorFn =>
+    (control: AbstractControl): ValidationErrors | null =>
+      nameRe.test(control.value) ? {forbiddenCharacterSequence: {value: control.value}} : null;
