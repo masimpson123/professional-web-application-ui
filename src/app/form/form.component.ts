@@ -4,10 +4,11 @@ import { ConfirmationComponent } from './confirmation/confirmation.component';
 import { WelcomeComponent } from './welcome/welcome.component';
 import { UserIntakeComponent } from './user-intake/user-intake.component';
 import { SecurityIntakeComponent } from './security-intake/security-intake.component';
+import { SignalFormComponent } from "./signal-form/signal-form.component";
 
 @Component({
   selector: 'app-form',
-  imports: [ReactiveFormsModule, ConfirmationComponent, WelcomeComponent, UserIntakeComponent, SecurityIntakeComponent],
+  imports: [ReactiveFormsModule, ConfirmationComponent, WelcomeComponent, UserIntakeComponent, SecurityIntakeComponent, SignalFormComponent],
   templateUrl: './form.component.html',
   styleUrl: './form.component.css',
   standalone: true
