@@ -20,5 +20,8 @@ app.get('/tensorflow', async function(req, res) {
    const tensorflow = require('./tensorflow/tensorflow');
    res.send(await tensorflow.getData());
 });
+app.get('*default', function(req, res) {
+   res.sendFile(__dirname + '/dist/client-2026/browser/index.html');
+});
 
 app.listen(8080);
