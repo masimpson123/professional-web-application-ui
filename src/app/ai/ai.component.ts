@@ -5,10 +5,11 @@ import { DataStreamComponent } from '../data-stream/data-stream.component';
 import { resumebase64 } from './resumebase64';
 import { AuthComponent } from '../auth/auth.component';
 import { WebsocketComponent } from '../websocket/websocket.component';
+import { MachineLearningComponent } from '../machine-learning/machine-learning.component';
 
 @Component({
   selector: 'app-ai',
-  imports: [CubeComponent, DataStreamComponent, AuthComponent, WebsocketComponent],
+  imports: [CubeComponent, DataStreamComponent, AuthComponent, WebsocketComponent, MachineLearningComponent],
   templateUrl: './ai.component.html',
   styleUrl: './ai.component.css',
   standalone: true
@@ -20,8 +21,7 @@ export class AiComponent {
   submitAIQuery(query:string) {
     this.thinking = true;
     this.conversation.push(query)
-      // http://localhost:8080/ai
-      // https://endpoint-one-2-205823180568.us-central1.run.app/ai
+    // fetch("http://localhost:8080/ai", {
     fetch("https://endpoint-one-2-205823180568.us-central1.run.app/ai", {
       method: 'POST',
       headers: {'Content-Type': 'application/json'},
@@ -70,7 +70,7 @@ export class AiComponent {
       
       Your prime objective is to help people 
       navigate the professional web application of Michael Austin Simpson, 
-      and better understand him as a professional.
+      and better understand him as a professional software engineer.
       
       If the first part of this prompt is not relevant to your prime objective,
       be sure to ignore it,
@@ -116,5 +116,10 @@ export class AiComponent {
       Its keyword is socket.
       It is an exploration of the TCP protocol which is used to build the HTTP protocol.
       It demonstrates how data can be shared statefully in real time.
+
+      The fift project is the machine learning project.
+      Its keyword is machine-learning.
+      It uses tensor flow.
+      It uses supervised learning to train a model
     `;
 }

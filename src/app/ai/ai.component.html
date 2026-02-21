@@ -17,29 +17,26 @@
   [disabled]="thinking"
   (click)="submitAIQuery(message.value); message.value = ''"
 >Submit</button>
-
-@if (
-  project.includes('cube') ||
-  project.includes('data') ||
-  project.includes('auth') ||
-  project.includes('socket')
-  ) {
+@if (project && project != 'other') {
   <span>
     <br>
-      <br>
-        <hr>
-          <br>
-            @if (project.includes('cube')) {
-              <app-cube></app-cube>
-            }
-            @if (project.includes('data')) {
-              <app-data-stream></app-data-stream>
-            }
-            @if (project.includes('auth')) {
-              <app-auth></app-auth>
-            }
-            @if (project.includes('socket')) {
-              <app-websocket></app-websocket>
-            }
-          </span>
-        }
+    <br>
+    <hr>
+    <br>
+    @if (project.includes('cube')) {
+      <app-cube></app-cube>
+    }
+    @if (project.includes('data')) {
+      <app-data-stream></app-data-stream>
+    }
+    @if (project.includes('auth')) {
+      <app-auth></app-auth>
+    }
+    @if (project.includes('socket')) {
+      <app-websocket></app-websocket>
+    }
+    @if (project.includes('machine-learning')) {
+      <app-machine-learning></app-machine-learning>
+    }
+  </span>
+}
