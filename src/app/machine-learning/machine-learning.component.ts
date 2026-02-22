@@ -1,5 +1,6 @@
 import { Component, ViewChild, ElementRef, AfterViewInit } from '@angular/core';
 import * as tfvis from '@tensorflow/tfjs-vis';
+import * as tf from '@tensorflow/tfjs';
 
 @Component({
   selector: 'app-machine-learning',
@@ -8,10 +9,27 @@ import * as tfvis from '@tensorflow/tfjs-vis';
   styleUrl: './machine-learning.component.css',
 })
 export class MachineLearningComponent {
-  @ViewChild('machinelearningvisualization') drawArea!: ElementRef<HTMLInputElement>;
-  ngAfterViewInit() {
-    // fetch('http://localhost:8080/tensorflow')
-    fetch('https://msio-u7qjhl7iia-uc.a.run.app/tensorflow')
+  @ViewChild('modeldatatable') modelDrawArea!: ElementRef<HTMLInputElement>;
+  @ViewChild('trainingdatagraph') graphDrawArea!: ElementRef<HTMLInputElement>;
+  sessionId = crypto.randomUUID();
+  // apiUrl = 'http://localhost:8080/';
+  apiUrl = 'https://msio-u7qjhl7iia-uc.a.run.app/';
+  saveModelData() {
+    fetch(this.apiUrl + 'tensorflow-save-model-data/' + this.sessionId)
+      .then(modelData => modelData.json())
+      .then(model => {
+        console.log(model);
+      });
+  }
+  getRenderModelData() {
+      tf.loadLayersModel(this.apiUrl + 'tensorflow-get-model-data/' + this.sessionId + "/model.json")
+        .then(model => {
+          const surface = { name: 'Model Summary', tab: 'Model Inspection', drawArea: this.modelDrawArea.nativeElement };
+          tfvis.show.modelSummary(surface, model);
+        });
+  }
+  getRenderTrainingData() {
+    fetch(this.apiUrl + 'tensorflow-get-training-data')
       .then(res => res.json())
       .then(res => {
         const values = res.map((data:any) => ({
@@ -21,7 +39,7 @@ export class MachineLearningComponent {
         tfvis.render.scatterplot(
           {
             name: 'Horsepower v MPG',
-            drawArea: this.drawArea.nativeElement
+            drawArea: this.graphDrawArea.nativeElement
           },
           {
             values,

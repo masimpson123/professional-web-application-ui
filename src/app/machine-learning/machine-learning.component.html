@@ -1,1 +1,6 @@
-<div #machinelearningvisualization style="width: 90%; margin: auto"></div>
+<p>Your session id is {{ sessionId }}.</p>
+<button (click)="saveModelData()">Save model data</button><br />
+<button (click)="getRenderModelData()">Get model data</button><br />
+<button (click)="getRenderTrainingData()">Get training data</button><br />
+<div #modeldatatable style="width: 90%; margin: auto"></div>
+<div #trainingdatagraph style="width: 90%; margin: auto"></div>
