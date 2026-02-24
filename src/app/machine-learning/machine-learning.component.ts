@@ -1,10 +1,11 @@
-import { Component, ViewChild, ElementRef, AfterViewInit } from '@angular/core';
+import { Component, ViewChild, ElementRef } from '@angular/core';
+import { JsonPipe } from '@angular/common';
 import * as tfvis from '@tensorflow/tfjs-vis';
 import * as tf from '@tensorflow/tfjs';
 
 @Component({
   selector: 'app-machine-learning',
-  imports: [],
+  imports: [JsonPipe],
   templateUrl: './machine-learning.component.html',
   styleUrl: './machine-learning.component.css',
 })
@@ -12,21 +13,27 @@ export class MachineLearningComponent {
   @ViewChild('modeldatatable') modelDrawArea!: ElementRef<HTMLInputElement>;
   @ViewChild('trainingdatagraph') graphDrawArea!: ElementRef<HTMLInputElement>;
   sessionId = crypto.randomUUID();
+  modelData: tf.LayersModel|null = null;
   trainingData = null;
-  apiUrl = 'http://localhost:8080/';
-  // apiUrl = 'https://msio-u7qjhl7iia-uc.a.run.app/';
+  tensors = null;
+  // apiUrl = 'http://localhost:8080/';
+  apiUrl = 'https://msio-u7qjhl7iia-uc.a.run.app/';
   saveModelDataForSession() {
     fetch(this.apiUrl + 'tensorflow-save-model-data/' + this.sessionId)
       .then(saveOperationResponse => saveOperationResponse.json())
       .then(saveOperationResponse => {
-        alert(saveOperationResponse);
+        alert(saveOperationResponse.message);
       });
   }
   getRenderModelDataForSession() {
       tf.loadLayersModel(this.apiUrl + 'tensorflow-get-model-data/' + this.sessionId + "/model.json")
         .then(model => {
+          this.modelData = model;
           const surface = { name: 'Model Summary', tab: 'Model Inspection', drawArea: this.modelDrawArea.nativeElement };
           tfvis.show.modelSummary(surface, model);
+        })
+        .catch(err => {
+          alert(err)
         });
   }
   getRenderTrainingData() {
@@ -58,7 +65,7 @@ export class MachineLearningComponent {
       });
   }
   getTensorsFromTrainingData() {
-    fetch(this.apiUrl + 'tensorflow-data-to-tensors', {
+    fetch(this.apiUrl + 'tensorflow-training-data-to-tensors', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -67,7 +74,7 @@ export class MachineLearningComponent {
     })
       .then(tensorsData => tensorsData.json())
       .then(tensors => {
-        console.log(tensors);
+        this.tensors = tensors;
       });
   }
 }

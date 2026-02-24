@@ -3,5 +3,21 @@
 <button (click)="getRenderModelDataForSession()">Get model data</button><br />
 <button (click)="getRenderTrainingData()">Get training data</button><br />
 <button (click)="getTensorsFromTrainingData()">Get tensors from training data</button><br />
+@if (modelData) {
+    <br />
+    <hr />
+    <br />
+}
 <div #modeldatatable style="width: 90%; margin: auto"></div>
+@if (trainingData) {
+    <br />
+    <hr />
+    <br />
+}
 <div #trainingdatagraph style="width: 90%; margin: auto"></div>
+@if (tensors) {
+    <br />
+    <hr />
+    <br />
+    {{ tensors | json }}
+}
