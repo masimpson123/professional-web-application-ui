@@ -23,7 +23,12 @@ async function saveModel(keyword) {
   return JSON.stringify({message: "The model was saved successfully."});
 }
 
+async function getTensors(trainingData) {
+  return JSON.stringify({message: trainingData});
+}
+
 module.exports = {
   getData,
-  saveModel
+  saveModel,
+  getTensors
 };

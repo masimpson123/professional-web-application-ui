@@ -12,16 +12,17 @@ export class MachineLearningComponent {
   @ViewChild('modeldatatable') modelDrawArea!: ElementRef<HTMLInputElement>;
   @ViewChild('trainingdatagraph') graphDrawArea!: ElementRef<HTMLInputElement>;
   sessionId = crypto.randomUUID();
-  // apiUrl = 'http://localhost:8080/';
-  apiUrl = 'https://msio-u7qjhl7iia-uc.a.run.app/';
-  saveModelData() {
+  trainingData = null;
+  apiUrl = 'http://localhost:8080/';
+  // apiUrl = 'https://msio-u7qjhl7iia-uc.a.run.app/';
+  saveModelDataForSession() {
     fetch(this.apiUrl + 'tensorflow-save-model-data/' + this.sessionId)
-      .then(modelData => modelData.json())
-      .then(model => {
-        console.log(model);
+      .then(saveOperationResponse => saveOperationResponse.json())
+      .then(saveOperationResponse => {
+        alert(saveOperationResponse);
       });
   }
-  getRenderModelData() {
+  getRenderModelDataForSession() {
       tf.loadLayersModel(this.apiUrl + 'tensorflow-get-model-data/' + this.sessionId + "/model.json")
         .then(model => {
           const surface = { name: 'Model Summary', tab: 'Model Inspection', drawArea: this.modelDrawArea.nativeElement };
@@ -30,9 +31,10 @@ export class MachineLearningComponent {
   }
   getRenderTrainingData() {
     fetch(this.apiUrl + 'tensorflow-get-training-data')
-      .then(res => res.json())
-      .then(res => {
-        const values = res.map((data:any) => ({
+      .then(trainingDataResponse => trainingDataResponse.json())
+      .then(trainingData => {
+        this.trainingData = trainingData;
+        const values = trainingData.map((data:any) => ({
           x: data.horsepower,
           y: data.mpg,
         }));
@@ -53,6 +55,19 @@ export class MachineLearningComponent {
             
           }
         );
+      });
+  }
+  getTensorsFromTrainingData() {
+    fetch(this.apiUrl + 'tensorflow-data-to-tensors', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({trainingData: this.trainingData})
+    })
+      .then(tensorsData => tensorsData.json())
+      .then(tensors => {
+        console.log(tensors);
       });
   }
 }
