@@ -80,8 +80,10 @@ export class MachineLearningComponent {
     })
       .then(trainingReportResponse => trainingReportResponse.json())
       .then(trainingReport => {
-        console.log(trainingReport);
-        // TODO: render report
+        tfvis.show.history(
+          { name: 'Training report' },
+          trainingReport,
+          ['loss', 'mse'])
       })
       .catch(err => {
         alert(err)
