@@ -52,8 +52,29 @@ async function getTensors(data) {
   });
 }
 
+async function trainModel(sessionId, trainingData) {
+  const model = await tf.loadLayersModel(`file://${__dirname}/model-data/${sessionId}/model.json`);
+  const {inputs, labels} = await getTensors(trainingData);
+
+  model.compile({
+    optimizer: tf.train.adam(),
+    loss: tf.losses.meanSquaredError,
+    metrics: ['mse'],
+  });
+
+  const batchSize = 32;
+  const epochs = 50;
+
+  return await model.fit(inputs, labels, {
+    batchSize,
+    epochs,
+    shuffle: true
+  });
+}
+
 module.exports = {
   getTrainingData,
   saveModel,
-  getTensors
+  getTensors,
+  trainModel
 };

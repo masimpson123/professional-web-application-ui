@@ -1,11 +1,10 @@
 import { Component, ViewChild, ElementRef } from '@angular/core';
-import { JsonPipe } from '@angular/common';
 import * as tfvis from '@tensorflow/tfjs-vis';
 import * as tf from '@tensorflow/tfjs';
 
 @Component({
   selector: 'app-machine-learning',
-  imports: [JsonPipe],
+  imports: [],
   templateUrl: './machine-learning.component.html',
   styleUrl: './machine-learning.component.css',
 })
@@ -15,18 +14,20 @@ export class MachineLearningComponent {
   sessionId = crypto.randomUUID();
   modelData: tf.LayersModel|null = null;
   trainingData = null;
-  tensors = null;
-  // apiUrl = 'http://localhost:8080/';
-  apiUrl = 'https://msio-u7qjhl7iia-uc.a.run.app/';
+  apiUrl = 'http://localhost:8080/';
+  // apiUrl = 'https://msio-u7qjhl7iia-uc.a.run.app/';
   saveModelDataForSession() {
-    fetch(this.apiUrl + 'tensorflow-save-model-data/' + this.sessionId)
+    fetch(this.apiUrl + 'tensorflow-save-model/' + this.sessionId)
       .then(saveOperationResponse => saveOperationResponse.json())
       .then(saveOperationResponse => {
         alert(saveOperationResponse.message);
+      })
+      .catch(err => {
+        alert(err)
       });
   }
   getRenderModelDataForSession() {
-      tf.loadLayersModel(this.apiUrl + 'tensorflow-get-model-data/' + this.sessionId + "/model.json")
+      tf.loadLayersModel(this.apiUrl + 'tensorflow-get-model/' + this.sessionId + "/model.json")
         .then(model => {
           this.modelData = model;
           const surface = { name: 'Model Summary', tab: 'Model Inspection', drawArea: this.modelDrawArea.nativeElement };
@@ -59,22 +60,31 @@ export class MachineLearningComponent {
             yLabel: 'MPG',
             height: 300,
             seriesColors: ['green'],
-            
           }
         );
+      })
+      .catch(err => {
+        alert(err)
       });
   }
-  getTensorsFromTrainingData() {
-    fetch(this.apiUrl + 'tensorflow-training-data-to-tensors', {
+  trainModelRenderTrainingReport() {
+    fetch(this.apiUrl + 'tensorflow-train-model', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({trainingData: this.trainingData})
+      body: JSON.stringify({
+        sessionId: this.sessionId,
+        trainingData: this.trainingData
+      })
     })
-      .then(tensorsData => tensorsData.json())
-      .then(tensors => {
-        this.tensors = tensors;
+      .then(trainingReportResponse => trainingReportResponse.json())
+      .then(trainingReport => {
+        console.log(trainingReport);
+        // TODO: render report
+      })
+      .catch(err => {
+        alert(err)
       });
   }
 }
