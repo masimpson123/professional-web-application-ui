@@ -20,15 +20,6 @@ app.use(express.static("dist/client-2026/browser"));
 app.use(express.static("tensorflow/model-data"));
 app.use(express.json());
 
-app.get('/tensorflow-save-model/:keyword', async function(req, res) {
-   res.send(await tensorflow.saveModel(req.params.keyword));
-});
-app.get('/tensorflow-get-model/:sessionid/:file', async function(req, res) {
-   res.sendFile(`${__dirname}/tensorflow/model-data/${req.params.sessionid}/${req.params.file}`);
-});
-app.get('/tensorflow-get-training-data', async function(req, res) {
-   res.send(await tensorflow.getTrainingData());
-});
 app.post('/tensorflow-train-model', async function(req, res) {
    res.send(await tensorflow.trainModel(req.body.sessionId, req.body.trainingData));
 });

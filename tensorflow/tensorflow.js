@@ -1,18 +1,5 @@
 const tf = require('@tensorflow/tfjs-node');
 
-async function saveModel(keyword) {
-  const fs = require('fs/promises');
-  const path = 'tensorflow/model-data/'+keyword;
-  await fs.mkdir(path, { recursive: true });
-  
-  const model = tf.sequential();
-  model.add(tf.layers.dense({inputShape: [1], units: 1, useBias: true}));
-  model.add(tf.layers.dense({units: 1, useBias: true}));
-  model.save('file://' + path);
-  
-  return {message: "The model data was saved successfully."};
-}
-
 function getTensors(data) {
   if (!data) return {message: "no training data. no tensors."}
   return tf.tidy(() => {
@@ -41,9 +28,11 @@ function getTensors(data) {
   });
 }
 
-async function trainModel(sessionId, trainingData) {
-  const path = `file://${__dirname}/model-data/${sessionId}`;
-  const model = await tf.loadLayersModel(path + '/model.json');
+async function trainModel(trainingData) {
+  const model = tf.sequential();
+  model.add(tf.layers.dense({inputShape: [1], units: 1, useBias: true}));
+  model.add(tf.layers.dense({units: 1, useBias: true}));
+
   const {inputs, labels} = getTensors(trainingData);
 
   model.compile({
@@ -53,7 +42,7 @@ async function trainModel(sessionId, trainingData) {
   });
 
   const batchSize = 32;
-  const epochs = 100;
+  const epochs = 250;
 
   const trainingReport = await model.fit(inputs, labels, {
     batchSize,
@@ -61,13 +50,13 @@ async function trainModel(sessionId, trainingData) {
     shuffle: true
   });
 
-  model.save(path);
+  model.save(`file://${__dirname}/model-data`);
 
   return trainingReport;
 }
 
-async function getLinearRegressionPredictions(sessionId, trainingData) {
-  const model = await tf.loadLayersModel(`file://${__dirname}/model-data/${sessionId}/model.json`);
+async function getLinearRegressionPredictions(trainingData) {
+  const model = await tf.loadLayersModel(`file://${__dirname}/model-data/model.json`);
   const {inputMax, inputMin, labelMin, labelMax} = getTensors(trainingData);
   const [xValues, predictedValues] = tf.tidy(() => {
     const normalizedXValues = tf.linspace(0, 1, 100);
@@ -90,7 +79,6 @@ async function getLinearRegressionPredictions(sessionId, trainingData) {
 }
 
 module.exports = {
-  saveModel,
   trainModel,
   getLinearRegressionPredictions
 };
