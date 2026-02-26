@@ -45,3 +45,6 @@ major.minor.patch
 ^ latest minor
 ~ latest patch
 19.x should install the latest version 19 package and be compatible with all version 19 packages
+
+! important tensorflow codelab
+! https://codelabs.developers.google.com/codelabs/tfjs-training-regression/index.html#0
