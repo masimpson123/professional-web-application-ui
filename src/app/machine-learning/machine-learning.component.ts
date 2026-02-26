@@ -9,11 +9,13 @@ import * as tf from '@tensorflow/tfjs';
   styleUrl: './machine-learning.component.css',
 })
 export class MachineLearningComponent {
-  @ViewChild('modeldatatable') modelDrawArea!: ElementRef<HTMLInputElement>;
-  @ViewChild('trainingdatagraph') graphDrawArea!: ElementRef<HTMLInputElement>;
+  @ViewChild('modeltable') modelTable!: ElementRef<HTMLInputElement>;
+  @ViewChild('trainingdatagraph') trainingDataGraph!: ElementRef<HTMLInputElement>;
+  @ViewChild('trainingreportgraphs') trainingReportGraphs!: ElementRef<HTMLInputElement>;
   sessionId = crypto.randomUUID();
-  modelData: tf.LayersModel|null = null;
+  modelData = null;
   trainingData = null;
+  trainingReport = null;
   apiUrl = 'http://localhost:8080/';
   // apiUrl = 'https://msio-u7qjhl7iia-uc.a.run.app/';
   saveModelDataForSession() {
@@ -29,8 +31,12 @@ export class MachineLearningComponent {
   getRenderModelDataForSession() {
       tf.loadLayersModel(this.apiUrl + 'tensorflow-get-model/' + this.sessionId + "/model.json")
         .then(model => {
-          this.modelData = model;
-          const surface = { name: 'Model Summary', tab: 'Model Inspection', drawArea: this.modelDrawArea.nativeElement };
+          this.modelData = model as any;
+          const surface = {
+            name: 'Model Summary',
+            tab: 'Model Inspection',
+            drawArea: this.modelTable.nativeElement
+          };
           tfvis.show.modelSummary(surface, model);
         })
         .catch(err => {
@@ -49,7 +55,7 @@ export class MachineLearningComponent {
         tfvis.render.scatterplot(
           {
             name: 'Horsepower v MPG',
-            drawArea: this.graphDrawArea.nativeElement
+            drawArea: this.trainingDataGraph.nativeElement
           },
           {
             values,
@@ -80,8 +86,12 @@ export class MachineLearningComponent {
     })
       .then(trainingReportResponse => trainingReportResponse.json())
       .then(trainingReport => {
+        this.trainingReport = trainingReport
         tfvis.show.history(
-          { name: 'Training report' },
+          {
+            name: 'Training report',
+            drawArea: this.trainingReportGraphs.nativeElement
+          },
           trainingReport,
           ['loss', 'mse'])
       })
