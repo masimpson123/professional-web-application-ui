@@ -15,7 +15,6 @@ app.use(cors({
    return callback(null, true);
    }
 }));
-
 app.use(express.static("dist/client-2026/browser"));
 app.use(express.static("tensorflow/model-data"));
 app.use(express.json());
@@ -28,6 +27,10 @@ app.post('/tensorflow-get-linear-regression-predictions', async function(req, re
 });
 app.get('*default', function(req, res) {
    res.sendFile(__dirname + '/dist/client-2026/browser/index.html');
+});
+
+app.use((err, req, res, next) => {
+   res.status(500).send(err.message);
 });
 
 app.listen(8080);

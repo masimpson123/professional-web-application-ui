@@ -61,7 +61,10 @@ export class MachineLearningComponent {
         trainingData: this.trainingData
       })
     })
-      .then(trainingReportResponse => trainingReportResponse.json())
+      .then(async trainingReportResponse => {
+        if (!trainingReportResponse.ok) throw new Error(await trainingReportResponse.text());
+        return trainingReportResponse.json();
+      })
       .then(trainingReport => {
         this.trainingReport = trainingReport
         tfvis.show.history(
@@ -73,7 +76,7 @@ export class MachineLearningComponent {
           ['loss', 'mse'])
       })
       .catch(err => {
-        alert(err)
+        alert(err.message)
       });
   }
   getLinearRegressionPredictions() {
