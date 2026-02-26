@@ -76,7 +76,7 @@ export class MachineLearningComponent {
           ['loss', 'mse'])
       })
       .catch(err => {
-        alert(err.message)
+        alert(err.message);
       });
   }
   getLinearRegressionPredictions() {
@@ -89,7 +89,10 @@ export class MachineLearningComponent {
         trainingData: this.trainingData
       })
     })
-      .then(predictionsResponse => predictionsResponse.json())
+      .then(async predictionsResponse => {
+        if (!predictionsResponse.ok) throw new Error(await predictionsResponse.text());
+        return predictionsResponse.json();
+      })
       .then(predictions => {
         this.renderScatterPlot(
           this.trainingData,
@@ -97,7 +100,7 @@ export class MachineLearningComponent {
         );
       })
       .catch(err => {
-        alert(err)
+        alert(err.message);
       });
   }
 }

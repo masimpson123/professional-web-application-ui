@@ -58,6 +58,7 @@ async function trainModel(trainingData) {
 }
 
 async function getLinearRegressionPredictions(trainingData) {
+  if (!trainingData.length) throw new Error('No training data!');
   const model = await tf.loadLayersModel(`file://${__dirname}/model-data/model.json`);
   const {inputMax, inputMin, labelMin, labelMax} = getTensors(trainingData);
   const [xValues, predictedValues] = tf.tidy(() => {
