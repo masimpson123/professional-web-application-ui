@@ -64,7 +64,7 @@ async function trainModel(sessionId, trainingData) {
   });
 
   const batchSize = 32;
-  const epochs = 50;
+  const epochs = 100;
 
   const trainingReport = await model.fit(inputs, labels, {
     batchSize,
