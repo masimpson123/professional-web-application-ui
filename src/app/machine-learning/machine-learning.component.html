@@ -1,8 +1,9 @@
 <p>Your session id is {{ sessionId }}.</p>
-<button (click)="saveModelDataForSession()">Save model data with session id</button><br />
-<button (click)="getRenderModelDataForSession()">Get and render model data</button><br />
+<button (click)="saveModelDataForSession()">Initialize and save model with session id</button><br />
+<button (click)="getRenderModelDataForSession()">Get and render model</button><br />
 <button (click)="getRenderTrainingData()">Get and render training data</button><br />
-<button (click)="trainModelRenderTrainingReport()">Train model and render training report</button><br />
+<button (click)="trainModelRenderTrainingReport()">Train model with training data and render training report</button><br />
+<button (click)="getLinearRegressionPredictions()">Get and render linear regression predictions</button><br />
 @if (modelData) {
     <br />
     <hr />
@@ -21,3 +22,9 @@
     <br />
 }
 <div #trainingreportgraphs style="width: 90%; margin: auto"></div>
+@if (linearRegressionPredictions) {
+    <br />
+    <hr />
+    <br />
+}
+<div #linearregressionpredictions style="width: 90%; margin: auto"></div>

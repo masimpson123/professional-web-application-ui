@@ -24,7 +24,7 @@ async function saveModel(keyword) {
   return {message: "The model data was saved successfully."};
 }
 
-async function getTensors(data) {
+function getTensors(data) {
   if (!data) return {message: "no training data. no tensors."}
   return tf.tidy(() => {
     tf.util.shuffle(data);
@@ -53,7 +53,8 @@ async function getTensors(data) {
 }
 
 async function trainModel(sessionId, trainingData) {
-  const model = await tf.loadLayersModel(`file://${__dirname}/model-data/${sessionId}/model.json`);
+  const path = `file://${__dirname}/model-data/${sessionId}`;
+  const model = await tf.loadLayersModel(path + '/model.json');
   const {inputs, labels} = await getTensors(trainingData);
 
   model.compile({
@@ -65,16 +66,44 @@ async function trainModel(sessionId, trainingData) {
   const batchSize = 32;
   const epochs = 50;
 
-  return await model.fit(inputs, labels, {
+  const trainingReport = await model.fit(inputs, labels, {
     batchSize,
     epochs,
     shuffle: true
   });
+
+  model.save(path);
+
+  return trainingReport;
+}
+
+async function getLinearRegressionPredictions(sessionId, trainingData) {
+  const model = await tf.loadLayersModel(`file://${__dirname}/model-data/${sessionId}/model.json`);
+  const {inputMax, inputMin, labelMin, labelMax} = getTensors(trainingData);
+  const [xValues, predictedValues] = tf.tidy(() => {
+    const normalizedXValues = tf.linspace(0, 1, 100);
+    const predictions = model.predict(normalizedXValues.reshape([100, 1]));
+    const denormalizedXValues = normalizedXValues
+      .mul(inputMax.sub(inputMin))
+      .add(inputMin);
+    const denormalizedPredictedValues = predictions
+      .mul(labelMax.sub(labelMin))
+      .add(labelMin);
+    return [denormalizedXValues.dataSync(), denormalizedPredictedValues.dataSync()];
+  });
+  const predictedPoints = Array.from(xValues).map((val, i) => {
+    return {x: val, y: predictedValues[i]}
+  });
+  const originalPoints = trainingData.map(d => ({
+    x: d.horsepower, y: d.mpg,
+  }));
+  return {originalPoints, predictedPoints};
 }
 
 module.exports = {
   getTrainingData,
   saveModel,
   getTensors,
-  trainModel
+  trainModel,
+  getLinearRegressionPredictions
 };

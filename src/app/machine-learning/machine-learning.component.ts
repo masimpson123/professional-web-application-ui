@@ -12,6 +12,7 @@ export class MachineLearningComponent {
   @ViewChild('modeltable') modelTable!: ElementRef<HTMLInputElement>;
   @ViewChild('trainingdatagraph') trainingDataGraph!: ElementRef<HTMLInputElement>;
   @ViewChild('trainingreportgraphs') trainingReportGraphs!: ElementRef<HTMLInputElement>;
+  @ViewChild('linearregressionpredictions') linearRegressionPredictions!: ElementRef<HTMLInputElement>;
   sessionId = crypto.randomUUID();
   modelData = null;
   trainingData = null;
@@ -94,6 +95,38 @@ export class MachineLearningComponent {
           },
           trainingReport,
           ['loss', 'mse'])
+      })
+      .catch(err => {
+        alert(err)
+      });
+  }
+  getLinearRegressionPredictions() {
+    fetch(this.apiUrl + 'tensorflow-get-linear-regression-predictions', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        sessionId: this.sessionId,
+        trainingData: this.trainingData
+      })
+    })
+      .then(testResultResponse => testResultResponse.json())
+      .then(testResult => {
+        tfvis.render.scatterplot(
+          {
+            name: 'Model Predictions vs Original Data',
+            drawArea: this.linearRegressionPredictions.nativeElement
+          },
+          {
+            values: [testResult.originalPoints, testResult.predictedPoints],
+            series: ['original', 'predicted']},
+          {
+            xLabel: 'Horsepower',
+            yLabel: 'MPG',
+            height: 300
+          }
+        );
       })
       .catch(err => {
         alert(err)
