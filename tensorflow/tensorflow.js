@@ -1,16 +1,5 @@
 const tf = require('@tensorflow/tfjs-node');
 
-async function getTrainingData() {
-  const carsDataResponse = await fetch('https://storage.googleapis.com/tfjs-tutorials/carsData.json');
-  const carsData = await carsDataResponse.json();
-  const cleaned = carsData.map(car => ({
-    mpg: car.Miles_per_Gallon,
-    horsepower: car.Horsepower,
-  }))
-  .filter(car => (car.mpg != null && car.horsepower != null));
-  return cleaned;
-}
-
 async function saveModel(keyword) {
   const fs = require('fs/promises');
   const path = 'tensorflow/model-data/'+keyword;
@@ -29,8 +18,8 @@ function getTensors(data) {
   return tf.tidy(() => {
     tf.util.shuffle(data);
 
-    const inputs = data.map(d => d.horsepower)
-    const labels = data.map(d => d.mpg);
+    const inputs = data.map(datum => datum.metricOne); // x
+    const labels = data.map(datum => datum.metricTwo); // y
     const inputTensor = tf.tensor2d(inputs, [inputs.length, 1]);
     const labelTensor = tf.tensor2d(labels, [labels.length, 1]);
 
@@ -55,7 +44,7 @@ function getTensors(data) {
 async function trainModel(sessionId, trainingData) {
   const path = `file://${__dirname}/model-data/${sessionId}`;
   const model = await tf.loadLayersModel(path + '/model.json');
-  const {inputs, labels} = await getTensors(trainingData);
+  const {inputs, labels} = getTensors(trainingData);
 
   model.compile({
     optimizer: tf.train.adam(),
@@ -94,16 +83,14 @@ async function getLinearRegressionPredictions(sessionId, trainingData) {
   const predictedPoints = Array.from(xValues).map((val, i) => {
     return {x: val, y: predictedValues[i]}
   });
-  const originalPoints = trainingData.map(d => ({
-    x: d.horsepower, y: d.mpg,
+  const originalPoints = trainingData.map(datum => ({
+    x: datum.metricOne, y: datum.metricTwo,
   }));
   return {originalPoints, predictedPoints};
 }
 
 module.exports = {
-  getTrainingData,
   saveModel,
-  getTensors,
   trainModel,
   getLinearRegressionPredictions
 };
