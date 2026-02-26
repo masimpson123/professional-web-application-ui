@@ -30,8 +30,9 @@ function getTensors(data) {
 
 async function trainModel(trainingData) {
   const model = tf.sequential();
-  model.add(tf.layers.dense({inputShape: [1], units: 1, useBias: true}));
-  model.add(tf.layers.dense({units: 1, useBias: true}));
+  model.add(tf.layers.dense({inputShape: [1], units: 1, useBias: true})); // input
+  model.add(tf.layers.dense({units: 50, activation: 'relu'})); // hidden
+  model.add(tf.layers.dense({units: 1, useBias: true})); // output
 
   const {inputs, labels} = getTensors(trainingData);
 
