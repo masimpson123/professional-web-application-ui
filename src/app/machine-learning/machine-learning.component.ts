@@ -18,12 +18,13 @@ export class MachineLearningComponent {
   apiUrl = 'http://localhost:8080/';
   // apiUrl = 'https://msio-u7qjhl7iia-uc.a.run.app/';
   generateRenderTrainingData() {
+    const positiveDirection = Math.random() > .5;
     this.trainingData =
       new Array(100)
         .fill(0)
         .map((_, index) => ({
           input: index + (((30 - index) * Math.max(.4, Math.random()))),
-          label: (index ** 2) + (2000 * Math.random())
+          label: ((positiveDirection ? (100 - index) : index) ** 2) + (2000 * Math.random())
         }));
     this.renderScatterPlot(this.trainingData, []);
   }
