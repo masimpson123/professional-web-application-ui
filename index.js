@@ -21,10 +21,10 @@ app.use(express.static("tensorflow/model-data"));
 app.use(express.json());
 
 app.post('/tensorflow-train-model', async function(req, res) {
-   res.send(await tensorflow.trainModel(req.body.sessionId, req.body.trainingData));
+   res.send(await tensorflow.trainModel(req.body.trainingData));
 });
 app.post('/tensorflow-get-linear-regression-predictions', async function(req, res) {
-   res.send(await tensorflow.getLinearRegressionPredictions(req.body.sessionId, req.body.trainingData));
+   res.send(await tensorflow.getLinearRegressionPredictions(req.body.trainingData));
 });
 app.get('*default', function(req, res) {
    res.sendFile(__dirname + '/dist/client-2026/browser/index.html');

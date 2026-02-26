@@ -12,7 +12,7 @@ export class MachineLearningComponent {
   @ViewChild('linearregressiongraph') linearRegressionGraph!: ElementRef<HTMLInputElement>;
   @ViewChild('trainingreportgraphs') trainingReportGraphs!: ElementRef<HTMLInputElement>;
   modelData = null;
-  trainingData: {metricOne: number, metricTwo: number}[]|null = null;
+  trainingData: LinearRegressionPoint[] = [];
   trainingReport = null;
   linearRegressionPredictions = null;
   apiUrl = 'http://localhost:8080/';
@@ -22,23 +22,31 @@ export class MachineLearningComponent {
       new Array(100)
         .fill(0)
         .map((_, index) => ({
-          metricOne: index + (((30 - index) * Math.max(.4, Math.random()))),
-          metricTwo: (index ** 2) + (2000 * Math.random())
+          input: index + (((30 - index) * Math.max(.4, Math.random()))),
+          label: (index ** 2) + (2000 * Math.random())
         }));
+    this.renderScatterPlot(this.trainingData, []);
+  }
+  renderScatterPlot(
+    trainingData: LinearRegressionPoint[],
+    predictions: LinearRegressionPoint[]
+  ) {
     tfvis.render.scatterplot(
       {
-        name: 'metic one v metric two',
+        name: 'Model Predictions vs Original Data',
         drawArea: this.linearRegressionGraph.nativeElement
       },
       {
-        values: this.trainingData.map(datum => ({x: datum.metricOne, y: datum.metricTwo})),
-        series: ['2026']
-      },
+        values: [
+          trainingData.map(datum => ({x: datum.input, y: datum.label})),
+          predictions.map(datum => ({x: datum.input, y: datum.label}))
+        ],
+        series: ['traning data', 'predictions']},
       {
-        xLabel: 'metric one',
-        yLabel: 'metric two',
+        xLabel: 'inputs',
+        yLabel: 'labels',
         height: 300,
-        seriesColors: ['green'],
+        seriesColors: ['red', 'grey']
       }
     );
   }
@@ -77,25 +85,20 @@ export class MachineLearningComponent {
         trainingData: this.trainingData
       })
     })
-      .then(testResultResponse => testResultResponse.json())
-      .then(testResult => {
-        tfvis.render.scatterplot(
-          {
-            name: 'Model Predictions vs Original Data',
-            drawArea: this.linearRegressionGraph.nativeElement
-          },
-          {
-            values: [testResult.originalPoints, testResult.predictedPoints],
-            series: ['original', 'predicted']},
-          {
-        xLabel: 'metric one',
-        yLabel: 'metric two',
-            height: 300
-          }
+      .then(predictionsResponse => predictionsResponse.json())
+      .then(predictions => {
+        this.renderScatterPlot(
+          this.trainingData,
+          predictions
         );
       })
       .catch(err => {
         alert(err)
       });
   }
+}
+
+interface LinearRegressionPoint {
+  input: number;
+  label: number;
 }

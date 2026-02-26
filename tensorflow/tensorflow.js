@@ -5,8 +5,8 @@ function getTensors(data) {
   return tf.tidy(() => {
     tf.util.shuffle(data);
 
-    const inputs = data.map(datum => datum.metricOne); // x
-    const labels = data.map(datum => datum.metricTwo); // y
+    const inputs = data.map(datum => datum.input); // x
+    const labels = data.map(datum => datum.label); // y
     const inputTensor = tf.tensor2d(inputs, [inputs.length, 1]);
     const labelTensor = tf.tensor2d(labels, [labels.length, 1]);
 
@@ -70,12 +70,9 @@ async function getLinearRegressionPredictions(trainingData) {
     return [denormalizedXValues.dataSync(), denormalizedPredictedValues.dataSync()];
   });
   const predictedPoints = Array.from(xValues).map((val, i) => {
-    return {x: val, y: predictedValues[i]}
+    return {input: val, label: predictedValues[i]}
   });
-  const originalPoints = trainingData.map(datum => ({
-    x: datum.metricOne, y: datum.metricTwo,
-  }));
-  return {originalPoints, predictedPoints};
+  return predictedPoints;
 }
 
 module.exports = {
