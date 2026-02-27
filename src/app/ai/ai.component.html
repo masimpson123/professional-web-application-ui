@@ -1,12 +1,12 @@
 @for (message of conversation; track message; let i = $index) {
-  <div>
+  <p>
     @if (i%2===1) {
       <b class="chat-message">{{message}}</b>
     }
     @if (i%2===0) {
       <code class="chat-message">{{message}}</code>
     }
-  </div>
+  </p>
 }
 
 @if (thinking) {
