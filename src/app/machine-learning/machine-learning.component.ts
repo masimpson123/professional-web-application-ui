@@ -15,8 +15,8 @@ export class MachineLearningComponent {
   trainingData: LinearRegressionPoint[] = [];
   trainingReport = null;
   linearRegressionPredictions = null;
-  apiUrl = 'http://localhost:8080/';
-  // apiUrl = 'https://msio-u7qjhl7iia-uc.a.run.app/';
+  // apiUrl = 'http://localhost:8080/';
+  apiUrl = 'https://msio-u7qjhl7iia-uc.a.run.app/';
   generateRenderTrainingData() {
     const positiveDirection = Math.random() > .5;
     this.trainingData =
@@ -73,7 +73,7 @@ export class MachineLearningComponent {
             drawArea: this.trainingReportGraphs.nativeElement
           },
           trainingReport,
-          ['loss', 'mse'])
+          ['loss'])
       })
       .catch(err => {
         alert(err.message);
