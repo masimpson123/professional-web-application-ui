@@ -25,7 +25,7 @@ export class MachineLearningComponent {
         .fill(0)
         .map((_, index) => ({
           input: index + (((30 - index) * Math.max(.4, Math.random()))),
-          label: ((positiveDirection ? (100 - index) : index) ** 2) + (2000 * Math.random())
+          label: (((positiveDirection ? (100 - index) : index) ** 2) + (2000 * Math.random())) / 100
         }));
     this.renderScatterPlot(this.trainingData, []);
   }
