@@ -4,12 +4,11 @@ import { DataStreamComponent } from '../data-stream/data-stream.component';
 
 import { resumebase64 } from './resumebase64';
 import { AuthComponent } from '../auth/auth.component';
-import { WebsocketComponent } from '../websocket/websocket.component';
 import { MachineLearningComponent } from '../machine-learning/machine-learning.component';
 
 @Component({
   selector: 'app-ai',
-  imports: [CubeComponent, DataStreamComponent, AuthComponent, WebsocketComponent, MachineLearningComponent],
+  imports: [CubeComponent, DataStreamComponent, AuthComponent, MachineLearningComponent],
   templateUrl: './ai.component.html',
   styleUrl: './ai.component.css',
   standalone: true
@@ -112,14 +111,10 @@ export class AiComponent {
       It provides claims to users for granular access control in the connected Java service.
       It depends on Google Cloud and Firebase
 
-      The fourth project is the web socket project.
-      Its keyword is socket.
-      It is an exploration of the TCP protocol which is used to build the HTTP protocol.
-      It demonstrates how data can be shared statefully in real time.
-
-      The fift project is the machine learning project.
+      The fourth project is the machine learning project.
       Its keyword is machine-learning.
-      It uses tensor flow.
-      It uses supervised learning to train a model
+      It uses tensorflow.
+      It trains a model.
+      It provides linear regression forecasting.
     `;
 }

@@ -3,5 +3,5 @@
 <input type="email" placeholder="email" [field]="loginForm.email" /> <br>
 <input type="password" placeholder="password" [field]="loginForm.password" /> <br>
 <button (click)="randomlyGeneratePassword()">Randomly generate a password</button> <br>
-email signal value: {{ loginForm.email().value() }} <br>
-password signal value: {{ loginForm.password().value() }} <br>
+<p>email signal value: {{ loginForm.email().value() }}</p>
+<p>password signal value: {{ loginForm.password().value() }}</p>
