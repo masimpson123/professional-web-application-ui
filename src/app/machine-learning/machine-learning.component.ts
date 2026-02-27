@@ -12,6 +12,7 @@ export class MachineLearningComponent {
   @ViewChild('linearregressiongraph') linearRegressionGraph!: ElementRef<HTMLInputElement>;
   @ViewChild('trainingreportgraphs') trainingReportGraphs!: ElementRef<HTMLInputElement>;
   modelData = null;
+  training = false;
   trainingData: LinearRegressionPoint[] = [];
   trainingReport = null;
   linearRegressionPredictions = null;
@@ -52,6 +53,9 @@ export class MachineLearningComponent {
     );
   }
   trainModelRenderTrainingReport() {
+    this.trainingReport = null;
+    this.trainingReportGraphs.nativeElement.innerHTML = '';
+    this.training = true;
     fetch(this.apiUrl + 'tensorflow-train-model', {
       method: 'POST',
       headers: {
@@ -66,6 +70,7 @@ export class MachineLearningComponent {
         return trainingReportResponse.json();
       })
       .then(trainingReport => {
+        this.training = false;
         this.trainingReport = trainingReport
         tfvis.show.history(
           {
@@ -76,6 +81,7 @@ export class MachineLearningComponent {
           ['loss'])
       })
       .catch(err => {
+        this.training = false;
         alert(err.message);
       });
   }

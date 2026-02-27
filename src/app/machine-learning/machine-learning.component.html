@@ -7,9 +7,12 @@
     <br />
 }
 <div #linearregressiongraph style="width: 90%; margin: auto"></div>
-@if (trainingReport) {
+@if (trainingReport || training) {
     <br />
     <hr />
     <br />
+}
+@if (training) {
+  <i class="training-message">Training...</i>
 }
 <div #trainingreportgraphs style="width: 90%; margin: auto"></div>
