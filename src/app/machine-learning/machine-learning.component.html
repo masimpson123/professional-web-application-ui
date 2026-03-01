@@ -3,6 +3,7 @@
 <button (click)="generateRenderTrainingData()">Generate and render training data</button><br />
 <button (click)="trainModelRenderTrainingReport()">Train model with training data and render training report</button><br />
 <button (click)="getLinearRegressionPredictions()">Get and render linear regression predictions</button><br />
+<button (click)="getRenderModelConfiguration()">Get and render model configuration</button><br />
 @if (trainingData.length) {
     <br />
     <hr />
@@ -18,3 +19,9 @@
   <i class="training-message">Training...</i>
 }
 <div #trainingreportgraphs style="width: 90%; margin: auto"></div>
+@if (modelConfiguration) {
+    <br />
+    <hr />
+    <br />
+}
+<div #modeltable style="width: 90%; margin: auto"></div>

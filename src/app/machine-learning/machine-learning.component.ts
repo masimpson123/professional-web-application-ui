@@ -1,5 +1,6 @@
 import { Component, ViewChild, ElementRef } from '@angular/core';
 import * as tfvis from '@tensorflow/tfjs-vis';
+import * as tf from '@tensorflow/tfjs';
 
 @Component({
   selector: 'app-machine-learning',
@@ -16,16 +17,27 @@ export class MachineLearningComponent {
   trainingData: LinearRegressionPoint[] = [];
   trainingReport = null;
   linearRegressionPredictions = null;
-  // apiUrl = 'http://localhost:8080/';
-  apiUrl = 'https://msio-u7qjhl7iia-uc.a.run.app/';
+  modelConfiguration = null;
+  apiUrl = 'http://localhost:8080/';
+  // apiUrl = 'https://msio-u7qjhl7iia-uc.a.run.app/';
+    getRenderModelConfiguration() {
+      tf.loadLayersModel(this.apiUrl + 'tensorflow-get-model/model.json')
+        .then(modelConfiguration => {
+          this.modelConfiguration = modelConfiguration as any;
+          const surface = {
+            drawArea: this.modelTable.nativeElement
+          };
+          tfvis.show.modelSummary(surface, modelConfiguration);
+        });
+  }
   generateRenderTrainingData() {
     const positiveDirection = Math.random() > .5;
     this.trainingData =
       new Array(100)
         .fill(0)
         .map((_, index) => ({
-          input: index + (((30 - index) * Math.max(.4, Math.random()))),
-          label: (((positiveDirection ? (100 - index) : index) ** 2) + (2000 * Math.random())) / 100
+          input: index + (((30 - index) * Math.max(.4, Math.random()))), // x
+          label: (((positiveDirection ? (100 - index) : index) ** 2) + (2000 * Math.random())) / 100 // y
         }));
     this.renderScatterPlot(this.trainingData, []);
   }

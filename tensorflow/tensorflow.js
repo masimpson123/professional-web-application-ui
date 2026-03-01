@@ -32,7 +32,9 @@ async function trainModel(trainingData) {
   if (!trainingData.length) throw new Error('No training data!');
   const model = tf.sequential();
   model.add(tf.layers.dense({inputShape: [1], units: 1, useBias: true})); // input
-  model.add(tf.layers.dense({units: 50, activation: 'relu'})); // hidden with Rectified Linear Unit (ReLU) activation
+  model.add(tf.layers.dense({units: 32, activation: 'relu'})); // hidden with Rectified Linear Unit (ReLU) activation
+  model.add(tf.layers.dense({units: 32, activation: 'relu'}));
+  model.add(tf.layers.dense({units: 32, activation: 'relu'}));
   model.add(tf.layers.dense({units: 1, useBias: true})); // output
 
   const {inputs, labels} = getTensors(trainingData);
@@ -43,12 +45,10 @@ async function trainModel(trainingData) {
     metrics: ['mse'],
   });
 
-  const batchSize = Math.round(trainingData.length / 5);
-  const epochs = 100;
-
+  // train the model so that it "fits" the data
   const trainingReport = await model.fit(inputs, labels, {
-    batchSize,
-    epochs,
+    batchSize: Math.round(trainingData.length / 5),
+    epochs: 100,
     shuffle: true
   });
 
