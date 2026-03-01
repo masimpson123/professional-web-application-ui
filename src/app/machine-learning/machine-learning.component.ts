@@ -14,7 +14,7 @@ export class MachineLearningComponent {
   @ViewChild('trainingreportgraphs') trainingReportGraphs!: ElementRef<HTMLInputElement>;
   modelData = null;
   training = false;
-  trainingData: LinearRegressionPoint[] = [];
+  trainingData: LinearRegressionPoint[][] = [];
   trainingReport = null;
   linearRegressionPredictions = null;
   modelConfiguration = null;
@@ -32,18 +32,18 @@ export class MachineLearningComponent {
   }
   generateRenderTrainingData() {
     const positiveDirection = Math.random() > .5;
-    this.trainingData =
+    this.trainingData.push(
       new Array(100)
         .fill(0)
         .map((_, index) => ({
           input: index + (((30 - index) * Math.max(.4, Math.random()))), // x
           label: (((positiveDirection ? (100 - index) : index) ** 2) + (2000 * Math.random())) / 100 // y
-        }));
-    this.renderScatterPlot(this.trainingData, []);
+        })));
+    this.renderScatterPlot([...this.trainingData], ['red']);
   }
   renderScatterPlot(
-    trainingData: LinearRegressionPoint[],
-    predictions: LinearRegressionPoint[]
+    data: LinearRegressionPoint[][],
+    seriesColors: string[]
   ) {
     tfvis.render.scatterplot(
       {
@@ -51,16 +51,16 @@ export class MachineLearningComponent {
         drawArea: this.linearRegressionGraph.nativeElement
       },
       {
-        values: [
-          trainingData.map(datum => ({x: datum.input, y: datum.label})),
-          predictions.map(datum => ({x: datum.input, y: datum.label}))
-        ],
-        series: ['traning data', 'predictions']},
+        values: data.map(
+          series => series.map(
+            series => ({x: series.input, y: series.label}))),
+        series: ['traning data', 'predictions']
+      },
       {
         xLabel: 'inputs',
         yLabel: 'labels',
         height: 300,
-        seriesColors: ['red', 'grey']
+        seriesColors
       }
     );
   }
@@ -112,10 +112,11 @@ export class MachineLearningComponent {
         return predictionsResponse.json();
       })
       .then(predictions => {
-        this.renderScatterPlot(
-          this.trainingData,
+        this.renderScatterPlot([
+          ...this.trainingData,
           predictions
-        );
+        ],
+        ['red', 'grey']);
       })
       .catch(err => {
         alert(err.message);

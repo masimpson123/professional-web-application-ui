@@ -1,7 +1,7 @@
 const tf = require('@tensorflow/tfjs-node');
 
 function getTensors(data) {
-  if (!data) return {message: "no training data. no tensors."}
+  if (!data) throw new Error('No training data!');
   return tf.tidy(() => {
     tf.util.shuffle(data);
 
@@ -37,7 +37,8 @@ async function trainModel(trainingData) {
   model.add(tf.layers.dense({units: 32, activation: 'relu'}));
   model.add(tf.layers.dense({units: 1, useBias: true})); // output
 
-  const {inputs, labels} = getTensors(trainingData);
+  const currentSeriesOfTrainingData = trainingData.pop();
+  const {inputs, labels} = getTensors(currentSeriesOfTrainingData);
 
   model.compile({
     optimizer: tf.train.adam(),
@@ -47,7 +48,7 @@ async function trainModel(trainingData) {
 
   // train the model so that it "fits" the data
   const trainingReport = await model.fit(inputs, labels, {
-    batchSize: Math.round(trainingData.length / 5),
+    batchSize: Math.round(currentSeriesOfTrainingData.length / 5),
     epochs: 100,
     shuffle: true
   });
@@ -60,7 +61,8 @@ async function trainModel(trainingData) {
 async function getLinearRegressionPredictions(trainingData) {
   if (!trainingData.length) throw new Error('No training data!');
   const model = await tf.loadLayersModel(`file://${__dirname}/model-data/model.json`);
-  const {inputMax, inputMin, labelMin, labelMax} = getTensors(trainingData);
+  const currentSeriesOfTrainingData = trainingData.pop();
+  const {inputMax, inputMin, labelMin, labelMax} = getTensors(currentSeriesOfTrainingData);
   const [xValues, predictedValues] = tf.tidy(() => {
     const normalizedXValues = tf.linspace(0, 1, 100);
     const predictions = model.predict(normalizedXValues.reshape([100, 1]));
