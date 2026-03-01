@@ -18,8 +18,8 @@ export class MachineLearningComponent {
   trainingReport = null;
   linearRegressionPredictions = null;
   modelConfiguration = null;
-  apiUrl = 'http://localhost:8080/';
-  // apiUrl = 'https://msio-u7qjhl7iia-uc.a.run.app/';
+  // apiUrl = 'http://localhost:8080/';
+  apiUrl = 'https://msio-u7qjhl7iia-uc.a.run.app/';
     getRenderModelConfiguration() {
       tf.loadLayersModel(this.apiUrl + 'tensorflow-get-model/model.json')
         .then(modelConfiguration => {
