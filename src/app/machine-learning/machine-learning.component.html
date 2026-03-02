@@ -1,32 +1,38 @@
 <p>This machine learning study was developed with Express, Node.js, JavaScript, Angular, TypeScript, and Tensorflow.</p>
 <br />
 <button (click)="generateRenderUnivariateTrainingData()">Generate and render univariate training data</button><br />
-<button [disabled]="!univariateData" (click)="trainModelRenderTrainingReport()">Train sequential model with univariate training data and render training report</button><br />
-<button [disabled]="trainingRequired" (click)="getLinearRegressionPredictions()">Get and render univariate linear regression predictions</button><br />
+<button [disabled]="!univariateData" (click)="trainUnivariateModelRenderTrainingReport()">Train sequential model with univariate training data and render training report</button><br />
+<button [disabled]="univariateTrainingRequired" (click)="getLinearRegressionPredictions()">Get and render univariate linear regression predictions</button><br />
 <button (click)="getRenderUnivariateModelConfiguration()">Get and render univariate model configuration</button><br />
 @if (univariateData) {
     <br />
     <hr />
     <br />
 }
-<div #linearregressiongraph style="width: 90%; margin: auto"></div>
-@if (trainingReport || training) {
+<div #univariatelinearregressiongraph style="width: 90%; margin: auto"></div>
+@if (univariateTrainingReport || univariateModelIsTraining) {
     <br />
     <hr />
     <br />
 }
-@if (training) {
+@if (univariateModelIsTraining) {
   <i class="training-message">Training...</i>
 }
-<div #trainingreportgraphs style="width: 90%; margin: auto"></div>
-@if (modelConfiguration) {
+<div #univariatetrainingreport style="width: 90%; margin: auto"></div>
+@if (univariateModelConfiguration) {
     <br />
     <hr />
     <br />
 }
-<div #modeltable style="width: 90%; margin: auto"></div>
+<div #univariatemodeltable style="width: 90%; margin: auto"></div>
 <br />
 <hr />
 <br />
 <button (click)="getRenderMultivariateTrainingData()">Get and render multivariate training data</button><br />
+<button [disabled]="!multivariateData" (click)="trainMultivariateModelRenderTrainingReport()">Train sequential model with univariate training data and render training report</button><br />
+@if (multivariateData) {
+    <br />
+    <hr />
+    <br />
+}
 <div #multivariatedatatable style="width: 90%; margin: auto"></div>
