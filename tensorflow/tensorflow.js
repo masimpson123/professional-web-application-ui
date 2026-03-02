@@ -28,7 +28,7 @@ function getTensors(data) {
   });
 }
 
-async function trainModel(trainingData) {
+async function trainUnivariateModel(trainingData) {
   if (!trainingData) throw new Error('No training data!');
   const model = tf.sequential();
   model.add(tf.layers.dense({inputShape: [1], units: 1, useBias: true})); // input
@@ -58,7 +58,7 @@ async function trainModel(trainingData) {
   return trainingReport;
 }
 
-async function getLinearRegressionPredictions(trainingData) {
+async function getUnivariateLinearRegressionPredictions(trainingData) {
   if (!trainingData) throw new Error('No training data!');
   const model = await tf.loadLayersModel(`file://${__dirname}/model-data/model.json`);
   const {inputMax, inputMin, labelMin, labelMax} = getTensors(trainingData);
@@ -79,7 +79,14 @@ async function getLinearRegressionPredictions(trainingData) {
   return predictedPoints;
 }
 
+async function trainMultivariateModel(trainingData) {
+  if (!trainingData) throw new Error('No training data!');
+  console.log(trainingData);
+  return trainingData;
+}
+
 module.exports = {
-  trainModel,
-  getLinearRegressionPredictions
+  trainUnivariateModel,
+  getUnivariateLinearRegressionPredictions,
+  trainMultivariateModel,
 };

@@ -6,8 +6,8 @@ const iceCreamData = require('./tensorflow/ice-cream-data');
 
 app.use(cors({
    origin: function (origin, callback) {
-   // const allowedOrigins = ['http://localhost:4200'];
-   const allowedOrigins = ['https://msio-u7qjhl7iia-uc.a.run.app'];
+   const allowedOrigins = ['http://localhost:4200'];
+   // const allowedOrigins = ['https://msio-u7qjhl7iia-uc.a.run.app'];
    if (!origin) return callback(null, true);
    if (allowedOrigins.indexOf(origin) === -1) {
       const msg = 'The CORS policy for this site does not allow access from the specified Origin.';
@@ -31,6 +31,9 @@ app.get('/tensorflow-get-univariate-model-configuration/:file', async function(r
 });
 app.get('/tensorflow-get-multivariate-data', async function(req, res) {
    res.send(iceCreamData.iceCreamData);
+});
+app.post('/tensorflow-train-multivariate-model', async function(req, res) {
+   res.send(await tensorflow.trainMultivariateModel(req.body.trainingData));
 });
 app.get('*default', function(req, res) {
    res.sendFile(__dirname + '/dist/client-2026/browser/index.html');

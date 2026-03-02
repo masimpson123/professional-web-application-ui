@@ -9,12 +9,13 @@ import * as tf from '@tensorflow/tfjs';
   styleUrl: './machine-learning.component.css',
 })
 export class MachineLearningComponent {
-  @ViewChild('univariatelinearregressiongraph') linearRegressionGraph!: ElementRef<HTMLInputElement>;
-  @ViewChild('univariatetrainingreport') trainingReportGraphs!: ElementRef<HTMLInputElement>;
+  @ViewChild('univariatelinearregressiongraph') univariateLinearRegressionGraph!: ElementRef<HTMLInputElement>;
+  @ViewChild('univariatetrainingreport') univariateTrainingReportGraph!: ElementRef<HTMLInputElement>;
   @ViewChild('univariatemodeltable') univariateModelTable!: ElementRef<HTMLInputElement>;
   @ViewChild('multivariatedatatable') multivariateTable!: ElementRef<HTMLInputElement>;
-  // apiUrl = 'http://localhost:8080/';
-  apiUrl = 'https://msio-u7qjhl7iia-uc.a.run.app/';
+  @ViewChild('multivariatetrainingreport') multivariateTrainingReportGraph!: ElementRef<HTMLInputElement>;
+  apiUrl = 'http://localhost:8080/';
+  // apiUrl = 'https://msio-u7qjhl7iia-uc.a.run.app/';
   univariateModelData = null;
   univariateModelIsTraining = false;
   univariateData: LinearRegressionPoint[]|null = null;
@@ -23,10 +24,13 @@ export class MachineLearningComponent {
   univariateModelConfiguration = null;
   univariateTrainingRequired = true;
   multivariateData: LinearRegressionDataSet|null = null;
+  multivariateTrainingReport = null;
+  multivariateModelIsTraining = false;
+  multivariateTrainingRequired = true;
   generateRenderUnivariateTrainingData() {
     this.univariateTrainingRequired = true;
     this.univariateTrainingReport = null;
-    this.trainingReportGraphs.nativeElement.innerHTML = '';
+    this.univariateTrainingReportGraph.nativeElement.innerHTML = '';
     const positiveDirection = Math.random() > .5;
     this.univariateData =
       new Array(100)
@@ -44,7 +48,7 @@ export class MachineLearningComponent {
   }
   trainUnivariateModelRenderTrainingReport() {
     this.univariateTrainingReport = null;
-    this.trainingReportGraphs.nativeElement.innerHTML = '';
+    this.univariateTrainingReportGraph.nativeElement.innerHTML = '';
     this.univariateModelIsTraining = true;
     fetch(this.apiUrl + 'tensorflow-train-univariate-model', {
       method: 'POST',
@@ -66,7 +70,7 @@ export class MachineLearningComponent {
         tfvis.show.history(
           {
             name: 'Training report',
-            drawArea: this.trainingReportGraphs.nativeElement
+            drawArea: this.univariateTrainingReportGraph.nativeElement
           },
           trainingReport,
           ['loss'])
@@ -76,7 +80,7 @@ export class MachineLearningComponent {
         alert(err.message);
       });
   }
-  getLinearRegressionPredictions() {
+  getRenderUnivariateLinearRegressionPredictions() {
     fetch(this.apiUrl + 'tensorflow-get-univariate-linear-regression-predictions', {
       method: 'POST',
       headers: {
@@ -113,31 +117,6 @@ export class MachineLearningComponent {
         tfvis.show.modelSummary(surface, modelConfiguration);
       });
   }
-  renderScatterPlot(
-    trainingData: LinearRegressionPoint[],
-    predictions: LinearRegressionPoint[],
-    seriesColors: string[],
-    seriesNames: string[]
-  ) {
-    tfvis.render.scatterplot(
-      {
-        name: 'Model Predictions vs Original Data',
-        drawArea: this.linearRegressionGraph.nativeElement
-      },
-      {
-        values: [
-          trainingData.map(datum => ({x: datum.input, y: datum.label})),
-          predictions.map(datum => ({x: datum.input, y: datum.label}))
-        ],
-        series: seriesNames},
-      {
-        xLabel: 'inputs',
-        yLabel: 'labels',
-        height: 300,
-        seriesColors
-      }
-    );
-  }
   getRenderMultivariateTrainingData() {
     fetch(this.apiUrl + 'tensorflow-get-multivariate-data')
       .then(multivariateDataResponse => multivariateDataResponse.json())
@@ -158,7 +137,63 @@ export class MachineLearningComponent {
       });
   }
   trainMultivariateModelRenderTrainingReport() {
-    console.log(':)');
+    this.multivariateTrainingReport = null;
+    this.multivariateTrainingReportGraph.nativeElement.innerHTML = '';
+    this.multivariateModelIsTraining = true;
+    fetch(this.apiUrl + 'tensorflow-train-multivariate-model', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        trainingData: this.multivariateData
+      })
+    })
+      .then(async trainingReportResponse => {
+        if (!trainingReportResponse.ok) throw new Error(await trainingReportResponse.text());
+        return trainingReportResponse.json();
+      })
+      .then(trainingReport => {
+        this.multivariateTrainingRequired = false;
+        this.multivariateModelIsTraining = false;
+        this.multivariateTrainingReport = trainingReport
+        tfvis.show.history(
+          {
+            name: 'Training report',
+            drawArea: this.multivariateTrainingReportGraph.nativeElement
+          },
+          trainingReport,
+          ['loss'])
+      })
+      .catch(err => {
+        this.multivariateModelIsTraining = false;
+        alert(err.message);
+      });
+  }
+  renderScatterPlot(
+    trainingData: LinearRegressionPoint[],
+    predictions: LinearRegressionPoint[],
+    seriesColors: string[],
+    seriesNames: string[]
+  ) {
+    tfvis.render.scatterplot(
+      {
+        name: 'Model Predictions vs Original Data',
+        drawArea: this.univariateLinearRegressionGraph.nativeElement
+      },
+      {
+        values: [
+          trainingData.map(datum => ({x: datum.input, y: datum.label})),
+          predictions.map(datum => ({x: datum.input, y: datum.label}))
+        ],
+        series: seriesNames},
+      {
+        xLabel: 'inputs',
+        yLabel: 'labels',
+        height: 300,
+        seriesColors
+      }
+    );
   }
 }
 
