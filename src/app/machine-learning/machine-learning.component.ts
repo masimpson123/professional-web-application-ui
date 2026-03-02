@@ -14,7 +14,7 @@ export class MachineLearningComponent {
   @ViewChild('trainingreportgraphs') trainingReportGraphs!: ElementRef<HTMLInputElement>;
   modelData = null;
   training = false;
-  trainingData: LinearRegressionPoint[][] = [];
+  trainingData: LinearRegressionPoint[] = [];
   trainingReport = null;
   linearRegressionPredictions = null;
   modelConfiguration = null;
@@ -30,20 +30,27 @@ export class MachineLearningComponent {
           tfvis.show.modelSummary(surface, modelConfiguration);
         });
   }
-  generateRenderTrainingData() {
+  generateRender2dTrainingData() {
     const positiveDirection = Math.random() > .5;
-    this.trainingData.push(
+    this.trainingData =
       new Array(100)
         .fill(0)
         .map((_, index) => ({
           input: index + (((30 - index) * Math.max(.4, Math.random()))), // x
           label: (((positiveDirection ? (100 - index) : index) ** 2) + (2000 * Math.random())) / 100 // y
-        })));
-    this.renderScatterPlot([...this.trainingData], ['red']);
+        }));
+    this.renderScatterPlot(
+      this.trainingData,
+      [],
+      ['orangered', 'slategrey'],
+      ['2d traning data', 'predictions']
+    );
   }
   renderScatterPlot(
-    data: LinearRegressionPoint[][],
-    seriesColors: string[]
+    trainingData: LinearRegressionPoint[],
+    predictions: LinearRegressionPoint[],
+    seriesColors: string[],
+    seriesNames: string[]
   ) {
     tfvis.render.scatterplot(
       {
@@ -51,11 +58,11 @@ export class MachineLearningComponent {
         drawArea: this.linearRegressionGraph.nativeElement
       },
       {
-        values: data.map(
-          series => series.map(
-            series => ({x: series.input, y: series.label}))),
-        series: ['traning data', 'predictions']
-      },
+        values: [
+          trainingData.map(datum => ({x: datum.input, y: datum.label})),
+          predictions.map(datum => ({x: datum.input, y: datum.label}))
+        ],
+        series: seriesNames},
       {
         xLabel: 'inputs',
         yLabel: 'labels',
@@ -112,11 +119,12 @@ export class MachineLearningComponent {
         return predictionsResponse.json();
       })
       .then(predictions => {
-        this.renderScatterPlot([
-          ...this.trainingData,
-          predictions
-        ],
-        ['red', 'grey']);
+        this.renderScatterPlot(
+          this.trainingData,
+          predictions,
+          ['slategrey', 'orangered'],
+          ['2d traning data', 'predictions']
+        );
       })
       .catch(err => {
         alert(err.message);
