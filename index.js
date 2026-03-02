@@ -21,10 +21,10 @@ app.use(express.static("tensorflow/model-data"));
 app.use(express.json());
 
 app.post('/tensorflow-train-univariate-model', async function(req, res) {
-   res.send(await tensorflow.trainModel(req.body.trainingData));
+   res.send(await tensorflow.trainUnivariateModel(req.body.trainingData));
 });
 app.post('/tensorflow-get-univariate-linear-regression-predictions', async function(req, res) {
-   res.send(await tensorflow.getLinearRegressionPredictions(req.body.trainingData));
+   res.send(await tensorflow.getUnivariateLinearRegressionPredictions(req.body.trainingData));
 });
 app.get('/tensorflow-get-univariate-model-configuration/:file', async function(req, res) {
    res.sendFile(`${__dirname}/tensorflow/model-data/univariate/${req.params.file}`);
