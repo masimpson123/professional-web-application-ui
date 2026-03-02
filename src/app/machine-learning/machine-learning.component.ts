@@ -25,6 +25,8 @@ export class MachineLearningComponent {
   apiUrl = 'https://msio-u7qjhl7iia-uc.a.run.app/';
   generateRenderUnivariateTrainingData() {
     this.trainingRequired = true;
+    this.trainingReport = null;
+    this.trainingReportGraphs.nativeElement.innerHTML = '';
     const positiveDirection = Math.random() > .5;
     this.univariateData =
       new Array(100)
