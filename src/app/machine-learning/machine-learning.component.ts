@@ -12,27 +12,21 @@ export class MachineLearningComponent {
   @ViewChild('modeltable') modelTable!: ElementRef<HTMLInputElement>;
   @ViewChild('linearregressiongraph') linearRegressionGraph!: ElementRef<HTMLInputElement>;
   @ViewChild('trainingreportgraphs') trainingReportGraphs!: ElementRef<HTMLInputElement>;
+  @ViewChild('multivariatedatatable') multivariateTable!: ElementRef<HTMLInputElement>;
   modelData = null;
   training = false;
-  trainingData: LinearRegressionPoint[] = [];
+  univariateData: LinearRegressionPoint[]|null = null;
+  multivariateData: LinearRegressionDataSet|null = null;
   trainingReport = null;
   linearRegressionPredictions = null;
   modelConfiguration = null;
+  trainingRequired = true;
   // apiUrl = 'http://localhost:8080/';
   apiUrl = 'https://msio-u7qjhl7iia-uc.a.run.app/';
-    getRenderModelConfiguration() {
-      tf.loadLayersModel(this.apiUrl + 'tensorflow-get-model/model.json')
-        .then(modelConfiguration => {
-          this.modelConfiguration = modelConfiguration as any;
-          const surface = {
-            drawArea: this.modelTable.nativeElement
-          };
-          tfvis.show.modelSummary(surface, modelConfiguration);
-        });
-  }
-  generateRender2dTrainingData() {
+  generateRenderUnivariateTrainingData() {
+    this.trainingRequired = true;
     const positiveDirection = Math.random() > .5;
-    this.trainingData =
+    this.univariateData =
       new Array(100)
         .fill(0)
         .map((_, index) => ({
@@ -40,11 +34,82 @@ export class MachineLearningComponent {
           label: (((positiveDirection ? (100 - index) : index) ** 2) + (2000 * Math.random())) / 100 // y
         }));
     this.renderScatterPlot(
-      this.trainingData,
+      this.univariateData,
       [],
       ['orangered', 'slategrey'],
       ['2d traning data', 'predictions']
     );
+  }
+  trainModelRenderTrainingReport() {
+    this.trainingReport = null;
+    this.trainingReportGraphs.nativeElement.innerHTML = '';
+    this.training = true;
+    fetch(this.apiUrl + 'tensorflow-train-model', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        trainingData: this.univariateData
+      })
+    })
+      .then(async trainingReportResponse => {
+        if (!trainingReportResponse.ok) throw new Error(await trainingReportResponse.text());
+        return trainingReportResponse.json();
+      })
+      .then(trainingReport => {
+        this.trainingRequired = false;
+        this.training = false;
+        this.trainingReport = trainingReport
+        tfvis.show.history(
+          {
+            name: 'Training report',
+            drawArea: this.trainingReportGraphs.nativeElement
+          },
+          trainingReport,
+          ['loss'])
+      })
+      .catch(err => {
+        this.training = false;
+        alert(err.message);
+      });
+  }
+  getLinearRegressionPredictions() {
+    fetch(this.apiUrl + 'tensorflow-get-linear-regression-predictions', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        trainingData: this.univariateData
+      })
+    })
+      .then(async predictionsResponse => {
+        if (!predictionsResponse.ok) throw new Error(await predictionsResponse.text());
+        return predictionsResponse.json();
+      })
+      .then(predictions => {
+        if (!this.univariateData) return;
+        this.renderScatterPlot(
+          this.univariateData,
+          predictions,
+          ['slategrey', 'orangered'],
+          ['2d traning data', 'predictions']
+        );
+      })
+      .catch(err => {
+        alert(err.message);
+      });
+  }
+  getRenderUnivariateModelConfiguration() {
+    tf.loadLayersModel(this.apiUrl + 'tensorflow-get-model/model.json')
+      .then(modelConfiguration => {
+        this.modelConfiguration = modelConfiguration as any;
+        const surface = {
+          drawArea: this.modelTable.nativeElement
+        };
+        tfvis.show.modelSummary(surface, modelConfiguration);
+      });
   }
   renderScatterPlot(
     trainingData: LinearRegressionPoint[],
@@ -71,63 +136,23 @@ export class MachineLearningComponent {
       }
     );
   }
-  trainModelRenderTrainingReport() {
-    this.trainingReport = null;
-    this.trainingReportGraphs.nativeElement.innerHTML = '';
-    this.training = true;
-    fetch(this.apiUrl + 'tensorflow-train-model', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        trainingData: this.trainingData
-      })
-    })
-      .then(async trainingReportResponse => {
-        if (!trainingReportResponse.ok) throw new Error(await trainingReportResponse.text());
-        return trainingReportResponse.json();
-      })
-      .then(trainingReport => {
-        this.training = false;
-        this.trainingReport = trainingReport
-        tfvis.show.history(
+  getRenderMultivariateTrainingData() {
+    fetch(this.apiUrl + 'tensorflow-get-multivariate-data')
+      .then(multivariateDataResponse => multivariateDataResponse.json())
+      .then(multivariateData => {
+        this.multivariateData = {
+          headers: [
+            'price', 'temperature', 'number sold'
+          ],
+          values: [
+            ...multivariateData
+          ]
+        };
+        tfvis.render.table(
           {
-            name: 'Training report',
-            drawArea: this.trainingReportGraphs.nativeElement
+            drawArea: this.multivariateTable.nativeElement
           },
-          trainingReport,
-          ['loss'])
-      })
-      .catch(err => {
-        this.training = false;
-        alert(err.message);
-      });
-  }
-  getLinearRegressionPredictions() {
-    fetch(this.apiUrl + 'tensorflow-get-linear-regression-predictions', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        trainingData: this.trainingData
-      })
-    })
-      .then(async predictionsResponse => {
-        if (!predictionsResponse.ok) throw new Error(await predictionsResponse.text());
-        return predictionsResponse.json();
-      })
-      .then(predictions => {
-        this.renderScatterPlot(
-          this.trainingData,
-          predictions,
-          ['slategrey', 'orangered'],
-          ['2d traning data', 'predictions']
-        );
-      })
-      .catch(err => {
-        alert(err.message);
+          this.multivariateData);
       });
   }
 }
@@ -135,4 +160,9 @@ export class MachineLearningComponent {
 interface LinearRegressionPoint {
   input: number;
   label: number;
+}
+
+interface LinearRegressionDataSet {
+  headers: string[],
+  values: number[][]
 }

@@ -29,7 +29,7 @@ function getTensors(data) {
 }
 
 async function trainModel(trainingData) {
-  if (!trainingData.length) throw new Error('No training data!');
+  if (!trainingData) throw new Error('No training data!');
   const model = tf.sequential();
   model.add(tf.layers.dense({inputShape: [1], units: 1, useBias: true})); // input
   model.add(tf.layers.dense({units: 32, activation: 'relu'})); // hidden with Rectified Linear Unit (ReLU) activation
@@ -59,7 +59,7 @@ async function trainModel(trainingData) {
 }
 
 async function getLinearRegressionPredictions(trainingData) {
-  if (!trainingData.length) throw new Error('No training data!');
+  if (!trainingData) throw new Error('No training data!');
   const model = await tf.loadLayersModel(`file://${__dirname}/model-data/model.json`);
   const {inputMax, inputMin, labelMin, labelMax} = getTensors(trainingData);
   const [xValues, predictedValues] = tf.tidy(() => {

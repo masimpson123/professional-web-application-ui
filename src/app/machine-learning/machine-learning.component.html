@@ -1,10 +1,10 @@
 <p>This machine learning study was developed with Express, Node.js, JavaScript, Angular, TypeScript, and Tensorflow.</p>
 <br />
-<button (click)="generateRender2dTrainingData()">Generate and render 2d training data</button><br />
-<button (click)="trainModelRenderTrainingReport()">Train model with training data and render training report</button><br />
-<button (click)="getLinearRegressionPredictions()">Get and render linear regression predictions</button><br />
-<button (click)="getRenderModelConfiguration()">Get and render model configuration</button><br />
-@if (trainingData.length) {
+<button (click)="generateRenderUnivariateTrainingData()">Generate and render univariate training data</button><br />
+<button [disabled]="!univariateData" (click)="trainModelRenderTrainingReport()">Train sequential model with univariate training data and render training report</button><br />
+<button [disabled]="trainingRequired" (click)="getLinearRegressionPredictions()">Get and render univariate linear regression predictions</button><br />
+<button (click)="getRenderUnivariateModelConfiguration()">Get and render univariate model configuration</button><br />
+@if (univariateData) {
     <br />
     <hr />
     <br />
@@ -25,3 +25,8 @@
     <br />
 }
 <div #modeltable style="width: 90%; margin: auto"></div>
+<br />
+<hr />
+<br />
+<button (click)="getRenderMultivariateTrainingData()">Get and render multivariate training data</button><br />
+<div #multivariatedatatable style="width: 90%; margin: auto"></div>

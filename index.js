@@ -2,6 +2,7 @@ var express = require('express');
 var app = express();
 const cors = require('cors');
 const tensorflow = require('./tensorflow/tensorflow');
+const iceCreamData = require('./tensorflow/ice-cream-data');
 
 app.use(cors({
    origin: function (origin, callback) {
@@ -21,6 +22,9 @@ app.use(express.json());
 
 app.get('/tensorflow-get-model/:file', async function(req, res) {
    res.sendFile(`${__dirname}/tensorflow/model-data/${req.params.file}`);
+});
+app.get('/tensorflow-get-multivariate-data', async function(req, res) {
+   res.send(iceCreamData.iceCreamData);
 });
 app.post('/tensorflow-train-model', async function(req, res) {
    res.send(await tensorflow.trainModel(req.body.trainingData));
