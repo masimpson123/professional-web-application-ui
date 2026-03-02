@@ -46,7 +46,7 @@ export class MachineLearningComponent {
     this.univariateTrainingReport = null;
     this.trainingReportGraphs.nativeElement.innerHTML = '';
     this.univariateModelIsTraining = true;
-    fetch(this.apiUrl + 'tensorflow-train-model', {
+    fetch(this.apiUrl + 'tensorflow-train-univariate-model', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -77,7 +77,7 @@ export class MachineLearningComponent {
       });
   }
   getLinearRegressionPredictions() {
-    fetch(this.apiUrl + 'tensorflow-get-linear-regression-predictions', {
+    fetch(this.apiUrl + 'tensorflow-get-univariate-linear-regression-predictions', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -104,7 +104,7 @@ export class MachineLearningComponent {
       });
   }
   getRenderUnivariateModelConfiguration() {
-    tf.loadLayersModel(this.apiUrl + 'tensorflow-get-model/model.json')
+    tf.loadLayersModel(this.apiUrl + 'tensorflow-get-univariate-model-configuration/model.json')
       .then(modelConfiguration => {
         this.univariateModelConfiguration = modelConfiguration as any;
         const surface = {

@@ -20,17 +20,17 @@ app.use(express.static("dist/client-2026/browser"));
 app.use(express.static("tensorflow/model-data"));
 app.use(express.json());
 
-app.get('/tensorflow-get-model/:file', async function(req, res) {
-   res.sendFile(`${__dirname}/tensorflow/model-data/${req.params.file}`);
+app.post('/tensorflow-train-univariate-model', async function(req, res) {
+   res.send(await tensorflow.trainModel(req.body.trainingData));
+});
+app.post('/tensorflow-get-univariate-linear-regression-predictions', async function(req, res) {
+   res.send(await tensorflow.getLinearRegressionPredictions(req.body.trainingData));
+});
+app.get('/tensorflow-get-univariate-model-configuration/:file', async function(req, res) {
+   res.sendFile(`${__dirname}/tensorflow/model-data/univariate/${req.params.file}`);
 });
 app.get('/tensorflow-get-multivariate-data', async function(req, res) {
    res.send(iceCreamData.iceCreamData);
-});
-app.post('/tensorflow-train-model', async function(req, res) {
-   res.send(await tensorflow.trainModel(req.body.trainingData));
-});
-app.post('/tensorflow-get-linear-regression-predictions', async function(req, res) {
-   res.send(await tensorflow.getLinearRegressionPredictions(req.body.trainingData));
 });
 app.get('*default', function(req, res) {
    res.sendFile(__dirname + '/dist/client-2026/browser/index.html');
