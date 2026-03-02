@@ -41,7 +41,7 @@ gcloud auth revoke
 gcloud config set account 'masimpson123@gmail.com'
 gcloud config set project 'endpoint-one'
 
-docker history --platform linux/amd64 client2026:latest
+docker history client2026:latest
 
 major.minor.patch
 ^ latest minor
