@@ -1,10 +1,12 @@
-import { Component, ViewChild, ElementRef } from '@angular/core';
+import { Component, ViewChild, ElementRef, signal } from '@angular/core';
+import { NgClass } from '@angular/common';
 import * as tfvis from '@tensorflow/tfjs-vis';
 import * as tf from '@tensorflow/tfjs';
+import { form, Field } from '@angular/forms/signals';
 
 @Component({
   selector: 'app-machine-learning',
-  imports: [],
+  imports: [NgClass, Field],
   templateUrl: './machine-learning.component.html',
   styleUrl: './machine-learning.component.css',
 })
@@ -27,6 +29,12 @@ export class MachineLearningComponent {
   multivariateTrainingReport = null;
   multivariateModelIsTraining = false;
   multivariateTrainingRequired = true;
+  revenuePredictionModel = signal<RevenueData>({
+    price: 3,
+    temperature: 80
+  });
+  revenuePredictionForm = form(this.revenuePredictionModel);
+  prediction = null;
   generateRenderUnivariateTrainingData() {
     this.univariateTrainingRequired = true;
     this.univariateTrainingReport = null;
@@ -81,6 +89,7 @@ export class MachineLearningComponent {
       });
   }
   getRenderUnivariateLinearRegressionPredictions() {
+    if (!this.univariateData) return;
     fetch(this.apiUrl + 'tensorflow-get-univariate-linear-regression-predictions', {
       method: 'POST',
       headers: {
@@ -95,9 +104,8 @@ export class MachineLearningComponent {
         return predictionsResponse.json();
       })
       .then(predictions => {
-        if (!this.univariateData) return;
         this.renderScatterPlot(
-          this.univariateData,
+          this.univariateData!,
           predictions,
           ['slategrey', 'orangered'],
           ['2d traning data', 'predictions']
@@ -195,6 +203,29 @@ export class MachineLearningComponent {
       }
     );
   }
+  predictNumberOfIceCreamConesSold() {
+    fetch(this.apiUrl + 'tensorflow-get-multivariate-linear-regression-prediction', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        trainingData: this.multivariateData,
+        price: this.revenuePredictionModel().price,
+        temperature: this.revenuePredictionModel().temperature
+      })
+    })
+      .then(async predictionResponse => {
+        if (!predictionResponse.ok) throw new Error(await predictionResponse.text());
+        return predictionResponse.json();
+      })
+      .then(prediction => {
+        this.prediction = prediction.prediction
+      })
+      .catch(err => {
+        alert(err.message);
+      });
+  }
 }
 
 interface LinearRegressionPoint {
@@ -205,4 +236,9 @@ interface LinearRegressionPoint {
 interface LinearRegressionDataSet {
   headers: string[],
   values: number[][]
+}
+
+interface RevenueData {
+  price: number;
+  temperature: number;
 }

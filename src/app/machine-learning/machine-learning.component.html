@@ -9,7 +9,7 @@
     <hr />
     <br />
 }
-<div #univariatelinearregressiongraph style="width: 90%; margin: auto"></div>
+<div #univariatelinearregressiongraph class="container"></div>
 @if (univariateTrainingReport || univariateModelIsTraining) {
     <br />
     <hr />
@@ -18,21 +18,38 @@
 @if (univariateModelIsTraining) {
   <i class="training-message">Training...</i>
 }
-<div #univariatetrainingreport style="width: 90%; margin: auto"></div>
+<div #univariatetrainingreport class="container"></div>
 @if (univariateModelConfiguration) {
     <br />
     <hr />
     <br />
 }
-<div #univariatemodeltable style="width: 90%; margin: auto"></div>
+<div #univariatemodeltable class="container"></div>
 <br />
 <hr />
 <br />
 <button (click)="getRenderMultivariateTrainingData()">Get and render multivariate training data</button><br />
-<button [disabled]="!multivariateData" (click)="trainMultivariateModelRenderTrainingReport()">Train sequential model with univariate training data and render training report</button><br />
+<button [disabled]="!multivariateData" (click)="trainMultivariateModelRenderTrainingReport()">Train functional model with multivariate training data and render training report</button><br />
+<input type="number" [field]="revenuePredictionForm.price" style="display: inline-block" />
+<input type="number" [field]="revenuePredictionForm.temperature" style="display: inline-block" />
+<button (click)="predictNumberOfIceCreamConesSold()" style="display: inline-block">
+    Predict number of cones sold for ${{revenuePredictionForm.price().value()}} when it is {{revenuePredictionForm.temperature().value()}}&deg;
+</button>
+{{prediction}}
+<br>
+
 @if (multivariateData) {
     <br />
     <hr />
     <br />
 }
-<div #multivariatedatatable style="width: 90%; margin: auto"></div>
+<div #multivariatedatatable class="container" [ngClass]="{'multivariate-data-table': multivariateData}"></div>
+@if (multivariateTrainingReport || multivariateModelIsTraining) {
+    <br />
+    <hr />
+    <br />
+}
+@if (multivariateModelIsTraining) {
+  <i class="training-message">Training...</i>
+}
+<div #multivariatetrainingreport class="container"></div>

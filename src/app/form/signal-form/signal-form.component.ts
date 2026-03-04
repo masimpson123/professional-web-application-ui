@@ -15,7 +15,6 @@ export class SignalFormComponent {
   loginForm = form(this.loginModel);
   randomlyGeneratePassword(){
     this.loginForm.password().value.set(crypto.randomUUID());
-    console.log(this.loginModel().password);
   }
 }
 

@@ -35,6 +35,12 @@ app.get('/tensorflow-get-multivariate-data', async function(req, res) {
 app.post('/tensorflow-train-multivariate-model', async function(req, res) {
    res.send(await tensorflow.trainMultivariateModel(req.body.trainingData));
 });
+app.post('/tensorflow-get-multivariate-linear-regression-prediction', async function(req, res) {
+   res.send(await tensorflow.getMultivariateLinearRegressionPrediction(
+      req.body.trainingData,
+      req.body.price, 
+      req.body.temperature));
+});
 app.get('*default', function(req, res) {
    res.sendFile(__dirname + '/dist/client-2026/browser/index.html');
 });

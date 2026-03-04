@@ -1,4 +1,15 @@
 .training-message {
     padding:5px;
-    display:block
+    display:block;
+}
+
+.container {
+    width: 90%;
+    margin: auto;
+}
+
+.multivariate-data-table {
+    border: 1px solid black;
+    height: 20vh;
+    overflow: auto;
 }
