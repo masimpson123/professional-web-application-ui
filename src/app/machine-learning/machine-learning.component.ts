@@ -203,7 +203,7 @@ export class MachineLearningComponent {
       }
     );
   }
-  predictNumberOfIceCreamConesSold() {
+  predictNumberOfUnitsSold() {
     fetch(this.apiUrl + 'tensorflow-get-multivariate-linear-regression-prediction', {
       method: 'POST',
       headers: {
