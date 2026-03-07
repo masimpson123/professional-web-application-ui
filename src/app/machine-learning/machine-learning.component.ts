@@ -2,7 +2,7 @@ import { Component, ViewChild, ElementRef, signal } from '@angular/core';
 import { NgClass, CurrencyPipe } from '@angular/common';
 import * as tfvis from '@tensorflow/tfjs-vis';
 import * as tf from '@tensorflow/tfjs';
-import { form, Field, min, max } from '@angular/forms/signals';
+import { form, Field, min, max, disabled } from '@angular/forms/signals';
 
 @Component({
   selector: 'app-machine-learning',
@@ -16,8 +16,8 @@ export class MachineLearningComponent {
   @ViewChild('univariatemodeltable') univariateModelTable!: ElementRef<HTMLInputElement>;
   @ViewChild('multivariatedatatable') multivariateTable!: ElementRef<HTMLInputElement>;
   @ViewChild('multivariatetrainingreport') multivariateTrainingReportGraph!: ElementRef<HTMLInputElement>;
-  apiUrl = 'http://localhost:8080/';
-  // apiUrl = 'https://msio-u7qjhl7iia-uc.a.run.app/';
+  // apiUrl = 'http://localhost:8080/';
+  apiUrl = 'https://msio-u7qjhl7iia-uc.a.run.app/';
   univariateModelData = null;
   univariateModelIsTraining = false;
   univariateData: LinearRegressionPoint[]|null = null;
@@ -28,7 +28,7 @@ export class MachineLearningComponent {
   multivariateData: LinearRegressionDataSet|null = null;
   multivariateTrainingReport = null;
   multivariateModelIsTraining = false;
-  multivariateTrainingRequired = true;
+  multivariateTrainingRequired = signal(true);
   revenuePredictionModel = signal<RevenueData>({
     price: 3,
     temperature: 80
@@ -38,6 +38,8 @@ export class MachineLearningComponent {
     max(schemaPath.price, 10, { message: 'We should charge less' });
     min(schemaPath.temperature, 55, { message: 'That is too cold' });
     max(schemaPath.temperature, 100, { message: 'That is too hot' });
+    disabled(schemaPath.price, this.multivariateTrainingRequired);
+    disabled(schemaPath.temperature, this.multivariateTrainingRequired);
   });
   prediction = '';
   generateRenderUnivariateTrainingData() {
@@ -167,7 +169,7 @@ export class MachineLearningComponent {
         return trainingReportResponse.json();
       })
       .then(trainingReport => {
-        this.multivariateTrainingRequired = false;
+        this.multivariateTrainingRequired.update(() => false)
         this.multivariateModelIsTraining = false;
         this.multivariateTrainingReport = trainingReport
         tfvis.show.history(

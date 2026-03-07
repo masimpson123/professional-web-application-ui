@@ -32,7 +32,7 @@
 <button [disabled]="!multivariateData" (click)="trainMultivariateModelRenderTrainingReport()">Train functional model with multivariate training data and render training report</button><br />
 <input type="number" [field]="revenuePredictionForm.price" style="display: inline-block" step="0.1" />
 <input type="number" [field]="revenuePredictionForm.temperature" style="display: inline-block" />
-<button [disabled]="multivariateTrainingRequired" (click)="predictNumberOfUnitsSold()" style="display: inline-block">
+<button [disabled]="multivariateTrainingRequired()" (click)="predictNumberOfUnitsSold()" style="display: inline-block">
     Predict number of water bottles sold for {{revenuePredictionForm.price().value() | currency}} when it is {{revenuePredictionForm.temperature().value()}}&deg;
 </button><br>
 <p>{{prediction}}</p>
