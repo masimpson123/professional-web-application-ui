@@ -2,7 +2,7 @@ var express = require('express');
 var app = express();
 const cors = require('cors');
 const tensorflow = require('./tensorflow/tensorflow');
-const iceCreamData = require('./tensorflow/ice-cream-data');
+const data = require('./tensorflow/water-bottle-data');
 
 app.use(cors({
    origin: function (origin, callback) {
@@ -30,7 +30,7 @@ app.get('/tensorflow-get-univariate-model-configuration/:file', async function(r
    res.sendFile(`${__dirname}/tensorflow/model-data/univariate/${req.params.file}`);
 });
 app.get('/tensorflow-get-multivariate-data', async function(req, res) {
-   res.send(iceCreamData.iceCreamData);
+   res.send(data.waterBottleData);
 });
 app.post('/tensorflow-train-multivariate-model', async function(req, res) {
    res.send(await tensorflow.trainMultivariateModel(req.body.trainingData));

@@ -1,12 +1,12 @@
 import { Component, ViewChild, ElementRef, signal } from '@angular/core';
-import { NgClass } from '@angular/common';
+import { NgClass, CurrencyPipe } from '@angular/common';
 import * as tfvis from '@tensorflow/tfjs-vis';
 import * as tf from '@tensorflow/tfjs';
-import { form, Field } from '@angular/forms/signals';
+import { form, Field, min, max } from '@angular/forms/signals';
 
 @Component({
   selector: 'app-machine-learning',
-  imports: [NgClass, Field],
+  imports: [NgClass, Field, CurrencyPipe],
   templateUrl: './machine-learning.component.html',
   styleUrl: './machine-learning.component.css',
 })
@@ -33,8 +33,13 @@ export class MachineLearningComponent {
     price: 3,
     temperature: 80
   });
-  revenuePredictionForm = form(this.revenuePredictionModel);
-  prediction = null;
+  revenuePredictionForm = form(this.revenuePredictionModel, (schemaPath) => {
+    min(schemaPath.price, 1, { message: 'We should charge more' });
+    max(schemaPath.price, 10, { message: 'We should charge less' });
+    min(schemaPath.temperature, 55, { message: 'That is too cold' });
+    max(schemaPath.temperature, 100, { message: 'That is too hot' });
+  });
+  prediction = '';
   generateRenderUnivariateTrainingData() {
     this.univariateTrainingRequired = true;
     this.univariateTrainingReport = null;
@@ -178,6 +183,31 @@ export class MachineLearningComponent {
         alert(err.message);
       });
   }
+  predictNumberOfUnitsSold() {
+    fetch(this.apiUrl + 'tensorflow-get-multivariate-linear-regression-prediction', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        trainingData: this.multivariateData,
+        price: this.revenuePredictionModel().price,
+        temperature: this.revenuePredictionModel().temperature
+      })
+    })
+      .then(async predictionResponse => {
+        if (!predictionResponse.ok) throw new Error(await predictionResponse.text());
+        return predictionResponse.json();
+      })
+      .then(prediction => {
+        this.prediction = `
+          ${Math.round(prediction.prediction)} water bottles will be sold for $${(prediction.prediction * this.revenuePredictionModel().price).toFixed(2)}.
+        `;
+      })
+      .catch(err => {
+        alert(err.message);
+      });
+  }
   renderScatterPlot(
     trainingData: LinearRegressionPoint[],
     predictions: LinearRegressionPoint[],
@@ -202,29 +232,6 @@ export class MachineLearningComponent {
         seriesColors
       }
     );
-  }
-  predictNumberOfUnitsSold() {
-    fetch(this.apiUrl + 'tensorflow-get-multivariate-linear-regression-prediction', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        trainingData: this.multivariateData,
-        price: this.revenuePredictionModel().price,
-        temperature: this.revenuePredictionModel().temperature
-      })
-    })
-      .then(async predictionResponse => {
-        if (!predictionResponse.ok) throw new Error(await predictionResponse.text());
-        return predictionResponse.json();
-      })
-      .then(prediction => {
-        this.prediction = prediction.prediction
-      })
-      .catch(err => {
-        alert(err.message);
-      });
   }
 }
 
