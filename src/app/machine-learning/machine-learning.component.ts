@@ -203,7 +203,7 @@ export class MachineLearningComponent {
       })
       .then(prediction => {
         this.prediction = `
-          ${Math.round(prediction.prediction)} water bottles will be sold for $${(prediction.prediction * this.revenuePredictionModel().price).toFixed(2)}.
+          ${Math.round(prediction.prediction)} water bottles will be sold for $${(Math.round(prediction.prediction) * this.revenuePredictionModel().price).toFixed(2)}.
         `;
       })
       .catch(err => {
