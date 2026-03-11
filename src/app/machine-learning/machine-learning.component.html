@@ -36,8 +36,8 @@
     Predict number of water bottles sold for {{revenuePredictionForm.price().value() | currency}} when it is {{revenuePredictionForm.temperature().value()}}&deg;
 </button><br>
 <p>{{prediction}}</p>
-@if (prediction) {
-    <app-scatter-plot-three-dimensions></app-scatter-plot-three-dimensions>
+@if (predictions) {
+    <app-scatter-plot-three-dimensions [data]="predictions"></app-scatter-plot-three-dimensions>
 }
 @if (multivariateTrainingReport || multivariateModelIsTraining) {
     <br />

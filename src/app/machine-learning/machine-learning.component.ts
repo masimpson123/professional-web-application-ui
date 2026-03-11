@@ -4,6 +4,7 @@ import * as tfvis from '@tensorflow/tfjs-vis';
 import * as tf from '@tensorflow/tfjs';
 import { form, Field, min, max, disabled } from '@angular/forms/signals';
 import { ScatterPlotThreeDimensionsComponent } from '../scatter-plot-three-dimensions/scatter-plot-three-dimensions.component';
+import { ThreeDimensionalData } from '../common-models/common-models';
 
 @Component({
   selector: 'app-machine-learning',
@@ -43,6 +44,7 @@ export class MachineLearningComponent {
     disabled(schemaPath.temperature, this.multivariateTrainingRequired);
   });
   prediction: string|null = null;
+  predictions: ThreeDimensionalData[]|null = null;
   generateRenderUnivariateTrainingData() {
     this.univariateTrainingRequired = true;
     this.univariateTrainingReport = null;
@@ -187,25 +189,29 @@ export class MachineLearningComponent {
       });
   }
   predictNumberOfUnitsSold() {
-    fetch(this.apiUrl + 'tensorflow-get-multivariate-linear-regression-prediction', {
+    fetch(this.apiUrl + 'tensorflow-get-multivariate-linear-regression-predictions', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        trainingData: this.multivariateData,
-        price: this.revenuePredictionModel().price,
-        temperature: this.revenuePredictionModel().temperature
+        trainingData: this.multivariateData
       })
     })
-      .then(async predictionResponse => {
-        if (!predictionResponse.ok) throw new Error(await predictionResponse.text());
-        return predictionResponse.json();
+      .then(async predictionsResponse => {
+        if (!predictionsResponse.ok) throw new Error(await predictionsResponse.text());
+        return predictionsResponse.json();
       })
-      .then(prediction => {
+      .then(predictions => {
         this.prediction = `
-          ${Math.round(prediction.prediction)} water bottles will be sold for $${(Math.round(prediction.prediction) * this.revenuePredictionModel().price).toFixed(2)}.
+          ${predictions.prediction} water bottles will be sold for $${predictions.prediction * this.revenuePredictionModel().price}.
         `;
+        // x price
+        // y units sold
+        // z temperature
+        this.predictions = predictions.predictions.map(
+          (prediction: {feature1: number, feature2: number, predictedLabel: number}) =>
+            ({x: (prediction.feature1 - 1) * 10, y: prediction.predictedLabel / 10, z: (prediction.feature2 - 55) * -1}));
       })
       .catch(err => {
         alert(err.message);

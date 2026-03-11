@@ -1,6 +1,7 @@
-import { Component, ElementRef, ViewChild, AfterViewInit, OnDestroy } from '@angular/core';
+import { Component, ElementRef, ViewChild, AfterViewInit, OnDestroy, Input } from '@angular/core';
 import * as THREE from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
+import { ThreeDimensionalData } from '../common-models/common-models';
 
 @Component({
   selector: 'app-scatter-plot-three-dimensions',
@@ -10,6 +11,7 @@ import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 })
 export class ScatterPlotThreeDimensionsComponent implements AfterViewInit, OnDestroy {
   @ViewChild('container') canvasRef!: ElementRef;
+  @Input() public data!: ThreeDimensionalData[];
 
   private scene!: THREE.Scene;
   private camera!: THREE.PerspectiveCamera;
@@ -37,7 +39,6 @@ export class ScatterPlotThreeDimensionsComponent implements AfterViewInit, OnDes
     const container = this.canvasRef.nativeElement;
     const width = container.clientWidth;
     const height = container.clientHeight;
-    console.log(width, height);
 
     // Scene
     this.scene = new THREE.Scene();
@@ -45,7 +46,7 @@ export class ScatterPlotThreeDimensionsComponent implements AfterViewInit, OnDes
 
     // Camera
     this.camera = new THREE.PerspectiveCamera(60, width / height, 0.1, 1000);
-    this.camera.position.set(15, 10, 20);
+    this.camera.position.set(0, 30, 100);
 
     // Renderer
     this.renderer = new THREE.WebGLRenderer({canvas: this.canvas });
@@ -67,21 +68,11 @@ export class ScatterPlotThreeDimensionsComponent implements AfterViewInit, OnDes
     dirLight.position.set(10, 20, 10);
     this.scene.add(dirLight);
 
-    // ── Your data ── (replace with your three related metrics)
-    const data = [
-      { x: 1,  y:  2,  z:  5, color: 0xff0000 },
-      { x: 3,  y:  1,  z:  8, color: 0x00ff00 },
-      { x: -2, y:  4,  z:  3, color: 0x0000ff },
-      { x: 5,  y: -1,  z: 12, color: 0xffff00 },
-      { x: 0,  y:  5,  z:  7, color: 0xff00ff },
-      { x: 4,  y:  3,  z:  1, color: 0x00ffff },
-    ];
-
     // Spheres (points)
     const geometry = new THREE.SphereGeometry(0.4, 16, 16); // radius 0.4
-    data.forEach(point => {
+    this.data.forEach(point => {
       const material = new THREE.MeshStandardMaterial({
-        color: point.color,
+        color: 'slategrey',
         metalness: 0.1,
         roughness: 0.5,
       });
@@ -95,7 +86,7 @@ export class ScatterPlotThreeDimensionsComponent implements AfterViewInit, OnDes
     this.scene.add(axesHelper);
 
     // Optional: grid on XZ plane
-    const gridHelper = new THREE.GridHelper(20, 20, 0x888888, 0xcccccc);
+    const gridHelper = new THREE.GridHelper(200, 200, 0x888888, 0xcccccc);
     this.scene.add(gridHelper);
   }
 
