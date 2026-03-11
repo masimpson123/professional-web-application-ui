@@ -3,3 +3,8 @@ button, p, textarea, input, canvas {
     margin: 5px;
     word-wrap:break-word;
 }
+
+canvas {
+    width: 800px;
+    height: 450px;
+}

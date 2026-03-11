@@ -36,13 +36,9 @@
     Predict number of water bottles sold for {{revenuePredictionForm.price().value() | currency}} when it is {{revenuePredictionForm.temperature().value()}}&deg;
 </button><br>
 <p>{{prediction}}</p>
-
-@if (multivariateData) {
-    <br />
-    <hr />
-    <br />
+@if (prediction) {
+    <app-scatter-plot-three-dimensions></app-scatter-plot-three-dimensions>
 }
-<div #multivariatedatatable class="container" [ngClass]="{'multivariate-data-table': multivariateData}"></div>
 @if (multivariateTrainingReport || multivariateModelIsTraining) {
     <br />
     <hr />
@@ -52,3 +48,9 @@
   <i class="training-message">Training...</i>
 }
 <div #multivariatetrainingreport class="container"></div>
+@if (multivariateData) {
+    <br />
+    <hr />
+    <br />
+}
+<div #multivariatedatatable class="container" [ngClass]="{'multivariate-data-table': multivariateData}"></div>

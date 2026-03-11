@@ -3,10 +3,11 @@ import { NgClass, CurrencyPipe } from '@angular/common';
 import * as tfvis from '@tensorflow/tfjs-vis';
 import * as tf from '@tensorflow/tfjs';
 import { form, Field, min, max, disabled } from '@angular/forms/signals';
+import { ScatterPlotThreeDimensionsComponent } from '../scatter-plot-three-dimensions/scatter-plot-three-dimensions.component';
 
 @Component({
   selector: 'app-machine-learning',
-  imports: [NgClass, Field, CurrencyPipe],
+  imports: [NgClass, Field, CurrencyPipe, ScatterPlotThreeDimensionsComponent],
   templateUrl: './machine-learning.component.html',
   styleUrl: './machine-learning.component.css',
 })
@@ -16,8 +17,8 @@ export class MachineLearningComponent {
   @ViewChild('univariatemodeltable') univariateModelTable!: ElementRef<HTMLInputElement>;
   @ViewChild('multivariatedatatable') multivariateTable!: ElementRef<HTMLInputElement>;
   @ViewChild('multivariatetrainingreport') multivariateTrainingReportGraph!: ElementRef<HTMLInputElement>;
-  // apiUrl = 'http://localhost:8080/';
-  apiUrl = 'https://msio-u7qjhl7iia-uc.a.run.app/';
+  apiUrl = 'http://localhost:8080/';
+  // apiUrl = 'https://msio-u7qjhl7iia-uc.a.run.app/';
   univariateModelData = null;
   univariateModelIsTraining = false;
   univariateData: LinearRegressionPoint[]|null = null;
@@ -41,7 +42,7 @@ export class MachineLearningComponent {
     disabled(schemaPath.price, this.multivariateTrainingRequired);
     disabled(schemaPath.temperature, this.multivariateTrainingRequired);
   });
-  prediction = '';
+  prediction: string|null = null;
   generateRenderUnivariateTrainingData() {
     this.univariateTrainingRequired = true;
     this.univariateTrainingReport = null;
