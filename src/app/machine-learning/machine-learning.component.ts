@@ -207,11 +207,11 @@ export class MachineLearningComponent {
           ${predictions.prediction} water bottles will be sold for $${predictions.prediction * this.revenuePredictionModel().price}.
         `;
         // x price
-        // y units sold
-        // z temperature
+        // y temperature
+        // z units sold (vertical)
         this.predictions = predictions.predictions.map(
           (prediction: {feature1: number, feature2: number, predictedLabel: number}) =>
-            ({x: (prediction.feature1 - 1) * 10, y: prediction.predictedLabel / 10, z: (prediction.feature2 - 55) * -1}));
+            ({x: (prediction.feature1 - 1) * -10, y: (prediction.feature2 - 55), z: prediction.predictedLabel / 10}));
       })
       .catch(err => {
         alert(err.message);
