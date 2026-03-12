@@ -8,3 +8,8 @@ canvas {
     width: 800px;
     height: 450px;
 }
+
+.no-margin canvas {
+    margin: 0;
+    border: 1px solid black;
+}

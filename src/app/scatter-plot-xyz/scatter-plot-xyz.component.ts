@@ -7,7 +7,7 @@ if (!PlotlyService.plotly) {
 }
 
 @Component({
-  selector: 'app-scatter-plot-three-dimensions',
+  selector: 'app-scatter-plot-xyz',
   imports: [
     PlotlyModule
   ],
@@ -15,19 +15,26 @@ if (!PlotlyService.plotly) {
     PlotlyService
   ],
   template: `
-    <plotly-plot
-      [data]="plotData"
-      [layout]="plotLayout"
-      [config]="{responsive: true}"
-    ></plotly-plot>
-  `
+    <span class="no-margin">
+      <plotly-plot
+        [data]="plotData"
+        [layout]="plotLayout"
+        [config]="{
+          responsive: true,
+          displayModeBar: false,
+          displaylogo: false
+        }"
+      ></plotly-plot>
+    </span>
+  `,
+  styleUrl: './scatter-plot-xyz.component.css',
 })
-export class ScatterPlotThreeDimensionsComponent {
+export class ScatterPlotXyzComponent {
   @Input() data: any;
   plotData = [{
     x: [1, 2, 3, 4, 5, 6],
     y: [10, 15, 8, 12, 20, 14],
-    z: [5, 8, 3, 12, 7, 11],
+    z: [5, 8, 3, 12, 7, 10],
     mode: 'markers',
     type: 'scatter3d',
     marker: {
@@ -47,6 +54,8 @@ export class ScatterPlotThreeDimensionsComponent {
       zaxis: { title: 'Metric C' },
       aspectmode: 'cube'
     },
-    margin: { l: 0, r: 0, b: 0, t: 50 }
+    margin: { l: 0, r: 0, b: 0, t: 0 },
+    width: 600,
+    height: 400
   };
 }

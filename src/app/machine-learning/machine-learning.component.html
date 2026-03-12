@@ -37,7 +37,7 @@
 </button><br>
 <p>{{prediction}}</p>
 @if (predictions) {
-    <app-scatter-plot-three-dimensions [data]="predictions"></app-scatter-plot-three-dimensions>
+    <app-scatter-plot-xyz [data]="predictions"></app-scatter-plot-xyz>
 }
 @if (multivariateTrainingReport || multivariateModelIsTraining) {
     <br />

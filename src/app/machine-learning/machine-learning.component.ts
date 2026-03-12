@@ -3,12 +3,12 @@ import { NgClass, CurrencyPipe } from '@angular/common';
 import * as tfvis from '@tensorflow/tfjs-vis';
 import * as tf from '@tensorflow/tfjs';
 import { form, Field, min, max, disabled } from '@angular/forms/signals';
-import { ScatterPlotThreeDimensionsComponent } from '../scatter-plot-three-dimensions/scatter-plot-three-dimensions.component';
 import { ThreeDimensionalData } from '../common-models/common-models';
+import { ScatterPlotXyzComponent } from '../scatter-plot-xyz/scatter-plot-xyz.component';
 
 @Component({
   selector: 'app-machine-learning',
-  imports: [NgClass, Field, CurrencyPipe, ScatterPlotThreeDimensionsComponent],
+  imports: [NgClass, Field, CurrencyPipe, ScatterPlotXyzComponent],
   templateUrl: './machine-learning.component.html',
   styleUrl: './machine-learning.component.css',
 })
