@@ -3,7 +3,6 @@
 <button (click)="generateRenderUnivariateTrainingData()">Generate and render univariate training data</button><br />
 <button [disabled]="!univariateData" (click)="trainUnivariateModelRenderTrainingReport()">Train sequential model with univariate training data and render training report</button><br />
 <button [disabled]="univariateTrainingRequired" (click)="getRenderUnivariateLinearRegressionPredictions()">Get and render univariate linear regression predictions</button><br />
-<button (click)="getRenderUnivariateModelConfiguration()">Get and render univariate model configuration</button><br />
 @if (univariateData) {
     <br />
     <hr />
@@ -19,12 +18,6 @@
   <i class="training-message">Training...</i>
 }
 <div #univariatetrainingreport class="container"></div>
-@if (univariateModelConfiguration) {
-    <br />
-    <hr />
-    <br />
-}
-<div #univariatemodeltable class="container"></div>
 <br />
 <hr />
 <br />
