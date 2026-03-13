@@ -88,13 +88,13 @@ async function trainMultivariateModel(trainingData) {
 
   const model = tf.model({inputs: [inputA, inputB], outputs: output});
 
-  const {inputs1, inputs2, labels} = getTensorsMultivariate(trainingData.values);
+  const {inputs1, inputs2, labels} = getTensorsMultivariate(trainingData);
 
   model.compile({optimizer: 'adam', loss: 'meanSquaredError'});
 
   // train the model so that it "fits" the data
   const trainingReport = await model.fit([inputs1, inputs2], labels, {
-    batchSize: Math.round(trainingData.values.length / 5),
+    batchSize: Math.round(trainingData.length / 5),
     epochs: 200,
     shuffle: true
   });
@@ -143,7 +143,7 @@ function getTensorsMultivariate(data) {
 
 async function getMultivariateLinearRegressionPredictions(trainingData) {
   const model = await tf.loadLayersModel(`file://${__dirname}/model-data/multivariate/model.json`);
-  const { input1Max, input1Min, input2Max, input2Min, labelMax, labelMin } = getTensorsMultivariate(trainingData.values);
+  const { input1Max, input1Min, input2Max, input2Min, labelMax, labelMin } = getTensorsMultivariate(trainingData);
   const denormalizedPredictions = [];
   for (feature1 = 10; feature1 <= 100; feature1 += 1) {
     for (feature2 = 55; feature2 <= 100; feature2 += 1) {

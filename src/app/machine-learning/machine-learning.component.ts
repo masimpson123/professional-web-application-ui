@@ -1,5 +1,5 @@
 import { Component, ViewChild, ElementRef, signal } from '@angular/core';
-import { NgClass, CurrencyPipe } from '@angular/common';
+import { CurrencyPipe } from '@angular/common';
 import * as tfvis from '@tensorflow/tfjs-vis';
 import * as tf from '@tensorflow/tfjs';
 import { form, Field, min, max, disabled } from '@angular/forms/signals';
@@ -8,7 +8,7 @@ import { ScatterPlotXyzComponent } from '../scatter-plot-xyz/scatter-plot-xyz.co
 
 @Component({
   selector: 'app-machine-learning',
-  imports: [NgClass, Field, CurrencyPipe, ScatterPlotXyzComponent],
+  imports: [Field, CurrencyPipe, ScatterPlotXyzComponent],
   templateUrl: './machine-learning.component.html',
   styleUrl: './machine-learning.component.css',
 })
@@ -16,7 +16,6 @@ export class MachineLearningComponent {
   @ViewChild('univariatelinearregressiongraph') univariateLinearRegressionGraph!: ElementRef<HTMLInputElement>;
   @ViewChild('univariatetrainingreport') univariateTrainingReportGraph!: ElementRef<HTMLInputElement>;
   @ViewChild('univariatemodeltable') univariateModelTable!: ElementRef<HTMLInputElement>;
-  @ViewChild('multivariatedatatable') multivariateTable!: ElementRef<HTMLInputElement>;
   @ViewChild('multivariatetrainingreport') multivariateTrainingReportGraph!: ElementRef<HTMLInputElement>;
   apiUrl = 'http://localhost:8080/';
   // apiUrl = 'https://msio-u7qjhl7iia-uc.a.run.app/';
@@ -27,7 +26,7 @@ export class MachineLearningComponent {
   univariateLinearRegressionPredictions = null;
   univariateModelConfiguration = null;
   univariateTrainingRequired = true;
-  multivariateData: LinearRegressionDataSet|null = null;
+  multivariateTrainingData: number[][]|null = null;
   multivariateTrainingReport = null;
   multivariateModelIsTraining = false;
   multivariateTrainingRequired = signal(true);
@@ -44,7 +43,9 @@ export class MachineLearningComponent {
     disabled(schemaPath.temperature, this.multivariateTrainingRequired);
   });
   prediction: string|null = null;
-  predictions: ThreeDimensionalData[]|null = null;
+  multivariateScatterPlotData: ThreeDimensionalData[][]|null = null;
+  multivariateScatterPlotSeriesNames: string[]|null = null;
+  multivariateScatterPlotSeriesColors: string[]|null = null;
   generateRenderUnivariateTrainingData() {
     this.univariateTrainingRequired = true;
     this.univariateTrainingReport = null;
@@ -138,20 +139,17 @@ export class MachineLearningComponent {
   getRenderMultivariateTrainingData() {
     fetch(this.apiUrl + 'tensorflow-get-multivariate-data')
       .then(multivariateDataResponse => multivariateDataResponse.json())
-      .then(multivariateData => {
-        this.multivariateData = {
-          headers: [
-            'price', 'temperature', 'number sold'
-          ],
-          values: [
-            ...multivariateData
-          ]
-        };
-        tfvis.render.table(
-          {
-            drawArea: this.multivariateTable.nativeElement
-          },
-          this.multivariateData);
+      .then(multivariateTrainingData => {
+        this.multivariateTrainingData = multivariateTrainingData;
+        this.multivariateScatterPlotData = [
+          multivariateTrainingData.map((datum:number[]) =>
+            // x: price, y: temperature, z: units sold (vertical)
+            ({x: datum[0], y: datum[1], z: datum[2]})
+          ),
+          []
+        ];
+        this.multivariateScatterPlotSeriesColors = ['orangered'];
+        this.multivariateScatterPlotSeriesNames = ['Training data'];
       });
   }
   trainMultivariateModelRenderTrainingReport() {
@@ -164,7 +162,7 @@ export class MachineLearningComponent {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        trainingData: this.multivariateData
+        trainingData: this.multivariateTrainingData
       })
     })
       .then(async trainingReportResponse => {
@@ -195,7 +193,7 @@ export class MachineLearningComponent {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        trainingData: this.multivariateData
+        trainingData: this.multivariateTrainingData
       })
     })
       .then(async predictionsResponse => {
@@ -206,12 +204,18 @@ export class MachineLearningComponent {
         this.prediction = `
           ${predictions.prediction} water bottles will be sold for $${predictions.prediction * this.revenuePredictionModel().price}.
         `;
-        // x price
-        // y temperature
-        // z units sold (vertical)
-        this.predictions = predictions.predictions.map(
-          (prediction: {feature1: number, feature2: number, predictedLabel: number}) =>
-            ({x: (prediction.feature1 - 1) * -10, y: (prediction.feature2 - 55), z: prediction.predictedLabel / 10}));
+        // x: price, y: temperature, z: units sold (vertical)
+        this.multivariateScatterPlotData = [
+          this.multivariateTrainingData?.map((datum:number[]) =>
+            
+            ({x: datum[0], y: datum[1], z: datum[2]})
+          ),
+          predictions.predictions.map(
+            (prediction: {feature1: number, feature2: number, predictedLabel: number}) =>
+              ({x: prediction.feature1, y: prediction.feature2, z: prediction.predictedLabel}))
+        ];
+        this.multivariateScatterPlotSeriesColors = ['slategrey', 'orangered'];
+        this.multivariateScatterPlotSeriesNames = ['Training data', 'Predictions'];
       })
       .catch(err => {
         alert(err.message);
@@ -247,11 +251,6 @@ export class MachineLearningComponent {
 interface LinearRegressionPoint {
   input: number;
   label: number;
-}
-
-interface LinearRegressionDataSet {
-  headers: string[],
-  values: number[][]
 }
 
 interface RevenueData {
