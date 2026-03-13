@@ -1,4 +1,4 @@
-import { Component, ViewChild, ElementRef, signal } from '@angular/core';
+import { Component, ViewChild, ElementRef, signal, effect } from '@angular/core';
 import { CurrencyPipe } from '@angular/common';
 import * as tfvis from '@tensorflow/tfjs-vis';
 import * as tf from '@tensorflow/tfjs';
@@ -46,6 +46,15 @@ export class MachineLearningComponent {
   multivariateScatterPlotData: ThreeDimensionalData[][]|null = null;
   multivariateScatterPlotSeriesNames: string[]|null = null;
   multivariateScatterPlotSeriesColors: string[]|null = null;
+  multivariatePredictions: MultiVariatePrediction[]|null = null;
+  constructor() {
+    effect(() => {
+      const price = this.revenuePredictionModel().price;
+      const temperature = this.revenuePredictionModel().temperature;
+      if (!this.multivariatePredictions) return;
+      this.updatePredictionMessage(this.multivariatePredictions, price, temperature);
+    });
+  }
   generateRenderUnivariateTrainingData() {
     this.univariateTrainingRequired = true;
     this.univariateTrainingReport = null;
@@ -201,17 +210,19 @@ export class MachineLearningComponent {
         return predictionsResponse.json();
       })
       .then(predictions => {
-        this.prediction = `
-          ${predictions.prediction} water bottles will be sold for $${predictions.prediction * this.revenuePredictionModel().price}.
-        `;
+        this.multivariatePredictions = predictions.predictions;
+        this.updatePredictionMessage(
+          predictions.predictions,
+          this.revenuePredictionModel().price,
+          this.revenuePredictionModel().temperature
+        );
         // x: price, y: temperature, z: units sold (vertical)
         this.multivariateScatterPlotData = [
           this.multivariateTrainingData?.map((datum:number[]) =>
-            
             ({x: datum[0], y: datum[1], z: datum[2]})
           ),
           predictions.predictions.map(
-            (prediction: {feature1: number, feature2: number, predictedLabel: number}) =>
+            (prediction: MultiVariatePrediction) =>
               ({x: prediction.feature1, y: prediction.feature2, z: prediction.predictedLabel}))
         ];
         this.multivariateScatterPlotSeriesColors = ['slategrey', 'orangered'];
@@ -220,6 +231,22 @@ export class MachineLearningComponent {
       .catch(err => {
         alert(err.message);
       });
+  }
+  updatePredictionMessage(
+    predictions: MultiVariatePrediction[],
+    price: number,
+    temperature: number
+  ) {
+    const prediction =
+      predictions.find(
+        (prediction: MultiVariatePrediction) =>
+        prediction.feature1 === price &&
+        prediction.feature2 === temperature
+      )?.predictedLabel;
+      this.prediction =
+        prediction
+          ? `${prediction} water bottles will be sold for $${(prediction * (this.revenuePredictionModel().price * 10)) / 10}.`
+          : null;
   }
   renderScatterPlot(
     trainingData: LinearRegressionPoint[],
@@ -256,4 +283,10 @@ interface LinearRegressionPoint {
 interface RevenueData {
   price: number;
   temperature: number;
+}
+
+interface MultiVariatePrediction {
+  feature1: number;
+  feature2: number;
+  predictedLabel: number;
 }

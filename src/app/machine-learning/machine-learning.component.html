@@ -35,6 +35,16 @@
 <button [disabled]="multivariateTrainingRequired()" (click)="predictNumberOfUnitsSold()" style="display: inline-block">
     Predict number of water bottles sold for {{revenuePredictionForm.price().value() | currency}} when it is {{revenuePredictionForm.temperature().value()}}&deg;
 </button><br>
+@if (revenuePredictionForm.price().invalid() && revenuePredictionForm.price().touched()) {
+    @for (error of revenuePredictionForm.price().errors(); track error.kind) {
+      <p>{{ error.message }}</p>
+    }
+}
+@if (revenuePredictionForm.temperature().invalid() && revenuePredictionForm.temperature().touched()) {
+    @for (error of revenuePredictionForm.temperature().errors(); track error.kind) {
+      <p>{{ error.message }}</p>
+    }
+}
 <p>{{prediction}}</p>
 @if (multivariateScatterPlotData) {
     <app-scatter-plot-xyz
