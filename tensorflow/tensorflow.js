@@ -156,7 +156,11 @@ async function getMultivariateLinearRegressionPredictions(trainingData) {
         .mul(labelMax.sub(labelMin))
         .add(labelMin)
         .dataSync()[0];
-      denormalizedPredictions.push({feature1: feature1/10, feature2, predictedLabel: Math.round(unitsSold)})
+      denormalizedPredictions.push({
+        feature1: feature1/10,
+        feature2,
+        predictedLabel: Math.round(unitsSold) > 0 ? Math.round(unitsSold) : 0 
+      })
     }
   }
   return {predictions: denormalizedPredictions};
