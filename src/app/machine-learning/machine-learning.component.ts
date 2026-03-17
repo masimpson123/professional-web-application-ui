@@ -15,8 +15,8 @@ export class MachineLearningComponent {
   @ViewChild('univariatetrainingreport') univariateTrainingReportGraph!: ElementRef<HTMLInputElement>;
   @ViewChild('univariatemodeltable') univariateModelTable!: ElementRef<HTMLInputElement>;
   @ViewChild('multivariatetrainingreport') multivariateTrainingReportGraph!: ElementRef<HTMLInputElement>;
-  apiUrl = 'http://localhost:8080/';
-  // apiUrl = 'https://msio-u7qjhl7iia-uc.a.run.app/';
+  // apiUrl = 'http://localhost:8080/';
+  apiUrl = 'https://msio-u7qjhl7iia-uc.a.run.app/';
   univariateModelData = null;
   univariateModelIsTraining = false;
   univariateData: LinearRegressionPoint[]|null = null;
