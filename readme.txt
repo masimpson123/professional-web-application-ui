@@ -28,6 +28,9 @@ ensure host port and container port are both 8080
 docker tag client2026 us-central1-docker.pkg.dev/endpoint-one/endpoint-one/client2026:<mmddyy>
 docker push us-central1-docker.pkg.dev/endpoint-one/endpoint-one/client2026:<mmddyy>
 
+# UPDATE IMAGE IN CLOUD RUN
+gcloud run services update msio --region us-central1 --platform managed --image us-central1-docker.pkg.dev/endpoint-one/endpoint-one/client2026:<mmddyy>
+
 ###
 
 ! GitHub has excellent SSH documentation
