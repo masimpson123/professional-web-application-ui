@@ -60,7 +60,8 @@ export class MachineLearningComponent {
     this.scatterPlotXyzComponent = ScatterPlotXyzComponent;
   }
   private async tfvis() {
-    return await import('@tensorflow/tfjs-vis');
+    const m = await import('@tensorflow/tfjs-vis');
+    return (m as any).default ?? m;
   }
   generateRenderUnivariateTrainingData() {
     this.univariateTrainingRequired = true;
