@@ -17,23 +17,39 @@
   [disabled]="thinking"
   (click)="submitAIQuery(message.value); message.value = ''"
 >Submit</button>
-@if (project && project != 'other') {
+@if (project && project !== 'other') {
   <span>
     <br>
     <br>
     <hr>
     <br>
     @if (project.includes('cube')) {
-      <app-cube></app-cube>
+      @if (cubeComponent) {
+        <ng-container *ngComponentOutlet="cubeComponent"></ng-container>
+      } @else {
+        <i class="chat-message">Loading cube…</i>
+      }
     }
     @if (project.includes('data')) {
-      <app-data-stream></app-data-stream>
+      @if (dataStreamComponent) {
+        <ng-container *ngComponentOutlet="dataStreamComponent"></ng-container>
+      } @else {
+        <i class="chat-message">Loading data stream…</i>
+      }
     }
     @if (project.includes('auth')) {
-      <app-auth></app-auth>
+      @if (authComponent) {
+        <ng-container *ngComponentOutlet="authComponent"></ng-container>
+      } @else {
+        <i class="chat-message">Loading auth…</i>
+      }
     }
     @if (project.includes('machine-learning')) {
-      <app-machine-learning></app-machine-learning>
+      @if (machineLearningComponent) {
+        <ng-container *ngComponentOutlet="machineLearningComponent"></ng-container>
+      } @else {
+        <i class="chat-message">Loading machine learning…</i>
+      }
     }
   </span>
 }

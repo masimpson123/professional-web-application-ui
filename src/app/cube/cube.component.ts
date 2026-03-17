@@ -119,7 +119,7 @@ export class CubeComponent implements AfterViewInit {
     this.scene.add(this.light);
     this.scene.add(this.fillLight);
     // Camera
-    let aspectRatio = this.getAspectRatio();
+    const aspectRatio = this.getAspectRatio();
     this.camera = new THREE.PerspectiveCamera(
       this.fieldOfView,
       aspectRatio,
@@ -146,7 +146,7 @@ export class CubeComponent implements AfterViewInit {
     this.renderer.setPixelRatio(devicePixelRatio);
     this.renderer.setSize(this.canvas.clientWidth, this.canvas.clientHeight);
 
-    let component: CubeComponent = this;
+    const component: CubeComponent = this;
     (function render() {
       requestAnimationFrame(render);
       component.animateCube();

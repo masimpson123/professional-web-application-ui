@@ -14,7 +14,7 @@ import { debounceTime, tap } from 'rxjs';
 export class DataStreamComponent {
   searchInput = model('');
   controller: null|AbortController = null;
-  results: {}[] = [];
+  results: object[] = [];
   constructor() {
     toObservable(this.searchInput).pipe(
       tap(() => this.results = []),

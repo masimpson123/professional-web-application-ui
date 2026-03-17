@@ -40,11 +40,17 @@
 }
 <p>{{prediction}}</p>
 @if (multivariateScatterPlotData) {
-    <app-scatter-plot-xyz
-        [xyzData]="multivariateScatterPlotData"
-        [seriesColors]="multivariateScatterPlotSeriesColors"
-        [seriesNames]="multivariateScatterPlotSeriesNames"
-    ></app-scatter-plot-xyz>
+    @if (scatterPlotXyzComponent) {
+        <ng-container
+          *ngComponentOutlet="scatterPlotXyzComponent; inputs: {
+            xyzData: multivariateScatterPlotData,
+            seriesColors: multivariateScatterPlotSeriesColors,
+            seriesNames: multivariateScatterPlotSeriesNames
+          }"
+        ></ng-container>
+    } @else {
+        <i>Loading chart…</i>
+    }
 }
 @if (multivariateTrainingReport || multivariateModelIsTraining) {
     <br />

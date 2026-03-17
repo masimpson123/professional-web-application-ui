@@ -40,9 +40,9 @@ export class AuthComponent implements OnDestroy {
   }
   
   signUp() {
-    let email = prompt("Please enter an email for your new account:");
+    const email = prompt("Please enter an email for your new account:");
     if (email === null) return;
-    let password = prompt("Please enter a new password for your new account:");
+    const password = prompt("Please enter a new password for your new account:");
     if (password === null) return;
     createUserWithEmailAndPassword((window as any).msiofa, email, password)
       .then(() => {
@@ -54,9 +54,9 @@ export class AuthComponent implements OnDestroy {
   }
   
   signIn() {
-    let email = prompt("What is your email?");
+    const email = prompt("What is your email?");
     if (email === null) return;
-    let password = prompt("What is your password?");
+    const password = prompt("What is your password?");
     if (password === null) return;
     signInWithEmailAndPassword((window as any).msiofa, email, password)
       .then(() => {
@@ -79,7 +79,7 @@ export class AuthComponent implements OnDestroy {
   }
 
   fetchWeather(advanced: boolean) {
-    let securityToken = prompt('What is your security token?');
+    const securityToken = prompt('What is your security token?');
     if (securityToken === null) return;
     const headers = new HttpHeaders({
       'Content-Type': 'application/json',
@@ -103,7 +103,7 @@ export class AuthComponent implements OnDestroy {
   }
 
   requestAdvancedUsageClaim() {
-    let securityToken = prompt('What is your security token?');
+    const securityToken = prompt('What is your security token?');
     if (securityToken === null) return;
     const headers = new HttpHeaders({
       'Content-Type': 'application/json',

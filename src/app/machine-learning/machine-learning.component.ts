@@ -1,14 +1,12 @@
-import { Component, ViewChild, ElementRef, signal, effect } from '@angular/core';
-import { CurrencyPipe } from '@angular/common';
-import * as tfvis from '@tensorflow/tfjs-vis';
+import { CurrencyPipe, NgComponentOutlet } from '@angular/common';
+import { Component, ElementRef, Type, ViewChild, effect, signal } from '@angular/core';
 import * as tf from '@tensorflow/tfjs';
 import { form, Field, min, max, disabled } from '@angular/forms/signals';
 import { ThreeDimensionalData } from '../common-models/common-models';
-import { ScatterPlotXyzComponent } from '../scatter-plot-xyz/scatter-plot-xyz.component';
 
 @Component({
   selector: 'app-machine-learning',
-  imports: [Field, CurrencyPipe, ScatterPlotXyzComponent],
+  imports: [Field, CurrencyPipe, NgComponentOutlet],
   templateUrl: './machine-learning.component.html',
   styleUrl: './machine-learning.component.css',
 })
@@ -17,14 +15,14 @@ export class MachineLearningComponent {
   @ViewChild('univariatetrainingreport') univariateTrainingReportGraph!: ElementRef<HTMLInputElement>;
   @ViewChild('univariatemodeltable') univariateModelTable!: ElementRef<HTMLInputElement>;
   @ViewChild('multivariatetrainingreport') multivariateTrainingReportGraph!: ElementRef<HTMLInputElement>;
-  // apiUrl = 'http://localhost:8080/';
-  apiUrl = 'https://msio-u7qjhl7iia-uc.a.run.app/';
+  apiUrl = 'http://localhost:8080/';
+  // apiUrl = 'https://msio-u7qjhl7iia-uc.a.run.app/';
   univariateModelData = null;
   univariateModelIsTraining = false;
   univariateData: LinearRegressionPoint[]|null = null;
   univariateTrainingReport = null;
   univariateLinearRegressionPredictions = null;
-  univariateModelConfiguration = null;
+  univariateModelConfiguration: tf.LayersModel|null = null;
   univariateTrainingRequired = true;
   multivariateTrainingData: number[][]|null = null;
   multivariateTrainingReport = null;
@@ -47,6 +45,7 @@ export class MachineLearningComponent {
   multivariateScatterPlotSeriesNames: string[]|null = null;
   multivariateScatterPlotSeriesColors: string[]|null = null;
   multivariatePredictions: MultiVariatePrediction[]|null = null;
+  scatterPlotXyzComponent: Type<unknown>|null = null;
   constructor() {
     effect(() => {
       const price = this.revenuePredictionModel().price;
@@ -54,6 +53,14 @@ export class MachineLearningComponent {
       if (!this.multivariatePredictions) return;
       this.updatePredictionMessage(this.multivariatePredictions, price, temperature);
     });
+  }
+  private async ensureScatterPlotLoaded() {
+    if (this.scatterPlotXyzComponent) return;
+    const { ScatterPlotXyzComponent } = await import('../scatter-plot-xyz/scatter-plot-xyz.component');
+    this.scatterPlotXyzComponent = ScatterPlotXyzComponent;
+  }
+  private async tfvis() {
+    return await import('@tensorflow/tfjs-vis');
   }
   generateRenderUnivariateTrainingData() {
     this.univariateTrainingRequired = true;
@@ -95,13 +102,15 @@ export class MachineLearningComponent {
         this.univariateTrainingRequired = false;
         this.univariateModelIsTraining = false;
         this.univariateTrainingReport = trainingReport
-        tfvis.show.history(
-          {
-            name: 'Training report',
-            drawArea: this.univariateTrainingReportGraph.nativeElement
-          },
-          trainingReport,
-          ['loss'])
+        this.tfvis().then(({ show }) => {
+          show.history(
+            {
+              name: 'Training report',
+              drawArea: this.univariateTrainingReportGraph.nativeElement
+            },
+            trainingReport,
+            ['loss']);
+        });
       })
       .catch(err => {
         this.univariateModelIsTraining = false;
@@ -138,11 +147,13 @@ export class MachineLearningComponent {
   getRenderUnivariateModelConfiguration() {
     tf.loadLayersModel(this.apiUrl + 'tensorflow-get-univariate-model-configuration/model.json')
       .then(modelConfiguration => {
-        this.univariateModelConfiguration = modelConfiguration as any;
+        this.univariateModelConfiguration = modelConfiguration;
         const surface = {
           drawArea: this.univariateModelTable.nativeElement
         };
-        tfvis.show.modelSummary(surface, modelConfiguration);
+        this.tfvis().then(({ show }) => {
+          show.modelSummary(surface, modelConfiguration);
+        });
       });
   }
   getRenderMultivariateTrainingData() {
@@ -159,6 +170,7 @@ export class MachineLearningComponent {
         ];
         this.multivariateScatterPlotSeriesColors = ['orangered'];
         this.multivariateScatterPlotSeriesNames = ['Training data'];
+        void this.ensureScatterPlotLoaded();
       });
   }
   trainMultivariateModelRenderTrainingReport() {
@@ -182,13 +194,15 @@ export class MachineLearningComponent {
         this.multivariateTrainingRequired.update(() => false)
         this.multivariateModelIsTraining = false;
         this.multivariateTrainingReport = trainingReport
-        tfvis.show.history(
-          {
-            name: 'Training report',
-            drawArea: this.multivariateTrainingReportGraph.nativeElement
-          },
-          trainingReport,
-          ['loss'])
+        this.tfvis().then(({ show }) => {
+          show.history(
+            {
+              name: 'Training report',
+              drawArea: this.multivariateTrainingReportGraph.nativeElement
+            },
+            trainingReport,
+            ['loss']);
+        });
       })
       .catch(err => {
         this.multivariateModelIsTraining = false;
@@ -228,6 +242,7 @@ export class MachineLearningComponent {
         ];
         this.multivariateScatterPlotSeriesColors = ['slategrey', 'orangered'];
         this.multivariateScatterPlotSeriesNames = ['Training data', 'Predictions'];
+        void this.ensureScatterPlotLoaded();
       })
       .catch(err => {
         alert(err.message);
@@ -255,24 +270,26 @@ export class MachineLearningComponent {
     seriesColors: string[],
     seriesNames: string[]
   ) {
-    tfvis.render.scatterplot(
-      {
-        name: 'Model Predictions vs Original Data',
-        drawArea: this.univariateLinearRegressionGraph.nativeElement
-      },
-      {
-        values: [
-          trainingData.map(datum => ({x: datum.input, y: datum.label})),
-          predictions.map(datum => ({x: datum.input, y: datum.label}))
-        ],
-        series: seriesNames},
-      {
-        xLabel: 'inputs',
-        yLabel: 'labels',
-        height: 300,
-        seriesColors
-      }
-    );
+    this.tfvis().then(({ render }) => {
+      render.scatterplot(
+        {
+          name: 'Model Predictions vs Original Data',
+          drawArea: this.univariateLinearRegressionGraph.nativeElement
+        },
+        {
+          values: [
+            trainingData.map(datum => ({x: datum.input, y: datum.label})),
+            predictions.map(datum => ({x: datum.input, y: datum.label}))
+          ],
+          series: seriesNames},
+        {
+          xLabel: 'inputs',
+          yLabel: 'labels',
+          height: 300,
+          seriesColors
+        }
+      );
+    });
   }
 }
 

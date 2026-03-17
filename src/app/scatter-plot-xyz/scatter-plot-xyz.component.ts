@@ -1,4 +1,4 @@
-import { Component, Input, OnChanges } from '@angular/core';
+import { Component, Input } from '@angular/core';
 import { PlotlyModule, PlotlyService } from 'angular-plotly.js';
 import { ThreeDimensionalData } from '../common-models/common-models';
 import Plotly from 'plotly.js-dist-min';

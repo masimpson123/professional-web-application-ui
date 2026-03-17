@@ -1,14 +1,11 @@
-import { Component } from '@angular/core';
-import { CubeComponent } from '../cube/cube.component';
-import { DataStreamComponent } from '../data-stream/data-stream.component';
+import { NgComponentOutlet } from '@angular/common';
+import { Component, Type } from '@angular/core';
 
 import { resumebase64 } from './resumebase64';
-import { AuthComponent } from '../auth/auth.component';
-import { MachineLearningComponent } from '../machine-learning/machine-learning.component';
 
 @Component({
   selector: 'app-ai',
-  imports: [CubeComponent, DataStreamComponent, AuthComponent, MachineLearningComponent],
+  imports: [NgComponentOutlet],
   templateUrl: './ai.component.html',
   styleUrl: './ai.component.css',
   standalone: true
@@ -17,11 +14,40 @@ export class AiComponent {
   conversation: string[] = ["Hello, I am an AI assistant that can help you navigate this web application and better understand Michael as a professional. Please input your query below."];
   project = "";
   thinking = false;
+  cubeComponent: Type<unknown>|null = null;
+  dataStreamComponent: Type<unknown>|null = null;
+  authComponent: Type<unknown>|null = null;
+  machineLearningComponent: Type<unknown>|null = null;
+
+  private async ensureComponentsForProject(project: string) {
+    const needsCube = project.includes('cube');
+    const needsData = project.includes('data');
+    const needsAuth = project.includes('auth');
+    const needsMl = project.includes('machine-learning');
+
+    if (needsCube && !this.cubeComponent) {
+      const { CubeComponent } = await import('../cube/cube.component');
+      this.cubeComponent = CubeComponent;
+    }
+    if (needsData && !this.dataStreamComponent) {
+      const { DataStreamComponent } = await import('../data-stream/data-stream.component');
+      this.dataStreamComponent = DataStreamComponent;
+    }
+    if (needsAuth && !this.authComponent) {
+      const { AuthComponent } = await import('../auth/auth.component');
+      this.authComponent = AuthComponent;
+    }
+    if (needsMl && !this.machineLearningComponent) {
+      const { MachineLearningComponent } = await import('../machine-learning/machine-learning.component');
+      this.machineLearningComponent = MachineLearningComponent;
+    }
+  }
+
   submitAIQuery(query:string) {
     this.thinking = true;
     this.conversation.push(query)
-    // fetch("http://localhost:8080/ai", {
-    fetch("https://endpoint-one-2-205823180568.us-central1.run.app/ai", {
+    fetch("http://localhost:8080/ai", {
+    // fetch("https://endpoint-one-2-205823180568.us-central1.run.app/ai", {
       method: 'POST',
       headers: {'Content-Type': 'application/json'},
       body: JSON.stringify(
@@ -52,13 +78,18 @@ export class AiComponent {
       .then(response => response.json())
       .then(data => {
         this.thinking = false;
-        JSON.parse(data.response).candidates
-          .forEach((candidate:any) => candidate.content.parts
-            .forEach((part:any) => {
-              let response = part.text.replaceAll("\n"," ").trim().split(" ");
-              this.project = response.pop();
-              this.conversation.push(response.join(" "));
-            }))
+        const parsed = JSON.parse(data.response) as {
+          candidates?: { content?: { parts?: { text?: string }[] } }[]
+        };
+        parsed.candidates
+          ?.flatMap(candidate => candidate.content?.parts ?? [])
+          .forEach(part => {
+            const text = part.text ?? '';
+            const response = text.replaceAll("\n", " ").trim().split(" ");
+            this.project = response.pop() ?? '';
+            this.conversation.push(response.join(" "));
+          });
+        void this.ensureComponentsForProject(this.project);
       })
       .catch(err => console.log(err));
   }
