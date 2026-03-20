@@ -1,10 +1,16 @@
-<button routerLink="/root">Root</button>
-<button routerLink="/ai">AI</button>
-<button routerLink="/machine-learning">Machine learning</button>
-<button routerLink="/auth">End user authentication</button>
-<button routerLink="/cube">Interactive cube</button>
-<button routerLink="/data-stream">Data stream</button>
-<button routerLink="/form">Forms</button>
-<button routerLink="/resume">Resume</button>
-<hr />
-<router-outlet />
+<nav class="top-nav">
+  <span class="nav-brand">MAS</span>
+  <div class="nav-links">
+    <button routerLink="/root">Home</button>
+    <button routerLink="/ai">AI</button>
+    <button routerLink="/machine-learning">Machine Learning</button>
+    <button routerLink="/auth">Auth</button>
+    <button routerLink="/cube">3D Cube</button>
+    <button routerLink="/data-stream">Data Stream</button>
+    <button routerLink="/form">Forms</button>
+    <button routerLink="/resume">Resume</button>
+  </div>
+</nav>
+<main>
+  <router-outlet />
+</main>

@@ -1,0 +1,57 @@
+.top-nav {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0 24px;
+  height: 56px;
+  background: #475569;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.15);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+.nav-brand {
+  font-size: 18px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  color: #ffffff;
+  margin-right: 16px;
+  font-family: 'Segoe UI', system-ui, sans-serif;
+  flex-shrink: 0;
+}
+
+.nav-links {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  flex-wrap: wrap;
+}
+
+.nav-links button {
+  background: transparent;
+  border: none;
+  color: #ffffff;
+  font-size: 13px;
+  font-family: 'Segoe UI', system-ui, sans-serif;
+  font-weight: 500;
+  padding: 6px 14px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+  white-space: nowrap;
+  letter-spacing: 0.01em;
+}
+
+.nav-links button:hover {
+  background: rgba(0, 0, 0, 0.15);
+  color: #fff;
+}
+
+.nav-links button:active {
+  background: rgba(0, 0, 0, 0.25);
+}
+
+main {
+  padding: 24px;
+}
