@@ -1,14 +1,18 @@
 <nav class="top-nav">
   <span class="nav-brand">MAS</span>
-  <div class="nav-links">
-    <button routerLink="/root">Home</button>
-    <button routerLink="/ai">AI</button>
-    <button routerLink="/machine-learning">Machine Learning</button>
-    <button routerLink="/auth">Auth</button>
-    <button routerLink="/cube">3D Cube</button>
-    <button routerLink="/data-stream">Data Stream</button>
-    <button routerLink="/form">Forms</button>
-    <button routerLink="/resume">Resume</button>
+  <button class="hamburger" (click)="toggleMenu()" [attr.aria-expanded]="menuOpen" aria-label="Toggle navigation">
+    <span></span><span></span><span></span>
+  </button>
+  <div class="nav-links" [class.open]="menuOpen">
+    <button routerLink="/root" (click)="closeMenu()">Home</button>
+    <button routerLink="/ai" (click)="closeMenu()">AI</button>
+    <button routerLink="/machine-learning" (click)="closeMenu()">Machine Learning</button>
+    <button routerLink="/auth" (click)="closeMenu()">Auth</button>
+    <button routerLink="/cube" (click)="closeMenu()">3D Cube</button>
+    <button routerLink="/data-stream" (click)="closeMenu()">Data Stream</button>
+    <button routerLink="/form" (click)="closeMenu()">Forms</button>
+    <button routerLink="/websocket" (click)="closeMenu()">Websockets</button>
+    <button routerLink="/resume" (click)="closeMenu()">Resume</button>
   </div>
 </nav>
 <main>

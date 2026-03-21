@@ -8,6 +8,7 @@ export const routes: Routes = [
     {path: 'ai', loadComponent: () => import('./ai/ai.component').then(c => c.AiComponent)},
     {path: 'resume', loadComponent: () => import('./resume/resume.component').then(c => c.ResumeComponent)},
     {path: 'form', loadComponent: () => import('./form/form.component').then(c => c.FormComponent)},
+    {path: 'websocket', loadComponent: () => import('./websocket/websocket.component').then(c => c.WebsocketComponent)},
     {path: 'machine-learning', loadComponent: () => import('./machine-learning/machine-learning.component').then(c => c.MachineLearningComponent)},
     {path: '**', loadComponent: () => import('./root/root.component').then(c => c.RootComponent)},
 ];

@@ -1,0 +1,12 @@
+<p>This WebSocket study was developed using Cloud Run, Docker, Angular, TypeScript, Spring, Java, and Stomp.</p>
+<br />
+<button [disabled]="connecting" (click)="connect()">CONNECT</button><br />
+<textarea #message>Hello, websocket!</textarea><br />
+<button [disabled]="connecting" (click)="sendMessage(message.value)">SEND MESSAGE</button><br />
+@for (message of messages; track message) {
+  <p class="chat-message">{{message}}</p>
+}
+<button [disabled]="connecting" (click)="disconnect()">DISCONNECT</button><br />
+@if (connecting) {
+  <p>Connecting...</p>
+}
