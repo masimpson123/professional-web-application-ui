@@ -16,9 +16,11 @@ msio-u7qjhl7iia-uc.a.run.app
 
 ###
 
+# START DOCKER
+open -a Docker && while ! docker info > /dev/null 2>&1; do sleep 1 ; done
+
 # BUILD IMAGE
 cd /Users/livingroom/Desktop/client-2026
-open docker desktop or run the docker daemon some other way
 docker build --platform linux/amd64 -t client2026 .
 
 # RUN IMAGE
