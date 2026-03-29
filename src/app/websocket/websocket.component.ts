@@ -26,10 +26,10 @@ export class WebsocketComponent implements OnDestroy {
   connect() {
     this.stompSignal.set(new Client({
       reconnectDelay: 0,
-      brokerURL: 'ws://localhost:8080/websocket-broker',
-      // brokerURL: 'wss://endpoint-one-2-205823180568.us-central1.run.app/websocket-broker',
+      // brokerURL: 'ws://localhost:8080/websocket-broker',
+      brokerURL: 'wss://endpoint-one-2-205823180568.us-central1.run.app/websocket-broker',
       onConnect: () => {
-        this.stompSignal()?.subscribe("/topic/" + this.websocketForm.roomId().value(),
+        this.stompSignal()?.subscribe("/sub/" + this.websocketForm.roomId().value(),
         message => {
           this.messages.push(message.body);
         });
@@ -58,7 +58,7 @@ export class WebsocketComponent implements OnDestroy {
   sendMessage(message: string) {
     try {
       this.stompSignal()?.publish({
-        destination: "/app/" + this.websocketForm.roomId().value(),
+        destination: "/pub/" + this.websocketForm.roomId().value(),
         body: message
       });
     } catch (error) {
