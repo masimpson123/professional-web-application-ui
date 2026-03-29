@@ -1,25 +1,36 @@
-import { Component, OnDestroy } from '@angular/core';
+import { Component, OnDestroy, signal } from '@angular/core';
 
 import { Client } from '@stomp/stompjs';
+import { form, Field, disabled } from '@angular/forms/signals';
 
 @Component({
   selector: 'app-websocket',
-  imports: [],
+  imports: [Field],
   templateUrl: './websocket.component.html',
   styleUrl: './websocket.component.css',
   standalone: true
 })
 export class WebsocketComponent implements OnDestroy {
-  client: Client;
+  stompSignal = signal<Client|null>(null);
   connecting = false;
   messages: string[] = [];
-  constructor() {
-    this.client = new Client({
+  websocketForm = form(
+    signal<ConnectionData>({
+      roomId: ""
+    }),
+    form => disabled(form.roomId, () => !!this.stompSignal())
+  );
+  ngOnDestroy() {
+    this.disconnect();
+  }
+  connect() {
+    this.stompSignal.set(new Client({
       reconnectDelay: 0,
-      // brokerURL: 'ws://localhost:8080/websocket-broker',
+      //brokerURL: 'ws://localhost:8080/websocket-broker',
       brokerURL: 'wss://endpoint-one-2-205823180568.us-central1.run.app/websocket-broker',
       onConnect: () => {
-        this.client.subscribe('/websocket-output', message => {
+        this.stompSignal()?.subscribe("/topic/room/" + this.websocketForm.roomId().value(),
+        message => {
           this.messages.push(message.body);
         });
         this.connecting = false;
@@ -36,26 +47,26 @@ export class WebsocketComponent implements OnDestroy {
       onDisconnect: () => {
         alert("The websocket connection has been destroyed.");
       },
-    });
-  }
-  ngOnDestroy() {
-    this.disconnect();
-  }
-  connect() {
+    }));
     this.connecting = true;
-    this.client.activate();
+    this.stompSignal()?.activate();
   }
   disconnect() {
-    this.client.deactivate();
+    this.stompSignal()?.deactivate();
+    this.stompSignal.set(null);
   }
   sendMessage(message: string) {
     try {
-      this.client.publish({
-        destination: "/websocket-input",
+      this.stompSignal()?.publish({
+        destination: "/app/room/" + this.websocketForm.roomId().value(),
         body: message
       });
     } catch (error) {
       alert(error);
     }
   }
+}
+
+interface ConnectionData {
+  roomId: string;
 }
