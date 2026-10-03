@@ -1,10 +1,12 @@
 <div [formGroup]="securityFormGroup">
-    <div formGroupName="securityIntake">
-    <label for="security-term">Security term: </label>
-    <input id="security-term" type="text" formControlName="securityTerm" placeholder="bingo" />
-    <br />
-    <label for="security-token">Security token: </label>
-    <input id="security-token" type="text" formControlName="securityToken" placeholder="234-r67-111" />
-    <br />
+  <div formGroupName="securityIntake" class="stack">
+    <div class="field">
+      <label for="security-term">Security term</label>
+      <input id="security-term" type="text" formControlName="securityTerm" placeholder="bingo" />
     </div>
+    <div class="field">
+      <label for="security-token">Security token <span class="hint">(optional)</span></label>
+      <input id="security-token" type="text" formControlName="securityToken" placeholder="234-r67-111" />
+    </div>
+  </div>
 </div>

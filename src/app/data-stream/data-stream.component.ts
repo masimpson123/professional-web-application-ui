@@ -3,10 +3,11 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { toObservable } from '@angular/core/rxjs-interop'
 import { debounceTime, tap } from 'rxjs';
+import { DemoHeaderComponent } from '../demo-header/demo-header.component';
 
 @Component({
   selector: 'app-data-stream',
-  imports: [FormsModule, CommonModule],
+  imports: [FormsModule, CommonModule, DemoHeaderComponent],
   templateUrl: './data-stream.component.html',
   styleUrl: './data-stream.component.css',
   standalone: true

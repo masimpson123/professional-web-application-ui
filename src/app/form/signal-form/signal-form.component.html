@@ -1,7 +1,18 @@
-<p>The inputs below are an Angular Signal Form.</p>
-<br />
-<input type="email" placeholder="email" [field]="loginForm.email" /> <br>
-<input type="password" placeholder="password" [field]="loginForm.password" /> <br>
-<button (click)="randomlyGeneratePassword()">Randomly generate a password</button> <br>
-<p>email signal value: {{ loginForm.email().value() }}</p>
-<p>password signal value: {{ loginForm.password().value() }}</p>
+<p class="hint intro">These fields are bound to a signal model. The values below update as you type.</p>
+<div class="stack">
+  <div class="field">
+    <label for="signal-email">Email</label>
+    <input id="signal-email" type="email" placeholder="you@example.com" [field]="loginForm.email" />
+  </div>
+  <div class="row">
+    <div class="field">
+      <label for="signal-password">Password</label>
+      <input id="signal-password" type="password" [field]="loginForm.password" />
+    </div>
+    <button (click)="randomlyGeneratePassword()">Generate a password</button>
+  </div>
+</div>
+<dl class="values">
+  <div><dt>email()</dt><dd>{{ loginForm.email().value() || '—' }}</dd></div>
+  <div><dt>password()</dt><dd>{{ loginForm.password().value() || '—' }}</dd></div>
+</dl>

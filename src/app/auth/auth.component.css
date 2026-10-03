@@ -1,0 +1,46 @@
+:host {
+  display: block;
+  max-width: 68rem;
+}
+
+.session {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding-bottom: 1.25rem;
+  margin-bottom: 1.5rem;
+  border-bottom: 1px solid var(--rule);
+}
+
+.token {
+  margin-bottom: 1.5rem;
+  padding: 1rem;
+  border-radius: var(--radius-control);
+  background: var(--paper);
+}
+
+.token-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 0.75rem;
+}
+
+.token h2 {
+  font-size: var(--step-0);
+}
+
+.token code {
+  display: block;
+  max-height: 6.5rem;
+  overflow: auto;
+  overflow-wrap: anywhere;
+  font-size: 0.8125rem;
+  line-height: 1.5;
+}
+
+.token .hint {
+  margin-top: 0.75rem;
+}

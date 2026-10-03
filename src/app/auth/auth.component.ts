@@ -9,17 +9,18 @@ import {
   Unsubscribe
 } from 'firebase/auth';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
-
+import { DemoHeaderComponent } from '../demo-header/demo-header.component';
 
 @Component({
   selector: 'app-auth',
-  imports: [],
+  imports: [DemoHeaderComponent],
   templateUrl: './auth.component.html',
   styleUrl: './auth.component.css',
   standalone: true
 })
 export class AuthComponent implements OnDestroy {
   token = '';
+  tokenCopied = false;
   loading = false;
   stopListeningForAuthEvents: Unsubscribe;
   
@@ -35,6 +36,13 @@ export class AuthComponent implements OnDestroy {
     });
   }
   
+  copyToken() {
+    navigator.clipboard.writeText(this.token).then(() => {
+      this.tokenCopied = true;
+      setTimeout(() => this.tokenCopied = false, 2000);
+    });
+  }
+
   ngOnDestroy() {
     this.stopListeningForAuthEvents();
   }

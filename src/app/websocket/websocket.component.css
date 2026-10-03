@@ -1,0 +1,32 @@
+:host {
+  display: block;
+  max-width: 68rem;
+}
+
+.composer,
+.received {
+  padding-top: 1.5rem;
+  border-top: 1px solid var(--rule);
+}
+
+.composer .row {
+  margin-top: 0.75rem;
+}
+
+.log-heading {
+  margin-bottom: 0.75rem;
+  font-size: var(--step-1);
+}
+
+.log {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  border-top: 1px solid var(--ink);
+}
+
+.log li {
+  padding: 0.625rem 0;
+  border-bottom: 1px solid var(--rule);
+  overflow-wrap: anywhere;
+}

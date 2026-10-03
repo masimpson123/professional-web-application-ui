@@ -1,55 +1,67 @@
-@for (message of conversation; track message; let i = $index) {
-  <p>
-    @if (i%2===1) {
-      <b class="chat-message">{{message}}</b>
-    }
-    @if (i%2===0) {
-      <code class="chat-message">{{message}}</code>
-    }
-  </p>
-}
+<app-demo-header id="ai" />
 
-@if (thinking) {
-  <i class="chat-message">Thinking...</i>
-}
-<textarea #message class="chat-input"></textarea><br />
-<button
-  [disabled]="thinking"
-  (click)="submitAIQuery(message.value); message.value = ''"
->Submit</button>
+<section class="stage chat" aria-label="Conversation">
+  <ol class="transcript" aria-live="polite">
+    @for (message of conversation; track $index; let i = $index) {
+      <li [class.user]="i % 2 === 1">
+        <span class="visually-hidden">{{ i % 2 === 1 ? 'You:' : 'Assistant:' }}</span>
+        {{ message }}
+      </li>
+    }
+    @if (thinking) {
+      <li class="status busy">Thinking…</li>
+    }
+  </ol>
+
+  <form class="composer" (submit)="$event.preventDefault(); ask(message)">
+    <label for="ai-query" class="visually-hidden">Your question</label>
+    <textarea
+      id="ai-query"
+      #message
+      rows="2"
+      placeholder="Ask about Michael’s experience, or which demo shows a skill you care about"
+      (keydown.enter)="onEnter($event, message)"
+      (input)="draft = message.value"
+    ></textarea>
+    <div class="row">
+      <button class="primary" type="submit" [disabled]="thinking || !draft.trim()">Ask</button>
+      <span class="hint">Enter to send, Shift+Enter for a new line</span>
+    </div>
+  </form>
+</section>
+
 @if (project && project !== 'other') {
-  <span>
-    <br>
-    <br>
-    <hr>
-    <br>
-    @if (project.includes('cube')) {
-      @if (cubeComponent) {
-        <ng-container *ngComponentOutlet="cubeComponent"></ng-container>
-      } @else {
-        <i class="chat-message">Loading cube…</i>
+  <section class="recommended" aria-labelledby="recommended-heading">
+    <h2 id="recommended-heading">Recommended demo</h2>
+    <div class="embed">
+      @if (project.includes('cube')) {
+        @if (cubeComponent) {
+          <ng-container *ngComponentOutlet="cubeComponent"></ng-container>
+        } @else {
+          <p class="status busy">Loading the 3D visualization…</p>
+        }
       }
-    }
-    @if (project.includes('data')) {
-      @if (dataStreamComponent) {
-        <ng-container *ngComponentOutlet="dataStreamComponent"></ng-container>
-      } @else {
-        <i class="chat-message">Loading data stream…</i>
+      @if (project.includes('data')) {
+        @if (dataStreamComponent) {
+          <ng-container *ngComponentOutlet="dataStreamComponent"></ng-container>
+        } @else {
+          <p class="status busy">Loading streaming search…</p>
+        }
       }
-    }
-    @if (project.includes('auth')) {
-      @if (authComponent) {
-        <ng-container *ngComponentOutlet="authComponent"></ng-container>
-      } @else {
-        <i class="chat-message">Loading auth…</i>
+      @if (project.includes('auth')) {
+        @if (authComponent) {
+          <ng-container *ngComponentOutlet="authComponent"></ng-container>
+        } @else {
+          <p class="status busy">Loading authentication…</p>
+        }
       }
-    }
-    @if (project.includes('machine-learning')) {
-      @if (machineLearningComponent) {
-        <ng-container *ngComponentOutlet="machineLearningComponent"></ng-container>
-      } @else {
-        <i class="chat-message">Loading machine learning…</i>
+      @if (project.includes('machine-learning')) {
+        @if (machineLearningComponent) {
+          <ng-container *ngComponentOutlet="machineLearningComponent"></ng-container>
+        } @else {
+          <p class="status busy">Loading machine learning…</p>
+        }
       }
-    }
-  </span>
+    </div>
+  </section>
 }

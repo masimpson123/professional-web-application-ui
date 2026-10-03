@@ -5,16 +5,18 @@ import { WelcomeComponent } from './welcome/welcome.component';
 import { UserIntakeComponent } from './user-intake/user-intake.component';
 import { SecurityIntakeComponent } from './security-intake/security-intake.component';
 import { SignalFormComponent } from "./signal-form/signal-form.component";
+import { DemoHeaderComponent } from '../demo-header/demo-header.component';
 
 @Component({
   selector: 'app-form',
-  imports: [ReactiveFormsModule, ConfirmationComponent, WelcomeComponent, UserIntakeComponent, SecurityIntakeComponent, SignalFormComponent],
+  imports: [ReactiveFormsModule, ConfirmationComponent, WelcomeComponent, UserIntakeComponent, SecurityIntakeComponent, SignalFormComponent, DemoHeaderComponent],
   templateUrl: './form.component.html',
   styleUrl: './form.component.css',
   standalone: true
 })
 export class FormComponent {
   currentStep = 1;
+  readonly steps = ['Welcome', 'Your details', 'Security', 'Confirm'];
   securityForm = new FormGroup({
     userIntake: new FormGroup({
       usersName: new FormControl('', [Validators.required, forbiddenCharacterSequenceValidator(new RegExp('q'))]),

@@ -1,0 +1,16 @@
+:host {
+  display: block;
+  max-width: 68rem;
+}
+
+.controls {
+  margin-bottom: 1.5rem;
+}
+
+canvas {
+  display: block;
+  width: 100%;
+  max-width: 50rem;
+  aspect-ratio: 16 / 9;
+  border-radius: var(--radius-control);
+}

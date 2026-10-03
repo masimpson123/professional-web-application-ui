@@ -7,7 +7,6 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 ```bash
 npm start          # Dev server at localhost:4200
 npm run build      # Production build
-npm test           # Unit tests via Karma/Jasmine
 npm run lint       # ESLint
 npm run watch      # Build with watch mode
 ```
@@ -15,6 +14,8 @@ npm run watch      # Build with watch mode
 The Express backend runs separately via `node index.js` on port 8080.
 
 ### Docker Deployment (Google Cloud Run)
+
+Run `/deploy-to-gcp` to sign in, build, and deploy the local working tree. The steps it runs:
 
 ```bash
 docker build --platform linux/amd64 -t client2026 .

@@ -1,9 +1,10 @@
 import { Component, ViewChild, ElementRef, Input, AfterViewInit, HostListener } from '@angular/core';
 import * as THREE from "three";
+import { DemoHeaderComponent } from '../demo-header/demo-header.component';
 
 @Component({
   selector: 'app-cube',
-  imports: [],
+  imports: [DemoHeaderComponent],
   templateUrl: './cube.component.html',
   styleUrl: './cube.component.css',
   standalone: true
@@ -23,8 +24,10 @@ export class CubeComponent implements AfterViewInit {
   desiredRotationX = 3.7699;
   cameraZ = 250;
 
-  private readonly MINT = 0x49796B;
-  private readonly ORANGE = 0xFF7F50;
+  // Match --slate, --signal, and --paper in styles.css.
+  private readonly MINT = 0x5E7A8A;
+  private readonly ORANGE = 0xD2401E;
+  private readonly BACKGROUND = 0xF4F6F7;
 
   private camera!: THREE.PerspectiveCamera;
   private get canvas():HTMLCanvasElement {
@@ -75,6 +78,15 @@ export class CubeComponent implements AfterViewInit {
     this.mouseCoordinates = [x,y];
   }
 
+  // The canvas is sized by CSS, so keep the drawing buffer and camera in step with it.
+  @HostListener('window:resize')
+  resize() {
+    if (!this.renderer) return;
+    this.renderer.setSize(this.canvas.clientWidth, this.canvas.clientHeight, false);
+    this.camera.aspect = this.getAspectRatio();
+    this.camera.updateProjectionMatrix();
+  }
+
   constructor() {
     this.lines.material.linewidth = 100;
     this.mouse = new THREE.Vector2();
@@ -88,8 +100,8 @@ export class CubeComponent implements AfterViewInit {
   }
 
   private highlight(coordinates: number[]) {
-    this.mouse.x = (coordinates[0] / 800) * 2 - 1;
-    this.mouse.y = -(coordinates[1] / 450) * 2 + 1;
+    this.mouse.x = (coordinates[0] / this.canvas.clientWidth) * 2 - 1;
+    this.mouse.y = -(coordinates[1] / this.canvas.clientHeight) * 2 + 1;
     this.raycaster.setFromCamera(this.mouse, this.camera);
     const intersects = this.raycaster.intersectObjects(this.scene.children);
     let faceIndex: number|undefined = undefined;
@@ -112,7 +124,7 @@ export class CubeComponent implements AfterViewInit {
   private createScene() {
     // Scene
     this.scene = new THREE.Scene();
-    this.scene.background = new THREE.Color(0x708090);
+    this.scene.background = new THREE.Color(this.BACKGROUND);
     this.scene.add(this.cube);
     // this.scene.add(this.lines);
     this.light.position.set(2,2,2);
@@ -144,7 +156,7 @@ export class CubeComponent implements AfterViewInit {
   private startRenderingLoop() {
     this.renderer = new THREE.WebGLRenderer({canvas: this.canvas});
     this.renderer.setPixelRatio(devicePixelRatio);
-    this.renderer.setSize(this.canvas.clientWidth, this.canvas.clientHeight);
+    this.renderer.setSize(this.canvas.clientWidth, this.canvas.clientHeight, false);
 
     const component: CubeComponent = this;
     (function render() {

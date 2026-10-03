@@ -2,10 +2,11 @@ import { Component, OnDestroy, signal } from '@angular/core';
 
 import { Client } from '@stomp/stompjs';
 import { form, Field, disabled } from '@angular/forms/signals';
+import { DemoHeaderComponent } from '../demo-header/demo-header.component';
 
 @Component({
   selector: 'app-websocket',
-  imports: [Field],
+  imports: [Field, DemoHeaderComponent],
   templateUrl: './websocket.component.html',
   styleUrl: './websocket.component.css',
   standalone: true

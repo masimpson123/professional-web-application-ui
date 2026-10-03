@@ -1,0 +1,55 @@
+:host {
+  display: block;
+  max-width: 68rem;
+}
+
+.field + .hint {
+  margin-top: 0.5rem;
+}
+
+.results-heading {
+  margin: 2rem 0 0.75rem;
+  font-size: var(--step-1);
+}
+
+.results {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  counter-reset: arrival;
+  border-top: 1px solid var(--ink);
+}
+
+.results li {
+  counter-increment: arrival;
+  display: grid;
+  grid-template-columns: 2rem minmax(8rem, 14rem) 1fr;
+  gap: 1rem;
+  padding: 0.625rem 0;
+  border-bottom: 1px solid var(--rule);
+}
+
+/* Arrival order is the point of the demo, so it is numbered. */
+.results li::before {
+  content: counter(arrival);
+  color: var(--graphite);
+  font-variant-numeric: tabular-nums;
+}
+
+.dataset {
+  font-weight: 600;
+}
+
+.value {
+  overflow-wrap: anywhere;
+}
+
+@media (max-width: 600px) {
+  .results li {
+    grid-template-columns: 2rem 1fr;
+  }
+
+  .value {
+    grid-column: 2;
+  }
+}

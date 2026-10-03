@@ -1,12 +1,17 @@
-import { CurrencyPipe, NgComponentOutlet } from '@angular/common';
+import { NgComponentOutlet } from '@angular/common';
 import { Component, ElementRef, Type, ViewChild, effect, signal } from '@angular/core';
 import * as tf from '@tensorflow/tfjs';
 import { form, Field, min, max, disabled } from '@angular/forms/signals';
 import { ThreeDimensionalData } from '../common-models/common-models';
+import { DemoHeaderComponent } from '../demo-header/demo-header.component';
+
+// Matches --slate and --signal in styles.css: observed data is slate, model output is signal.
+const DATA_COLOR = '#5e7a8a';
+const PREDICTION_COLOR = '#d2401e';
 
 @Component({
   selector: 'app-machine-learning',
-  imports: [Field, CurrencyPipe, NgComponentOutlet],
+  imports: [Field, NgComponentOutlet, DemoHeaderComponent],
   templateUrl: './machine-learning.component.html',
   styleUrl: './machine-learning.component.css',
 })
@@ -33,10 +38,10 @@ export class MachineLearningComponent {
     temperature: 80
   });
   revenuePredictionForm = form(this.revenuePredictionModel, (schemaPath) => {
-    min(schemaPath.price, 1, { message: 'We should charge more' });
-    max(schemaPath.price, 10, { message: 'We should charge less' });
-    min(schemaPath.temperature, 55, { message: 'That is too cold' });
-    max(schemaPath.temperature, 100, { message: 'That is too hot' });
+    min(schemaPath.price, 1, { message: 'Enter a price of at least $1.' });
+    max(schemaPath.price, 10, { message: 'Enter a price of $10 or less.' });
+    min(schemaPath.temperature, 55, { message: 'Enter a temperature of at least 55 °F.' });
+    max(schemaPath.temperature, 100, { message: 'Enter a temperature of 100 °F or less.' });
     disabled(schemaPath.price, this.multivariateTrainingRequired);
     disabled(schemaPath.temperature, this.multivariateTrainingRequired);
   });
@@ -78,8 +83,8 @@ export class MachineLearningComponent {
     this.renderScatterPlot(
       this.univariateData,
       [],
-      ['orangered', 'slategrey'],
-      ['2d traning data', 'predictions']
+      [DATA_COLOR, PREDICTION_COLOR],
+      ['Training data', 'Predictions']
     );
   }
   trainUnivariateModelRenderTrainingReport() {
@@ -137,8 +142,8 @@ export class MachineLearningComponent {
         this.renderScatterPlot(
           this.univariateData!,
           predictions,
-          ['slategrey', 'orangered'],
-          ['2d traning data', 'predictions']
+          [DATA_COLOR, PREDICTION_COLOR],
+          ['Training data', 'Predictions']
         );
       })
       .catch(err => {
@@ -169,7 +174,7 @@ export class MachineLearningComponent {
           ),
           []
         ];
-        this.multivariateScatterPlotSeriesColors = ['orangered'];
+        this.multivariateScatterPlotSeriesColors = [DATA_COLOR];
         this.multivariateScatterPlotSeriesNames = ['Training data'];
         void this.ensureScatterPlotLoaded();
       });
@@ -211,7 +216,7 @@ export class MachineLearningComponent {
       });
   }
   predictNumberOfUnitsSold() {
-    this.prediction = "Predicting number of units sold...";
+    this.prediction = 'Predicting sales…';
     fetch(this.apiUrl + 'tensorflow-get-multivariate-linear-regression-predictions', {
       method: 'POST',
       headers: {
@@ -241,7 +246,7 @@ export class MachineLearningComponent {
             (prediction: MultiVariatePrediction) =>
               ({x: prediction.feature1, y: prediction.feature2, z: prediction.predictedLabel}))
         ];
-        this.multivariateScatterPlotSeriesColors = ['slategrey', 'orangered'];
+        this.multivariateScatterPlotSeriesColors = [DATA_COLOR, PREDICTION_COLOR];
         this.multivariateScatterPlotSeriesNames = ['Training data', 'Predictions'];
         void this.ensureScatterPlotLoaded();
       })
@@ -262,7 +267,7 @@ export class MachineLearningComponent {
       )?.predictedLabel;
       this.prediction =
         prediction
-          ? `${prediction} water bottles will be sold for $${(prediction * (this.revenuePredictionModel().price * 10)) / 10}.`
+          ? `Predicted sales: ${prediction} bottles, or ${(prediction * price).toLocaleString('en-US', { style: 'currency', currency: 'USD' })} in revenue.`
           : null;
   }
   renderScatterPlot(
@@ -274,7 +279,7 @@ export class MachineLearningComponent {
     this.tfvis().then(({ render }) => {
       render.scatterplot(
         {
-          name: 'Model Predictions vs Original Data',
+          name: 'Predictions and training data',
           drawArea: this.univariateLinearRegressionGraph.nativeElement
         },
         {
@@ -284,9 +289,10 @@ export class MachineLearningComponent {
           ],
           series: seriesNames},
         {
-          xLabel: 'inputs',
-          yLabel: 'labels',
-          height: 300,
+          xLabel: 'Input',
+          yLabel: 'Label',
+          height: 320,
+          fontSize: 13,
           seriesColors
         }
       );

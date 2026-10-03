@@ -2,16 +2,18 @@ import { NgComponentOutlet } from '@angular/common';
 import { Component, Type } from '@angular/core';
 
 import { resumebase64 } from './resumebase64';
+import { DemoHeaderComponent } from '../demo-header/demo-header.component';
 
 @Component({
   selector: 'app-ai',
-  imports: [NgComponentOutlet],
+  imports: [NgComponentOutlet, DemoHeaderComponent],
   templateUrl: './ai.component.html',
   styleUrl: './ai.component.css',
   standalone: true
 })
 export class AiComponent {
-  conversation: string[] = ["Hello, I am an AI assistant that can help you navigate this web application and better understand Michael as a professional. Please input your query below."];
+  conversation: string[] = ["Hi. I can answer questions about Michael’s experience and point you to the demo that best shows it. What would you like to know?"];
+  draft = '';
   project = "";
   thinking = false;
   cubeComponent: Type<unknown>|null = null;
@@ -41,6 +43,20 @@ export class AiComponent {
       const { MachineLearningComponent } = await import('../machine-learning/machine-learning.component');
       this.machineLearningComponent = MachineLearningComponent;
     }
+  }
+
+  ask(input: HTMLTextAreaElement) {
+    const query = input.value.trim();
+    if (!query || this.thinking) return;
+    input.value = '';
+    this.draft = '';
+    this.submitAIQuery(query);
+  }
+
+  onEnter(event: Event, input: HTMLTextAreaElement) {
+    if ((event as KeyboardEvent).shiftKey) return;
+    event.preventDefault();
+    this.ask(input);
   }
 
   submitAIQuery(query:string) {
@@ -91,7 +107,11 @@ export class AiComponent {
           });
         void this.ensureComponentsForProject(this.project);
       })
-      .catch(err => console.log(err));
+      .catch(err => {
+        console.log(err);
+        this.thinking = false;
+        this.conversation.push("The assistant didn’t respond. Check your connection and ask again.");
+      });
   }
   instructions =
     `

@@ -1,0 +1,191 @@
+:host {
+  display: block;
+  max-width: 68rem;
+  container-type: inline-size;
+}
+
+.hero h1 {
+  font-size: var(--step-5);
+  font-weight: 600;
+  letter-spacing: -0.035em;
+  line-height: 1.05;
+}
+
+.role {
+  margin-top: 0.75rem;
+  font-size: var(--step-2);
+  font-weight: 400;
+  color: var(--graphite);
+}
+
+.lede {
+  margin-top: 1.5rem;
+  color: var(--graphite);
+  font-size: var(--step-1);
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  margin-top: 2rem;
+}
+
+.system {
+  margin-top: 4.5rem;
+}
+
+.system .hint {
+  margin-top: 0.375rem;
+}
+
+.map {
+  display: none;
+  margin: 1.75rem 0 0;
+}
+
+svg {
+  display: block;
+  width: 100%;
+  height: auto;
+  font-family: var(--font);
+}
+
+.zone {
+  fill: none;
+  stroke: var(--rule-strong);
+  stroke-dasharray: 4 4;
+}
+
+.zone-label,
+.annotation {
+  fill: var(--graphite);
+  font-size: 14px;
+}
+
+.node rect {
+  fill: var(--surface);
+  stroke: var(--rule-strong);
+  transition: stroke 0.15s, fill 0.15s;
+}
+
+.node text {
+  fill: var(--ink);
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.node .node-detail {
+  fill: var(--graphite);
+  font-size: 13px;
+  font-weight: 400;
+}
+
+.demo {
+  cursor: pointer;
+  outline: none;
+}
+
+.node.lit rect {
+  stroke: var(--signal);
+  stroke-width: 1.5;
+}
+
+.demo.lit rect {
+  fill: var(--signal-wash);
+}
+
+.demo:focus-visible rect {
+  stroke: var(--signal);
+  stroke-width: 2.5;
+}
+
+.bracket {
+  fill: none;
+  stroke: var(--rule-strong);
+}
+
+.edge line {
+  stroke: var(--slate);
+  stroke-width: 1.5;
+  stroke-dasharray: 1;
+  stroke-dashoffset: 1;
+  animation: draw 0.5s ease-out forwards;
+  animation-delay: calc(var(--i) * 80ms + 250ms);
+}
+
+.edge .head {
+  fill: var(--slate);
+  opacity: 0;
+  animation: appear 0.15s forwards;
+  animation-delay: calc(var(--i) * 80ms + 700ms);
+}
+
+.edge {
+  transition: opacity 0.15s;
+}
+
+.edge.dim {
+  opacity: 0.25;
+}
+
+.edge.lit line {
+  stroke: var(--signal);
+  stroke-width: 2.5;
+}
+
+.edge.lit .head {
+  fill: var(--signal);
+}
+
+@keyframes draw {
+  to { stroke-dashoffset: 0; }
+}
+
+@keyframes appear {
+  to { opacity: 1; }
+}
+
+.detail {
+  min-height: 3.2em;
+  margin-top: 1rem;
+  max-width: var(--measure);
+  color: var(--graphite);
+}
+
+.detail strong {
+  color: var(--ink);
+}
+
+.origin {
+  display: block;
+}
+
+.index {
+  list-style: none;
+  margin: 1.5rem 0 0;
+  padding: 0;
+}
+
+.index li {
+  padding: 1rem 0;
+  border-top: 1px solid var(--rule);
+}
+
+.index a {
+  font-weight: 600;
+}
+
+.index p {
+  margin-top: 0.25rem;
+}
+
+@container (min-width: 50rem) {
+  .map {
+    display: block;
+  }
+
+  .index {
+    display: none;
+  }
+}

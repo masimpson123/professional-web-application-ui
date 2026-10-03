@@ -17,35 +17,17 @@ if (!PlotlyService.plotly) {
   ],
   template: `
     @if (xyzData) {
-      <span class="no-margin">
-        <plotly-plot
-          [data]="plotData"
-          [layout]="{
-            showlegend: true,
-            legend: {
-              itemsizing: 'constant'
-            },
-            scene: {
-              camera: {
-                center: { x: 0, y: 0, z: -0.2 },
-                eye: {x: 2, y: 1, z: 1} 
-              },
-              xaxis: { title: { text: 'Price' } },
-              yaxis: { title: { text: 'Temperature' } },
-              zaxis: { title: { text: 'Water bottles sold' } },
-              aspectmode: 'cube'
-            },
-            margin: { l: 0, r: 0, b: 0, t: 0 },
-            width: 800,
-            height: 400
-          }"
-          [config]="{
-            responsive: true,
-            displayModeBar: false,
-            displaylogo: false
-          }"
-        ></plotly-plot>
-      </span>
+      <plotly-plot
+        [data]="plotData"
+        [layout]="layout"
+        [config]="{
+          responsive: true,
+          displayModeBar: false,
+          displaylogo: false
+        }"
+        [useResizeHandler]="true"
+        [style]="{ display: 'block', width: '100%', height: '440px' }"
+      ></plotly-plot>
     }
   `,
   styleUrl: './scatter-plot-xyz.component.css',
@@ -55,6 +37,34 @@ export class ScatterPlotXyzComponent {
   @Input() seriesColors: string[]|null = null;
   @Input() seriesNames: string[]|null = null;
   plotData:any = [];
+
+  private readonly axis = (text: string) => ({
+    title: { text },
+    gridcolor: '#d9dfe3',
+    zerolinecolor: '#b9c3ca',
+    backgroundcolor: '#ffffff',
+  });
+
+  // Fonts and grid colors match the tokens in styles.css.
+  readonly layout = {
+    autosize: true,
+    height: 440,
+    showlegend: true,
+    legend: { itemsizing: 'constant', x: 0, y: 1 },
+    font: { family: 'Geist, Helvetica Neue, Arial, sans-serif', size: 13, color: '#1b2730' },
+    paper_bgcolor: 'rgba(0,0,0,0)',
+    scene: {
+      camera: {
+        center: { x: 0, y: 0, z: -0.2 },
+        eye: { x: 2, y: 1, z: 1 }
+      },
+      xaxis: this.axis('Price ($)'),
+      yaxis: this.axis('Temperature (°F)'),
+      zaxis: this.axis('Bottles sold'),
+      aspectmode: 'cube'
+    },
+    margin: { l: 0, r: 0, b: 0, t: 0 },
+  };
   ngOnChanges() {
     if (!this.xyzData) return;
     this.plotData = this.xyzData.map((dataSet, index) => ({
@@ -64,8 +74,8 @@ export class ScatterPlotXyzComponent {
       mode: 'markers',
       type: 'scatter3d',
       marker: {
-        size: 1.5 - index,
-        color: this.seriesColors ? this.seriesColors[index] : 'slategrey',
+        size: index ? 1.5 : 3,
+        color: this.seriesColors ? this.seriesColors[index] : '#5e7a8a',
         colorscale: 'Viridis',
         opacity: 1
       },

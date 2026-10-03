@@ -1,0 +1,62 @@
+:host {
+  display: block;
+  max-width: 68rem;
+}
+
+.stepper {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem 1.5rem;
+  margin: 1.25rem 0 1.5rem;
+  padding: 0 0 1rem;
+  list-style: none;
+  counter-reset: step;
+  border-bottom: 1px solid var(--rule);
+  font-size: var(--step--1);
+  color: var(--graphite);
+}
+
+.stepper li {
+  counter-increment: step;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.stepper li::before {
+  content: counter(step);
+  display: grid;
+  place-items: center;
+  width: 1.5rem;
+  height: 1.5rem;
+  border: 1px solid var(--rule-strong);
+  border-radius: 50%;
+  font-weight: 600;
+}
+
+.stepper .done::before {
+  border-color: var(--ink);
+}
+
+.stepper .current {
+  color: var(--ink);
+  font-weight: 600;
+}
+
+.stepper .current::before {
+  background: var(--ink);
+  border-color: var(--ink);
+  color: #fff;
+}
+
+.panel {
+  min-height: 8rem;
+}
+
+.actions {
+  margin-top: 1.5rem;
+}
+
+.actions + .hint {
+  margin-top: 0.75rem;
+}

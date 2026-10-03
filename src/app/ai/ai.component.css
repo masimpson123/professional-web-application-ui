@@ -1,3 +1,55 @@
-.chat-input {
-    width: calc(100% - 16px);
+:host {
+  display: block;
+  max-width: 68rem;
+}
+
+.chat {
+  max-width: 48rem;
+}
+
+.transcript {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.transcript li {
+  max-width: 62ch;
+  white-space: pre-line;
+}
+
+.transcript li:not(.user):not(.status) {
+  padding-left: 1rem;
+  border-left: 2px solid var(--slate);
+}
+
+.transcript .user {
+  align-self: flex-end;
+  padding: 0.625rem 0.875rem;
+  border-radius: var(--radius-surface) var(--radius-surface) 4px var(--radius-surface);
+  background: var(--paper);
+}
+
+.composer {
+  margin-top: 1.5rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid var(--rule);
+}
+
+.composer .row {
+  margin-top: 0.75rem;
+  align-items: center;
+}
+
+.recommended {
+  margin-top: 3rem;
+}
+
+.recommended > h2 {
+  margin-bottom: 1.5rem;
+  padding-bottom: 0.75rem;
+  border-bottom: 1px solid var(--ink);
 }

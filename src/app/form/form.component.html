@@ -1,25 +1,50 @@
-@if (currentStep === 1) {
-  <app-welcome></app-welcome>
-}
-@if (currentStep === 2) {
-  <app-user-intake
-    [(securityFormGroup)]="securityForm"
-  ></app-user-intake>
-}
-@if (currentStep === 3) {
-  <app-security-intake
-    [(securityFormGroup)]="securityForm"
-  ></app-security-intake>
-}
-@if (currentStep === 4) {
-  <app-confirmation
-  ></app-confirmation>
-}
+<app-demo-header id="form" />
 
-<button (click)="previous()">PREVIOUS</button>
-<button (click)="next()">NEXT</button>
-<button (click)="submit()" [disabled]="!securityForm.valid">SUBMIT</button>
+<section class="stage" aria-labelledby="reactive-heading">
+  <h2 id="reactive-heading">Multi-step reactive form</h2>
 
-<hr />
+  <ol class="stepper">
+    @for (step of steps; track step; let i = $index) {
+      <li [class.current]="currentStep === i + 1" [class.done]="currentStep > i + 1" [attr.aria-current]="currentStep === i + 1 ? 'step' : null">
+        {{ step }}
+      </li>
+    }
+  </ol>
 
-<app-signal-form></app-signal-form>
+  <div class="panel">
+    @if (currentStep === 1) {
+      <app-welcome></app-welcome>
+    }
+    @if (currentStep === 2) {
+      <app-user-intake
+        [(securityFormGroup)]="securityForm"
+      ></app-user-intake>
+    }
+    @if (currentStep === 3) {
+      <app-security-intake
+        [(securityFormGroup)]="securityForm"
+      ></app-security-intake>
+    }
+    @if (currentStep === 4) {
+      <app-confirmation
+      ></app-confirmation>
+    }
+  </div>
+
+  <div class="row actions">
+    <button [disabled]="currentStep === 1" (click)="previous()">Back</button>
+    @if (currentStep < steps.length) {
+      <button class="primary" (click)="next()">Next</button>
+    } @else {
+      <button class="primary" (click)="submit()" [disabled]="!securityForm.valid">Submit</button>
+    }
+  </div>
+  @if (currentStep === steps.length && !securityForm.valid) {
+    <p class="hint">Go back and fill in the required fields to submit.</p>
+  }
+</section>
+
+<section class="stage" aria-labelledby="signal-heading">
+  <h2 id="signal-heading">Signal form</h2>
+  <app-signal-form></app-signal-form>
+</section>

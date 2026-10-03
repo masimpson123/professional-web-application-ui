@@ -1,16 +1,25 @@
-<p>This search service was developed with Angular, Spring Boot, RxJS, the Fetch API, the StreamingResponseBody class, and the CompletableFuture class. It searches multiple data stores concurrently and returns the results as they are found.</p>
-<br>
-<input type="text" [(ngModel)]="searchInput" />
-<ol>
-  @for (result of results; track result; let i = $index) {
-    <li>
-      @for (item of result | keyvalue; track item) {
-        <div>
-          Dataset: {{ item.key | titlecase }} <br>
-          Results: {{ item.value }}
-        </div>
+<app-demo-header id="data-stream" />
+
+<section class="stage">
+  <div class="field">
+    <label for="stream-search">Search term</label>
+    <input id="stream-search" type="search" [(ngModel)]="searchInput" />
+  </div>
+  <p class="hint">Results appear 500 ms after you stop typing. A new search cancels the one in flight.</p>
+
+  <h2 class="results-heading">Results</h2>
+  @if (results.length) {
+    <ol class="results" aria-live="polite">
+      @for (result of results; track result) {
+        @for (item of result | keyvalue; track item.key) {
+          <li>
+            <span class="dataset">{{ item.key | titlecase }}</span>
+            <span class="value">{{ item.value }}</span>
+          </li>
+        }
       }
-      <br>
-    </li>
+    </ol>
+  } @else {
+    <p class="hint">Each data store’s results appear here as soon as it answers, in arrival order.</p>
   }
-</ol>
+</section>

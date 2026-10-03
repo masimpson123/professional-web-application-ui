@@ -1,13 +1,46 @@
-<p>This WebSocket study was developed using Cloud Run, Docker, Angular, TypeScript, Spring, Java, and STOMP.</p>
-<br />
-<input type="text" placeholder="room name" [field]="websocketForm.roomId" /><br />
-<button [disabled]="connecting || !websocketForm.roomId().value()" (click)="connect()">CONNECT</button><br />
-<textarea #message>Hello, websocket!</textarea><br />
-<button [disabled]="connecting || !stompSignal()" (click)="sendMessage(message.value)">SEND MESSAGE</button><br />
-@for (message of messages; track message) {
-  <p class="chat-message">{{message}}</p>
-}
-<button [disabled]="connecting || !stompSignal()" (click)="disconnect()">DISCONNECT</button><br />
-@if (connecting) {
-  <p>Connecting...</p>
-}
+<app-demo-header id="websocket" />
+
+<section class="stage stack">
+  <div class="row">
+    <div class="field">
+      <label for="ws-room">Room name</label>
+      <input id="ws-room" type="text" placeholder="e.g. lobby" [field]="websocketForm.roomId" />
+    </div>
+    @if (stompSignal()) {
+      <button [disabled]="connecting" (click)="disconnect()">Disconnect</button>
+    } @else {
+      <button class="primary" [disabled]="connecting || !websocketForm.roomId().value()" (click)="connect()">Connect</button>
+    }
+  </div>
+
+  <p class="status" [class.live]="stompSignal() && !connecting" [class.busy]="connecting" aria-live="polite">
+    @if (connecting) {
+      Connecting to “{{ websocketForm.roomId().value() }}”…
+    } @else if (stompSignal()) {
+      Subscribed to “{{ websocketForm.roomId().value() }}”
+    } @else {
+      Not connected. Open this page in a second tab and join the same room to see messages arrive.
+    }
+  </p>
+
+  <div class="composer">
+    <label for="ws-message">Message</label>
+    <textarea id="ws-message" #message>Hello, websocket!</textarea>
+    <div class="row">
+      <button class="primary" [disabled]="connecting || !stompSignal()" (click)="sendMessage(message.value)">Publish message</button>
+    </div>
+  </div>
+
+  <div class="received">
+    <h2 class="log-heading">Received in this room</h2>
+    @if (messages.length) {
+      <ol class="log" aria-live="polite">
+        @for (message of messages; track $index) {
+          <li>{{ message }}</li>
+        }
+      </ol>
+    } @else {
+      <p class="hint">Messages published to this room appear here, including your own.</p>
+    }
+  </div>
+</section>

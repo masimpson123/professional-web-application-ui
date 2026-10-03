@@ -1,20 +1,33 @@
-<nav class="top-nav">
-  <span class="nav-brand">MAS</span>
-  <button class="hamburger" (click)="toggleMenu()" [attr.aria-expanded]="menuOpen" aria-label="Toggle navigation">
-    <span></span><span></span><span></span>
-  </button>
-  <div class="nav-links" [class.open]="menuOpen">
-    <button routerLink="/root" (click)="closeMenu()">Home</button>
-    <button routerLink="/ai" (click)="closeMenu()">AI</button>
-    <button routerLink="/machine-learning" (click)="closeMenu()">Machine Learning</button>
-    <button routerLink="/auth" (click)="closeMenu()">Auth</button>
-    <button routerLink="/cube" (click)="closeMenu()">3D Cube</button>
-    <button routerLink="/data-stream" (click)="closeMenu()">Data Stream</button>
-    <button routerLink="/form" (click)="closeMenu()">Forms</button>
-    <button routerLink="/websocket" (click)="closeMenu()">Websockets</button>
-    <button routerLink="/resume" (click)="closeMenu()">Resume</button>
-  </div>
+<header class="shell-bar">
+  <a class="brand" routerLink="/root" (click)="closeMenu()">
+    <span class="brand-name">Michael Austin Simpson</span>
+    <span class="brand-role">Staff software engineer and architect</span>
+  </a>
+  <button
+    class="menu-toggle"
+    (click)="toggleMenu()"
+    [attr.aria-expanded]="menuOpen"
+    aria-controls="site-nav"
+  >{{ menuOpen ? 'Close' : 'Menu' }}</button>
+</header>
+
+<nav id="site-nav" class="rail" [class.open]="menuOpen" aria-label="Site">
+  <a class="rail-link" routerLink="/root" routerLinkActive="active" ariaCurrentWhenActive="page" (click)="closeMenu()">Overview</a>
+  @for (group of groups; track group) {
+    <div class="rail-group">
+      <h2 class="rail-heading">{{ group }}</h2>
+      <ul>
+        @for (demo of demosIn(group); track demo.id) {
+          <li>
+            <a class="rail-link" [routerLink]="demo.route" routerLinkActive="active" ariaCurrentWhenActive="page" (click)="closeMenu()">{{ demo.title }}</a>
+          </li>
+        }
+      </ul>
+    </div>
+  }
+  <a class="rail-link resume" [href]="resumeUrl" target="_blank" rel="noopener" (click)="closeMenu()">Résumé (PDF)</a>
 </nav>
+
 <main>
   <router-outlet />
 </main>

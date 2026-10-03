@@ -1,46 +1,96 @@
-<p>This machine learning project was developed with Express, Node.js, JavaScript, Angular, TypeScript, and Tensorflow.</p>
-<br />
-<button (click)="generateRenderUnivariateTrainingData()">Generate and render univariate training data</button><br />
-<button [disabled]="!univariateData" (click)="trainUnivariateModelRenderTrainingReport()">Train sequential model with univariate training data and render training report</button><br />
-<button [disabled]="univariateTrainingRequired" (click)="getRenderUnivariateLinearRegressionPredictions()">Get and render univariate linear regression predictions</button><br />
-@if (univariateData) {
-    <br />
-    <hr />
-    <br />
-}
-<div #univariatelinearregressiongraph class="container"></div>
-@if (univariateTrainingReport || univariateModelIsTraining) {
-    <br />
-    <hr />
-    <br />
-}
-@if (univariateModelIsTraining) {
-  <i class="training-message">Training...</i>
-}
-<div #univariatetrainingreport class="container"></div>
-<br />
-<hr />
-<br />
-<button (click)="getRenderMultivariateTrainingData()">Get and render multivariate training data</button><br />
-<button [disabled]="!multivariateTrainingData" (click)="trainMultivariateModelRenderTrainingReport()">Train functional model with multivariate training data and render training report</button><br />
-<input type="number" [field]="revenuePredictionForm.price" style="display: inline-block" step="0.1" />
-<input type="number" [field]="revenuePredictionForm.temperature" style="display: inline-block" />
-<button [disabled]="multivariateTrainingRequired()" (click)="predictNumberOfUnitsSold()" style="display: inline-block">
-    Predict number of water bottles sold for {{revenuePredictionForm.price().value() | currency}} when it is {{revenuePredictionForm.temperature().value()}}&deg;
-</button><br>
-@if (revenuePredictionForm.price().invalid() && revenuePredictionForm.price().touched()) {
-    @for (error of revenuePredictionForm.price().errors(); track error.kind) {
-      <p>{{ error.message }}</p>
+<app-demo-header id="machine-learning" />
+
+<section class="stage" aria-labelledby="univariate-heading">
+  <h2 id="univariate-heading">One input</h2>
+  <p class="hint intro">Fit a line to 100 random points. Each run picks a new trend direction.</p>
+  <ol class="steps">
+    <li>
+      <h3>Generate training data</h3>
+      <p class="hint">Plots 100 noisy points in the browser.</p>
+      <div class="row">
+        <button class="primary" (click)="generateRenderUnivariateTrainingData()">Generate data</button>
+      </div>
+    </li>
+    <li>
+      <h3>Train the model</h3>
+      <p class="hint">Sends the points to the server, which trains a sequential model and returns its loss history.</p>
+      <div class="row">
+        <button [class.primary]="univariateData && univariateTrainingRequired" [disabled]="!univariateData || univariateModelIsTraining" (click)="trainUnivariateModelRenderTrainingReport()">
+          {{ univariateModelIsTraining ? 'Training…' : 'Train model' }}
+        </button>
+      </div>
+    </li>
+    <li>
+      <h3>Plot predictions</h3>
+      <p class="hint">Asks the trained model for a prediction at every input and draws them over the data.</p>
+      <div class="row">
+        <button [class.primary]="!univariateTrainingRequired" [disabled]="univariateTrainingRequired" (click)="getRenderUnivariateLinearRegressionPredictions()">Plot predictions</button>
+      </div>
+    </li>
+  </ol>
+
+  <div class="charts" [class.has-data]="univariateData">
+    <div #univariatelinearregressiongraph class="chart"></div>
+    @if (univariateModelIsTraining) {
+      <p class="status busy">Training on the server…</p>
     }
-}
-@if (revenuePredictionForm.temperature().invalid() && revenuePredictionForm.temperature().touched()) {
-    @for (error of revenuePredictionForm.temperature().errors(); track error.kind) {
-      <p>{{ error.message }}</p>
-    }
-}
-<p>{{prediction}}</p>
-@if (multivariateScatterPlotData) {
-    @if (scatterPlotXyzComponent) {
+    <div #univariatetrainingreport class="chart"></div>
+  </div>
+</section>
+
+<section class="stage" aria-labelledby="multivariate-heading">
+  <h2 id="multivariate-heading">Two inputs: price and temperature</h2>
+  <p class="hint intro">Predict how many water bottles sell at a given price on a day of a given temperature.</p>
+  <ol class="steps">
+    <li>
+      <h3>Load sales data</h3>
+      <p class="hint">Plots historical sales in 3D: price, temperature, and units sold.</p>
+      <div class="row">
+        <button class="primary" (click)="getRenderMultivariateTrainingData()">Load sales data</button>
+      </div>
+    </li>
+    <li>
+      <h3>Train the model</h3>
+      <p class="hint">Trains a functional model with two inputs on the server.</p>
+      <div class="row">
+        <button [class.primary]="multivariateTrainingData && multivariateTrainingRequired()" [disabled]="!multivariateTrainingData || multivariateModelIsTraining" (click)="trainMultivariateModelRenderTrainingReport()">
+          {{ multivariateModelIsTraining ? 'Training…' : 'Train model' }}
+        </button>
+      </div>
+    </li>
+    <li>
+      <h3>Predict sales</h3>
+      <p class="hint">Choose a price from $1 to $10 and a temperature from 55 to 100&nbsp;&deg;F.</p>
+      <div class="row">
+        <div class="field narrow">
+          <label for="ml-price">Price ($)</label>
+          <input id="ml-price" type="number" [field]="revenuePredictionForm.price" step="0.1" />
+        </div>
+        <div class="field narrow">
+          <label for="ml-temperature">Temperature (&deg;F)</label>
+          <input id="ml-temperature" type="number" [field]="revenuePredictionForm.temperature" />
+        </div>
+        <button [class.primary]="!multivariateTrainingRequired()" [disabled]="multivariateTrainingRequired()" (click)="predictNumberOfUnitsSold()">Predict sales</button>
+      </div>
+      @if (revenuePredictionForm.price().invalid() && revenuePredictionForm.price().touched()) {
+        @for (error of revenuePredictionForm.price().errors(); track error.kind) {
+          <p class="field-error">{{ error.message }}</p>
+        }
+      }
+      @if (revenuePredictionForm.temperature().invalid() && revenuePredictionForm.temperature().touched()) {
+        @for (error of revenuePredictionForm.temperature().errors(); track error.kind) {
+          <p class="field-error">{{ error.message }}</p>
+        }
+      }
+      @if (prediction) {
+        <p class="prediction" aria-live="polite">{{ prediction }}</p>
+      }
+    </li>
+  </ol>
+
+  <div class="charts" [class.has-data]="multivariateScatterPlotData">
+    @if (multivariateScatterPlotData) {
+      @if (scatterPlotXyzComponent) {
         <ng-container
           *ngComponentOutlet="scatterPlotXyzComponent; inputs: {
             xyzData: multivariateScatterPlotData,
@@ -48,16 +98,13 @@
             seriesNames: multivariateScatterPlotSeriesNames
           }"
         ></ng-container>
-    } @else {
-        <i>Loading chart…</i>
+      } @else {
+        <p class="status busy">Loading chart…</p>
+      }
     }
-}
-@if (multivariateTrainingReport || multivariateModelIsTraining) {
-    <br />
-    <hr />
-    <br />
-}
-@if (multivariateModelIsTraining) {
-  <i class="training-message">Training...</i>
-}
-<div #multivariatetrainingreport class="container"></div>
+    @if (multivariateModelIsTraining) {
+      <p class="status busy">Training on the server…</p>
+    }
+    <div #multivariatetrainingreport class="chart"></div>
+  </div>
+</section>

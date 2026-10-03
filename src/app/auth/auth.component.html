@@ -1,16 +1,56 @@
-<p>This end user authentication project was developed with Cloud Run, Docker, Angular, TypeScript, Spring, Java, Firebase, and Identity Platform.</p>
-<br />
-<button [disabled]="loading" (click)="signUp()">Sign up</button><br />
-<button [disabled]="loading" (click)="signIn()">Sign in</button><br />
-@if (token) {
-  <p>
-    Your security token is <b><code>{{token}}</code></b>.
-  </p>
-}
-<button [disabled]="loading" (click)="signOut()">Sign out</button><br />
-<button [disabled]="loading" (click)="fetchWeather(false)">Fetch weather data</button><br />
-<button [disabled]="loading" (click)="requestAdvancedUsageClaim()">Request advanced usage claim</button><br />
-<button [disabled]="loading" (click)="fetchWeather(true)">Fetch advanced weather data</button><br />
-@if (loading) {
-  <p>Loading...</p>
-}
+<app-demo-header id="auth" />
+
+<section class="stage">
+  <div class="session">
+    <p class="status" [class.live]="token" [class.busy]="loading" aria-live="polite">
+      {{ loading ? 'Waiting for the API…' : token ? 'Signed in' : 'Signed out' }}
+    </p>
+    @if (token) {
+      <button [disabled]="loading" (click)="signOut()">Sign out</button>
+    }
+  </div>
+
+  @if (token) {
+    <div class="token">
+      <div class="token-header">
+        <h2>Your ID token</h2>
+        <button (click)="copyToken()">{{ tokenCopied ? 'Copied' : 'Copy token' }}</button>
+      </div>
+      <code>{{ token }}</code>
+      <p class="hint">Paste this token when a request asks for it.</p>
+    </div>
+  }
+
+  <ol class="steps">
+    <li>
+      <h3>Create an account or sign in</h3>
+      <p class="hint">Firebase Auth issues a signed ID token to the browser.</p>
+      <div class="row">
+        <button [class.primary]="!token" [disabled]="loading" (click)="signUp()">Sign up</button>
+        <button [disabled]="loading" (click)="signIn()">Sign in</button>
+      </div>
+    </li>
+    <li>
+      <h3>Call the protected API</h3>
+      <p class="hint">The Spring service verifies the bearer token before returning weather data.</p>
+      <div class="row">
+        <button [class.primary]="token" [disabled]="loading" (click)="fetchWeather(false)">Fetch weather data</button>
+      </div>
+    </li>
+    <li>
+      <h3>Request the advanced usage claim</h3>
+      <p class="hint">The service adds a custom claim to your account. That invalidates your current token, so you’ll be signed out.</p>
+      <div class="row">
+        <button [disabled]="loading" (click)="requestAdvancedUsageClaim()">Request claim</button>
+      </div>
+    </li>
+    <li>
+      <h3>Sign in again and call the advanced API</h3>
+      <p class="hint">Your new token carries the claim, which the advanced endpoint requires.</p>
+      <div class="row">
+        <button [disabled]="loading" (click)="signIn()">Sign in</button>
+        <button [disabled]="loading" (click)="fetchWeather(true)">Fetch advanced weather data</button>
+      </div>
+    </li>
+  </ol>
+</section>

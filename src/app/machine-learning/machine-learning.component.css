@@ -1,14 +1,35 @@
-.training-message {
-    padding:5px;
-    display:block;
+:host {
+  display: block;
+  max-width: 68rem;
 }
 
-.container {
-    width: 90%;
-    margin: auto;
+.intro {
+  margin: 0.25rem 0 1.5rem;
 }
 
-.multivariate-data-table {
-    height: 20vh;
-    overflow: auto;
+.narrow {
+  flex: 0 1 10rem;
+}
+
+.prediction {
+  margin-top: 1rem;
+  padding: 0.75rem 1rem;
+  border-left: 3px solid var(--signal);
+  background: var(--paper);
+  font-weight: 600;
+}
+
+.charts.has-data {
+  margin-top: 1.5rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid var(--rule);
+}
+
+.chart:empty {
+  display: none;
+}
+
+.chart + .chart,
+.status + .chart {
+  margin-top: 1.5rem;
 }

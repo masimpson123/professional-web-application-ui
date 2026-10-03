@@ -1,16 +1,18 @@
-<div [formGroup]="securityFormGroup">
-    <div formGroupName="userIntake">
-    <label for="users-name">User's name: </label>
-    <input id="users-name" type="text" formControlName="usersName" placeholder="Mike" />
-    @if((userName?.dirty || userName?.touched) && userName?.hasError('required')) {
-        <div>User name field is required!</div>
-    }
-    @if((userName?.dirty || userName?.touched) && userName?.hasError('forbiddenCharacterSequence')) {
-        <div>"q" is not allowed!</div>
-    }
-    <br />
-    <label for="users-pets-name">User's pet's name: </label>
-    <input id="users-pets-name" type="text" formControlName="usersPetsName" placeholder="Speck" />
-    <br />
+<div class="stack" [formGroup]="securityFormGroup">
+  <div formGroupName="userIntake" class="stack">
+    <div class="field">
+      <label for="users-name">Name</label>
+      <input id="users-name" type="text" formControlName="usersName" placeholder="Mike" />
+      @if((userName?.dirty || userName?.touched) && userName?.hasError('required')) {
+        <p class="field-error">Enter a name.</p>
+      }
+      @if((userName?.dirty || userName?.touched) && userName?.hasError('forbiddenCharacterSequence')) {
+        <p class="field-error">Names can’t contain the letter “q”. This rule is a custom validator.</p>
+      }
     </div>
+    <div class="field">
+      <label for="users-pets-name">Pet’s name <span class="hint">(optional)</span></label>
+      <input id="users-pets-name" type="text" formControlName="usersPetsName" placeholder="Speck" />
+    </div>
+  </div>
 </div>
