@@ -6,8 +6,9 @@ const data = require('./tensorflow/water-bottle-data');
 
 app.use(cors({
    origin: function (origin, callback) {
-   // const allowedOrigins = ['http://localhost:4200'];
    const allowedOrigins = ['https://msio-u7qjhl7iia-uc.a.run.app'];
+   // `node index.js --local-development` also allows the local dev server (`npm start`).
+   if (process.argv.includes('--local-development')) allowedOrigins.push('http://localhost:4200');
    if (!origin) return callback(null, true);
    if (allowedOrigins.indexOf(origin) === -1) {
       const msg = 'The CORS policy for this site does not allow access from the specified Origin.';

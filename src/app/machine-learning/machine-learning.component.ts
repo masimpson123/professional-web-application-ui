@@ -4,6 +4,7 @@ import * as tf from '@tensorflow/tfjs';
 import { form, Field, min, max, disabled } from '@angular/forms/signals';
 import { ThreeDimensionalData } from '../common-models/common-models';
 import { DemoHeaderComponent } from '../demo-header/demo-header.component';
+import { environment } from '../../environments/environment';
 
 // Matches --slate and --signal in styles.css: observed data is slate, model output is signal.
 const DATA_COLOR = '#5e7a8a';
@@ -20,8 +21,7 @@ export class MachineLearningComponent {
   @ViewChild('univariatetrainingreport') univariateTrainingReportGraph!: ElementRef<HTMLInputElement>;
   @ViewChild('univariatemodeltable') univariateModelTable!: ElementRef<HTMLInputElement>;
   @ViewChild('multivariatetrainingreport') multivariateTrainingReportGraph!: ElementRef<HTMLInputElement>;
-  // apiUrl = 'http://localhost:8080/';
-  apiUrl = 'https://msio-u7qjhl7iia-uc.a.run.app/';
+  apiUrl = environment.expressApiUrl;
   univariateModelData = null;
   univariateModelIsTraining = false;
   univariateData: LinearRegressionPoint[]|null = null;

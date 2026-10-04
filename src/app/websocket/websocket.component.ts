@@ -3,6 +3,7 @@ import { Component, OnDestroy, signal } from '@angular/core';
 import { Client } from '@stomp/stompjs';
 import { form, Field, disabled } from '@angular/forms/signals';
 import { DemoHeaderComponent } from '../demo-header/demo-header.component';
+import { environment } from '../../environments/environment';
 
 @Component({
   selector: 'app-websocket',
@@ -27,8 +28,8 @@ export class WebsocketComponent implements OnDestroy {
   connect() {
     this.stompSignal.set(new Client({
       reconnectDelay: 0,
-      // brokerURL: 'ws://localhost:8080/websocket-broker',
-      brokerURL: 'wss://endpoint-one-2-205823180568.us-central1.run.app/websocket-broker',
+      // http(s):// becomes ws(s)://
+      brokerURL: environment.springApiUrl.replace(/^http/, 'ws') + 'websocket-broker',
       onConnect: () => {
         this.stompSignal()?.subscribe("/sub/" + this.websocketForm.roomId().value(),
         message => {

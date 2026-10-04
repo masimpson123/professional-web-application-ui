@@ -4,10 +4,11 @@ export type DemoId =
   | 'data-stream'
   | 'websocket'
   | 'auth'
+  | 'video'
   | 'cube'
   | 'form';
 
-export type ServiceId = 'express' | 'spring' | 'gemini' | 'identity';
+export type ServiceId = 'express' | 'spring' | 'gemini' | 'identity' | 'zoom';
 
 export interface Demo {
   id: DemoId;
@@ -23,6 +24,9 @@ export interface Demo {
 }
 
 // Order matters: it drives the nav, the home page diagram rows, and the mobile index.
+// The diagram's service nodes (root.component.ts) are positioned for this order:
+// Spring callers must stay in consecutive rows, and Gemini, Identity Platform, and Zoom
+// sit beside the AI, auth, and video rows.
 export const DEMOS: Demo[] = [
   {
     id: 'machine-learning',
@@ -81,6 +85,17 @@ export const DEMOS: Demo[] = [
     service: 'Spring, Java',
     platform: 'Identity Platform, Cloud Run, Docker',
     origin: 'End-user authentication system at JPMorganChase',
+    calls: ['spring'],
+  },
+  {
+    id: 'video',
+    route: '/video',
+    title: 'Video session',
+    group: 'Systems',
+    summary: 'Join one shared Zoom video call with everyone else on this page. The Spring service signs each visitor’s session token, so the Zoom secret never reaches the browser.',
+    client: 'Angular, Zoom Video SDK',
+    service: 'Spring Boot, JWT signing',
+    platform: 'Zoom Video SDK, Cloud Run, Docker',
     calls: ['spring'],
   },
   {

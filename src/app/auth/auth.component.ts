@@ -10,6 +10,7 @@ import {
 } from 'firebase/auth';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { DemoHeaderComponent } from '../demo-header/demo-header.component';
+import { environment } from '../../environments/environment';
 
 @Component({
   selector: 'app-auth',
@@ -94,10 +95,8 @@ export class AuthComponent implements OnDestroy {
       'Authorization': `Bearer ${securityToken}`
     });
     this.loading = true;
-    // http://localhost:8080/weather
-    // https://endpoint-one-2-205823180568.us-central1.run.app/weather
     this.http.get<{response?: string, error?: string}>(
-      'https://endpoint-one-2-205823180568.us-central1.run.app/weather' + (advanced ? '-advanced' : ''), {headers})
+      environment.springApiUrl + 'weather' + (advanced ? '-advanced' : ''), {headers})
       .subscribe({
         next: weather => {
           this.loading = false;
@@ -118,13 +117,12 @@ export class AuthComponent implements OnDestroy {
       'Authorization': `Bearer ${securityToken}`
     });
     this.loading = true;
-    // http://localhost:8080/request-advanced-usage-claim
-    // https://endpoint-one-2-205823180568.us-central1.run.app/request-advanced-usage-claim
     this.http.get<{response?: string, error?: string}>(
-      'https://endpoint-one-2-205823180568.us-central1.run.app/request-advanced-usage-claim', {headers})
+      environment.springApiUrl + 'request-advanced-usage-claim', {headers})
       .subscribe({
         next: response => {
-          // this should sign the user out and sign the user back in.
+          // The new claim invalidates the current ID token, so sign out. Signing in again
+          // issues a token that carries the claim.
           this.loading = false;
           if (response.response) {
             alert(response.response);

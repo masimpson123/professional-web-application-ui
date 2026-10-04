@@ -1,0 +1,37 @@
+<app-demo-header id="video" />
+
+<section class="stage">
+  <div class="toolbar">
+    <p class="status" [class.live]="status() === 'joined'" [class.busy]="status() === 'joining'" aria-live="polite">
+      @switch (status()) {
+        @case ('joining') { Joining… }
+        @case ('joined') { In the session as {{ name }} }
+        @default { Not in the session. Joining turns on your camera and microphone. }
+      }
+    </p>
+    <div class="row">
+      @if (status() === 'joined') {
+        <button [disabled]="busy()" (click)="toggleMic()">{{ micOn() ? 'Mute' : 'Unmute' }}</button>
+        <button [disabled]="busy()" (click)="toggleCamera()">{{ cameraOn() ? 'Stop camera' : 'Start camera' }}</button>
+        <button (click)="leave()">Leave session</button>
+      } @else {
+        <button class="primary" [disabled]="status() === 'joining'" (click)="join()">Join session</button>
+      }
+    </div>
+  </div>
+
+  @if (error()) {
+    <p class="field-error" role="alert">{{ error() }}</p>
+  }
+
+  <video-player-container #players></video-player-container>
+
+  @if (status() === 'joined') {
+    <h2 class="people-heading">{{ people().length }} {{ people().length === 1 ? 'person' : 'people' }} in this session</h2>
+    <ul class="people">
+      @for (person of people(); track $index) {
+        <li>{{ person }}</li>
+      }
+    </ul>
+  }
+</section>

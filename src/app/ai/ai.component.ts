@@ -3,6 +3,7 @@ import { Component, Type } from '@angular/core';
 
 import { resumebase64 } from './resumebase64';
 import { DemoHeaderComponent } from '../demo-header/demo-header.component';
+import { environment } from '../../environments/environment';
 
 @Component({
   selector: 'app-ai',
@@ -62,8 +63,7 @@ export class AiComponent {
   submitAIQuery(query:string) {
     this.thinking = true;
     this.conversation.push(query)
-    // fetch("http://localhost:8080/ai", {
-    fetch("https://endpoint-one-2-205823180568.us-central1.run.app/ai", {
+    fetch(environment.springApiUrl + 'ai', {
       method: 'POST',
       headers: {'Content-Type': 'application/json'},
       body: JSON.stringify(

@@ -4,11 +4,15 @@
   "scripts": {
     "ng": "ng",
     "start": "ng serve",
+    "start:prod": "ng serve --configuration production",
     "build": "ng build",
     "watch": "ng build --watch --configuration development",
     "lint": "ng lint"
   },
   "private": true,
+  "engines": {
+    "node": "22.x"
+  },
   "dependencies": {
     "@angular/animations": "21.0.5",
     "@angular/common": "21.0.5",
@@ -23,6 +27,7 @@
     "@tensorflow/tfjs-node": "^4.22.0",
     "@tensorflow/tfjs-vis": "^1.5.1",
     "@types/three": "^0.171.0",
+    "@zoom/videosdk": "^2.5.0",
     "angular-plotly.js": "^20.0.0",
     "buffer": "^6.0.3",
     "cors": "^2.8.6",

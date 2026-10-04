@@ -17,11 +17,11 @@
   <p class="hint">Every demo runs live against its own backend.</p>
 
   <figure class="map">
-    <svg viewBox="0 0 960 448" role="group" aria-label="Architecture diagram of this site">
+    <svg viewBox="0 0 960 504" role="group" aria-label="Architecture diagram of this site">
       <text class="zone-label" x="0" y="20">In the browser (Angular 21)</text>
-      <rect class="zone" x="0" y="32" width="372" height="412" rx="12" />
+      <rect class="zone" x="0" y="32" width="372" height="468" rx="12" />
       <text class="zone-label" x="500" y="20">Google Cloud Run</text>
-      <rect class="zone" x="500" y="32" width="240" height="336" rx="12" />
+      <rect class="zone" x="500" y="32" width="240" height="392" rx="12" />
       <text class="zone-label" x="800" y="20">Managed APIs</text>
 
       @for (edge of edges; track $index) {
@@ -68,7 +68,7 @@
           <span class="origin">Origin: {{ demo.origin }}.</span>
         }
       } @else {
-        Point at a demo to trace the services it calls. Demos on the left call Cloud Run services in the middle, which call managed Google APIs on the right.
+        Point at a demo to trace the services it calls. Demos on the left call Cloud Run services in the middle, which call managed APIs on the right.
       }
     </figcaption>
   </figure>

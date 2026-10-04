@@ -4,6 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { toObservable } from '@angular/core/rxjs-interop'
 import { debounceTime, tap } from 'rxjs';
 import { DemoHeaderComponent } from '../demo-header/demo-header.component';
+import { environment } from '../../environments/environment';
 
 @Component({
   selector: 'app-data-stream',
@@ -24,9 +25,7 @@ export class DataStreamComponent {
       if (this.controller) this.controller.abort();
       this.controller = new AbortController();
       if (!searchTerm) return;
-      // http://localhost:8080/search/
-      // https://endpoint-one-2-205823180568.us-central1.run.app/search/
-      fetch("https://endpoint-one-2-205823180568.us-central1.run.app/search/" + searchTerm, { signal: this.controller.signal })
+      fetch(environment.springApiUrl + 'search/' + searchTerm, { signal: this.controller.signal })
         .then(response => {
           const reader = response.body!.getReader();
           const read = () => {

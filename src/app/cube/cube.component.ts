@@ -25,8 +25,8 @@ export class CubeComponent implements AfterViewInit {
   cameraZ = 250;
 
   // Match --slate, --signal, and --paper in styles.css.
-  private readonly MINT = 0x5E7A8A;
-  private readonly ORANGE = 0xD2401E;
+  private readonly FACE_COLOR = 0x5E7A8A;
+  private readonly HIGHLIGHT_COLOR = 0xD2401E;
   private readonly BACKGROUND = 0xF4F6F7;
 
   private camera!: THREE.PerspectiveCamera;
@@ -35,17 +35,17 @@ export class CubeComponent implements AfterViewInit {
   }
   private geometry = new THREE.BoxGeometry(1,1,1).toNonIndexed();
   private material1 = new THREE.MeshPhongMaterial({
-  color: this.MINT});
+  color: this.FACE_COLOR});
   private material2 = new THREE.MeshPhongMaterial({
-  color: this.MINT});
+  color: this.FACE_COLOR});
   private material3 = new THREE.MeshPhongMaterial({
-  color: this.MINT});
+  color: this.FACE_COLOR});
   private material4 = new THREE.MeshPhongMaterial({
-  color: this.MINT});
+  color: this.FACE_COLOR});
   private material5 = new THREE.MeshPhongMaterial({
-  color: this.MINT});
+  color: this.FACE_COLOR});
   private material6 = new THREE.MeshPhongMaterial({
-  color: this.MINT});
+  color: this.FACE_COLOR});
   private cube: THREE.Mesh = new THREE.Mesh(this.geometry, [
     this.material1,
     this.material2,
@@ -112,7 +112,7 @@ export class CubeComponent implements AfterViewInit {
     }
     if (this.highlightedObject) {
       this.highlightedObject.material.forEach((value: any, index: number) => {
-        value.color.set((index === faceIndex) ? this.ORANGE : this.MINT);
+        value.color.set((index === faceIndex) ? this.HIGHLIGHT_COLOR : this.FACE_COLOR);
         value.colorsNeedUpdate = true;
       });
     }

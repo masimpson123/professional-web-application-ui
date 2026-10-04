@@ -44,19 +44,21 @@ export class RootComponent {
     {
       id: 'spring',
       title: 'Spring Boot service',
-      ports: ['Gemini proxy', 'Streaming search', 'STOMP broker', 'Protected API'],
+      ports: ['Gemini proxy', 'Streaming search', 'STOMP broker', 'Protected API', 'Zoom token signing'],
       x: 516,
       y: this.rowTop(1),
-      height: 3 * ROW_PITCH + NODE_HEIGHT + 36,
+      height: 4 * ROW_PITCH + NODE_HEIGHT + 36,
     },
     { id: 'gemini', title: 'Gemini API', ports: [], x: 800, y: this.rowTop(1), height: NODE_HEIGHT },
     { id: 'identity', title: 'Identity Platform', ports: [], x: 800, y: this.rowTop(4), height: NODE_HEIGHT },
+    { id: 'zoom', title: 'Zoom Video SDK', ports: [], x: 800, y: this.rowTop(5), height: NODE_HEIGHT },
   ];
 
   readonly edges: Edge[] = [
     ...DEMOS.flatMap((demo, row) => demo.calls.map(() => ({ demo: demo.id, x1: 356, x2: 516, y: rowCenter(row) }))),
     { demo: 'ai', x1: 724, x2: 800, y: rowCenter(1) },
     { demo: 'auth', x1: 724, x2: 800, y: rowCenter(4) },
+    { demo: 'video', x1: 724, x2: 800, y: rowCenter(5) },
   ];
 
   readonly clientOnlyTop = this.rowTop(DEMOS.findIndex(demo => !demo.calls.length));
@@ -72,6 +74,7 @@ export class RootComponent {
     'data-stream': ['spring'],
     websocket: ['spring'],
     auth: ['spring', 'identity'],
+    video: ['spring', 'zoom'],
     cube: [],
     form: [],
   };

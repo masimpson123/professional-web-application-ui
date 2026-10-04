@@ -6,8 +6,9 @@ Gemini
 https://ai.google.dev/gemini-api/docs
 https://aistudio.google.com/apikey
 
-cd /Users/livingroom/Desktop/client-2026
-ng serve
+cd ~/Desktop/client-2026
+npm start            (local backends)
+npm run start:prod   (production backends)
 ng g component
 
 console.cloud.google.com
@@ -20,7 +21,7 @@ msio-u7qjhl7iia-uc.a.run.app
 open -a Docker && while ! docker info > /dev/null 2>&1; do sleep 1 ; done
 
 # BUILD IMAGE
-cd /Users/livingroom/Desktop/client-2026
+cd ~/Desktop/client-2026
 docker build --platform linux/amd64 -t client2026 .
 
 # RUN IMAGE
