@@ -74,6 +74,12 @@ export interface ZoomSessionState {
   /** Everyone Zoom has told us about, by user id, including stale copies. */
   participants: ReadonlyMap<number, SessionParticipant>;
   micOn: boolean;
+  /** Whether we're connected to the session's audio: hearing it, and sending it if unmuted. */
+  audio: 'off' | 'starting' | 'on';
+  /** Audio is connected without our microphone (it's blocked or busy): we hear, but aren't heard. */
+  speakerOnly: boolean;
+  /** `auto-play-audio-failed`: the browser won't play the call's sound until we click something. */
+  soundBlocked: boolean;
   cameraOn: boolean;
   /** We are sharing our screen. */
   sharing: boolean;
@@ -88,6 +94,9 @@ export const initialZoomSessionState: ZoomSessionState = {
   maxRemoteVideos: 0,
   participants: new Map(),
   micOn: true,
+  audio: 'off',
+  speakerOnly: false,
+  soundBlocked: false,
   cameraOn: false,
   sharing: false,
   error: '',
@@ -128,6 +137,14 @@ export type ZoomEvent =
   | { type: 'local-mic'; on: boolean }
   | { type: 'local-camera'; on: boolean }
   | { type: 'local-share'; on: boolean }
+  /** We called `startAudio()`. */
+  | { type: 'audio-starting' }
+  /** `startAudio()` resolved, with our microphone or without it. */
+  | { type: 'audio-joined'; speakerOnly: boolean }
+  /** `startAudio()` failed, or `current-audio-change` says audio dropped. */
+  | { type: 'audio-left' }
+  /** `auto-play-audio-failed`. */
+  | { type: 'sound-blocked' }
   /** `active-media-failed`: our media broke after it had started. */
   | { type: 'media-failed'; kind: 'audio' | 'video' | 'sharing' }
   /** A problem worth showing that doesn't change anything else. */
@@ -206,6 +223,21 @@ export function reduce(state: ZoomSessionState, event: ZoomEvent): ZoomSessionSt
       return { ...state, micOn: event.on };
     case 'local-camera':
       return { ...state, cameraOn: event.on };
+
+    case 'audio-starting':
+      return { ...state, audio: 'starting' };
+    case 'audio-joined':
+      return {
+        ...state,
+        audio: 'on',
+        speakerOnly: event.speakerOnly,
+        soundBlocked: false,
+        micOn: event.speakerOnly ? false : state.micOn,
+      };
+    case 'audio-left':
+      return { ...state, audio: 'off', speakerOnly: false, micOn: false };
+    case 'sound-blocked':
+      return { ...state, soundBlocked: true };
     case 'local-share':
       return { ...state, sharing: event.on };
 
@@ -309,6 +341,9 @@ function ended(state: ZoomSessionState): ZoomSessionState {
     reconnecting: false,
     myId: undefined,
     participants: new Map(),
+    audio: 'off',
+    speakerOnly: false,
+    soundBlocked: false,
     cameraOn: false,
     sharing: false,
   };

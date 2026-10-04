@@ -70,6 +70,10 @@ export class ZoomCall extends CallService {
   readonly sharing = computed(() => this.state().sharing);
   readonly reconnecting = computed(() => this.state().reconnecting);
   readonly error = computed(() => this.state().error);
+  readonly soundOff = computed(() => {
+    const { status, leaving, audio, soundBlocked } = this.state();
+    return status === 'connected' && !leaving && (audio === 'off' || soundBlocked);
+  });
   readonly remotes = computed(() => selectRemoteParticipants(this.state()), {
     equal: sameRemotes,
   });
@@ -115,10 +119,22 @@ export class ZoomCall extends CallService {
   toggleMic(): Promise<void> {
     return this.once('mic', async () => {
       if (!this.stream) return;
+      const { audio, speakerOnly } = this.state();
+      if (audio === 'starting') return;
+      if (audio === 'off' || speakerOnly) {
+        // We aren't sending audio, so there's nothing to unmute: reconnect with the microphone.
+        this.dispatch({ type: 'local-mic', on: true });
+        await this.restartAudio();
+        return;
+      }
       if (this.micOn()) await this.stream.muteAudio();
       else await this.stream.unmuteAudio();
       this.dispatch({ type: 'local-mic', on: !this.micOn() });
     });
+  }
+
+  turnOnSound(): Promise<void> {
+    return this.once('sound', () => this.restartAudio());
   }
 
   /** Starts or stops our camera. The self-view follows from state; nothing is attached here. */
@@ -268,6 +284,16 @@ export class ZoomCall extends CallService {
       },
     );
 
+    // The browser blocked the call's sound until the page gets a click.
+    on('auto-play-audio-failed', () => this.dispatch({ type: 'sound-blocked' }));
+    // Audio dropped: another app took the device, the microphone failed, and so on.
+    // Our own `stopAudio()` ('active') and Zoom's automatic failover aren't drops.
+    on('current-audio-change', ({ action, source }: { action: string; source?: string }) => {
+      if (action === 'leave' && source !== 'active' && source !== 'failover') {
+        this.dispatch({ type: 'audio-left' });
+      }
+    });
+
     // Media broke mid-call: device unplugged, permission revoked, audio interrupted.
     on('active-media-failed', ({ type }: { type: 'audio' | 'video' | 'sharing' }) => {
       if (type === 'sharing') this.clearSharePreview();
@@ -278,17 +304,44 @@ export class ZoomCall extends CallService {
     return client;
   }
 
-  private async startAudio(): Promise<void> {
+  /**
+   * Connects us to the session's audio, with our microphone if we can have it.
+   * Without one (blocked, or busy in another app) we still connect to listen, so a
+   * microphone problem never means hearing nothing.
+   *
+   * @param fromClick Called straight from a click. Otherwise it runs after joining,
+   *   past the browser's gesture window, which Safari has to be told about.
+   */
+  private async startAudio(fromClick = false): Promise<void> {
+    const stream = this.stream;
+    if (!stream) return;
+    const autoStartAudioInSafari = !fromClick && isSafari();
+    this.dispatch({ type: 'audio-starting' });
     try {
-      await this.stream!.startAudio({ mute: !this.micOn() });
+      await stream.startAudio({ mute: !this.micOn(), autoStartAudioInSafari });
+      this.dispatch({ type: 'audio-joined', speakerOnly: false });
+      return;
     } catch {
-      this.dispatch({ type: 'local-mic', on: false });
+      // Fall through to listening only.
+    }
+    try {
+      await stream.startAudio({ speakerOnly: true, autoStartAudioInSafari });
+      this.dispatch({ type: 'audio-joined', speakerOnly: true });
       this.dispatch({
         type: 'error',
         message:
-          'Microphone is blocked. Allow microphone access in your browser settings, then unmute.',
+          'Your microphone is blocked or in use, so others can’t hear you, but you can hear them. Allow microphone access in your browser settings, then unmute.',
       });
+    } catch {
+      this.dispatch({ type: 'audio-left' });
+      this.dispatch({ type: 'error', message: 'Couldn’t connect the call’s audio.' });
     }
+  }
+
+  /** From a click: drops whatever audio we have and connects it again. */
+  private async restartAudio(): Promise<void> {
+    if (this.state().audio === 'on') await this.stream?.stopAudio().catch(() => undefined);
+    await this.startAudio(true);
   }
 
   // ---- Connecting --------------------------------------------------------------
@@ -527,4 +580,9 @@ function describeJoinError(err: unknown): string {
     return 'Couldn’t reach Zoom. Check your internet connection, then try again.';
   }
   return `Couldn’t join the session${reason ? ` (${reason})` : ''}. Try again.`;
+}
+
+/** Desktop Safari, which needs `autoStartAudioInSafari` to start audio outside a click. */
+function isSafari(): boolean {
+  return /^((?!chrome|chromium|android|crios|fxios).)*safari/i.test(navigator.userAgent);
 }

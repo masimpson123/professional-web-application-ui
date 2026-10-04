@@ -42,13 +42,13 @@ export class HomePage {
     const headline = `Welcome Back${name}`;
     if (this.isProvider()) {
       return {
-        image: 'guidance/welcome-provider.svg',
+        image: 'telehealth/welcome-provider.svg',
         headline,
         description: 'Thank you for the care you give. Your sessions and your members’ care plans are all here.',
         action: 'View Your Sessions',
       };
     }
-    return { image: 'guidance/welcome.jpg', headline, ...this.carePlanNudge() };
+    return { image: 'telehealth/welcome.jpg', headline, ...this.carePlanNudge() };
   });
 
   /** Members: what's left of their care plan, and when it's due. */

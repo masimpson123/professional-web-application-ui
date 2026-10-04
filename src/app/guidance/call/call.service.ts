@@ -47,6 +47,11 @@ export abstract class CallService {
   abstract readonly reconnecting: Signal<boolean>;
   /** Plain-language problem to show, or empty. */
   abstract readonly error: Signal<string>;
+  /**
+   * We're in the call but can't hear it: the browser blocked its sound, or audio
+   * dropped. `turnOnSound()`, from a click, fixes both.
+   */
+  abstract readonly soundOff: Signal<boolean>;
 
   abstract setViews(views: CallViews): void;
   abstract join(options: JoinOptions): Promise<void>;
@@ -54,4 +59,6 @@ export abstract class CallService {
   abstract toggleMic(): Promise<void>;
   abstract toggleCamera(): Promise<void>;
   abstract toggleShare(): Promise<void>;
+  /** Call from a click: connects the call's audio, which the browser only allows after a gesture. */
+  abstract turnOnSound(): Promise<void>;
 }

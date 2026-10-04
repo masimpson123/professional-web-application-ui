@@ -277,6 +277,24 @@
   color: var(--accent-primary-sys-on-primary-container-variant);
 }
 
+/* Over the call, so it's seen without hiding anyone's video. */
+.sound {
+  position: absolute;
+  z-index: 2;
+  top: var(--spacing-padding-sys-padding-12);
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-padding-sys-padding-8);
+  padding: var(--spacing-padding-sys-padding-8) var(--spacing-padding-sys-padding-8)
+    var(--spacing-padding-sys-padding-8) var(--spacing-padding-sys-padding-12);
+  border: 1px solid var(--room-line);
+  border-radius: var(--border-radius-sys-radius-full);
+  background: var(--room-raised);
+  white-space: nowrap;
+}
+
 /* ---- Session clock: elapsed share of the 50-minute hour -------------- */
 
 .clock {

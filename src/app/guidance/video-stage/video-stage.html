@@ -120,6 +120,15 @@
         </div>
       }
     }
+
+    @if (call.soundOff()) {
+      <!-- Browsers only play sound after a click, so the fix has to be one. -->
+      <div class="sound" role="alert">
+        <app-icon name="volume-x" [size]="18" />
+        <span>You can’t hear the call yet.</span>
+        <compsych-button size="small" label="Turn on sound" leadingIcon="volume-2" (click)="call.turnOnSound()" />
+      </div>
+    }
   </div>
 
   <div
