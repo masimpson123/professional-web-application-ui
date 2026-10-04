@@ -1,0 +1,41 @@
+@switch (view()) {
+  @case ('room') {
+    <div class="room">
+      <div class="room__intro">
+        <h1 class="room__title">{{ title() }}</h1>
+        <p class="room__when">{{ when() }} · {{ store.session().focus }}</p>
+      </div>
+
+      <app-video-stage class="room__stage" />
+      <app-care-plan-panel class="room__docs" />
+    </div>
+  }
+  @case ('past') {
+    <div class="past">
+      <div>
+        <h1 class="room__title">{{ title() }}</h1>
+        <p class="room__when">{{ when() }} · {{ store.session().focus }}</p>
+      </div>
+      <app-past-session-view />
+    </div>
+  }
+  @case ('loading') {
+    <div class="notice" role="status">
+      <p class="notice__body">Opening your session…</p>
+    </div>
+  }
+  @case ('missing') {
+    <div class="notice">
+      <h1 class="notice__title">We couldn’t find that session</h1>
+      <p class="notice__body">It may have been cancelled, or it isn’t one of yours.</p>
+      <a class="notice__link" [routerLink]="sessionsUrl">Back to your sessions</a>
+    </div>
+  }
+  @case ('failed') {
+    <div class="notice" role="alert">
+      <h1 class="notice__title">We couldn’t open this session</h1>
+      <p class="notice__body">Check your internet connection, then try again.</p>
+      <compsych-button label="Try again" leadingIcon="rotate-cw" (click)="retry()" />
+    </div>
+  }
+}

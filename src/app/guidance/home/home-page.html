@@ -1,0 +1,55 @@
+<div class="home">
+  <h1 class="visually-hidden">Home</h1>
+  <div class="top">
+    @let welcome = banner();
+    <compsych-card
+      class="welcome"
+      variant="content"
+      appearance="banner"
+      [imageSrc]="welcome.image"
+      imagePosition="right center"
+      [headline]="welcome.headline"
+      [headlineDescription]="welcome.description"
+      [actionLabel]="welcome.action"
+      [headingLevel]="2"
+      (actionClick)="onBannerAction(carePlans)"
+    />
+    <app-highlights class="highlights" />
+  </div>
+
+  <app-your-sessions />
+  <app-care-plans #carePlans />
+
+  <!-- Members' ways into GuidanceResources services; providers don't need them. -->
+  @if (!isProvider()) {
+    <section class="journeys" aria-labelledby="journeys-heading">
+      <h2 id="journeys-heading" class="section-title">Start a new journey</h2>
+      <div class="journeys__grid">
+        @for (journey of journeys; track journey.id) {
+          <compsych-card
+            size="sm"
+            [icon]="journey.icon"
+            [title]="journey.title"
+            [subtitle]="journey.subtitle"
+            [showArrow]="true"
+            [interactive]="true"
+            [headingLevel]="3"
+          />
+        }
+      </div>
+      <compsych-card
+        variant="action"
+        icon="layout-grid"
+        label="Browse All Services"
+        [fullWidth]="true"
+        [interactive]="true"
+      />
+    </section>
+  }
+</div>
+
+<!-- Ava, the GuidanceResources assistant. -->
+<button type="button" class="ava">
+  <span class="ava__mark" aria-hidden="true"></span>
+  Ava
+</button>

@@ -1,0 +1,70 @@
+/*
+ * App shell: header and footer stay put and the page fills exactly the space
+ * between them. Each page decides whether it scrolls inside that space.
+ */
+:host {
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr) auto;
+  height: 100vh;
+  height: 100dvh;
+  overflow: hidden;
+}
+
+.body {
+  position: relative;
+  display: flex;
+  min-height: 0;
+}
+
+/* A drawer over the page, so opening it never moves the page underneath. */
+.menu {
+  position: absolute;
+  inset: 0 auto 0 0;
+  z-index: 3;
+  overflow-y: auto;
+  border-right: 1px solid var(--line);
+  background: var(--surface-surface-container-sys-surface-container-lowest);
+  box-shadow: 4px 0 24px rgba(7, 15, 54, 0.12);
+  animation: slide-in 160ms ease-out;
+}
+
+.scrim {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  background: rgba(7, 15, 54, 0.24);
+}
+
+@keyframes slide-in {
+  from {
+    transform: translateX(-100%);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .menu {
+    animation: none;
+  }
+}
+
+.main {
+  flex: 1;
+  display: grid;
+  grid-template: minmax(0, 1fr) / minmax(0, 1fr);
+  min-width: 0;
+  min-height: 0;
+}
+
+/* The routed page renders beside the outlet, and should get the grid cell to itself. */
+router-outlet {
+  display: none;
+}
+
+/* Narrow screens let the whole page scroll instead. */
+@media (max-width: 1024px) {
+  :host {
+    height: auto;
+    min-height: 100vh;
+    overflow: visible;
+  }
+}

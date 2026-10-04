@@ -1,0 +1,43 @@
+<section class="panel" aria-labelledby="care-plan-heading">
+  <header class="panel__head">
+    <h2 id="care-plan-heading" class="panel__title">
+      Care plan
+      @if (store.openCount()) {
+        <compsych-badge size="sm" [label]="'' + store.openCount()" />
+        <span class="visually-hidden">open</span>
+      }
+    </h2>
+    @if (store.isProvider()) {
+      <compsych-button
+        variant="outlined"
+        size="small"
+        label="Add to care plan"
+        leadingIcon="plus"
+        (click)="adding.set(true)"
+      />
+    }
+  </header>
+
+  <div class="panel__body">
+    <app-care-plan-list
+      [items]="store.carePlan()"
+      [role]="store.role()"
+      [nextSession]="store.nextSession()"
+      [memberName]="store.member().firstName"
+      (doneChange)="store.setDone($event.id, $event.done)"
+      (remove)="store.remove($event)"
+    />
+  </div>
+
+  <p class="visually-hidden" aria-live="polite">{{ store.announcement() }}</p>
+</section>
+
+@if (store.isProvider()) {
+  <app-add-to-care-plan
+    [(open)]="adding"
+    [memberName]="store.member().firstName"
+    [items]="store.carePlan()"
+    (add)="store.addResources($event)"
+    (upload)="store.upload($event)"
+  />
+}

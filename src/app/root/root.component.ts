@@ -58,7 +58,7 @@ export class RootComponent {
     ...DEMOS.flatMap((demo, row) => demo.calls.map(() => ({ demo: demo.id, x1: 356, x2: 516, y: rowCenter(row) }))),
     { demo: 'ai', x1: 724, x2: 800, y: rowCenter(1) },
     { demo: 'auth', x1: 724, x2: 800, y: rowCenter(4) },
-    { demo: 'video', x1: 724, x2: 800, y: rowCenter(5) },
+    { demo: 'guidance', x1: 724, x2: 800, y: rowCenter(5) },
   ];
 
   readonly clientOnlyTop = this.rowTop(DEMOS.findIndex(demo => !demo.calls.length));
@@ -74,7 +74,7 @@ export class RootComponent {
     'data-stream': ['spring'],
     websocket: ['spring'],
     auth: ['spring', 'identity'],
-    video: ['spring', 'zoom'],
+    guidance: ['spring', 'zoom'],
     cube: [],
     form: [],
   };

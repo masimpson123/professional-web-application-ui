@@ -1,0 +1,57 @@
+@if (slides.hasValue() && count()) {
+  <!--
+    Every slide sits in the same grid cell and only the current one is shown, so
+    the carousel (and the banner beside it) is always as tall as the tallest
+    slide and never changes height as the slides change.
+  -->
+  <div class="slides" aria-live="polite">
+    @for (slide of slides.value(); track slide.id; let i = $index) {
+      <compsych-card
+        class="slide"
+        [class.slide--current]="i === index()"
+        [inert]="i !== index()"
+        variant="content"
+        appearance="banner"
+        [hideImage]="true"
+        [inlineIcon]="true"
+        [icon]="slide.icon"
+        [title]="slide.title"
+        [description]="slide.description"
+        [actionLabel]="slide.actionLabel"
+        [headingLevel]="3"
+        aria-roledescription="slide"
+        [attr.aria-label]="i + 1 + ' of ' + count()"
+      />
+    }
+  </div>
+
+  <div class="dots">
+    @for (s of slides.value(); track s.id; let i = $index) {
+      <button
+        type="button"
+        class="dot"
+        [class.dot--current]="i === index()"
+        [attr.aria-label]="'Show highlight ' + (i + 1)"
+        [attr.aria-current]="i === index() || null"
+        (click)="index.set(i)"
+      ></button>
+    }
+    <button
+      type="button"
+      class="control control--small"
+      [attr.aria-label]="paused() ? 'Play highlights' : 'Pause highlights'"
+      (click)="paused.set(!paused())"
+    >
+      <app-icon [name]="paused() ? 'play' : 'pause'" [size]="12" />
+    </button>
+  </div>
+
+  <div class="arrows">
+    <button type="button" class="control" aria-label="Previous highlight" (click)="step(-1)">
+      <app-icon name="chevron-left" [size]="16" />
+    </button>
+    <button type="button" class="control" aria-label="Next highlight" (click)="step(1)">
+      <app-icon name="chevron-right" [size]="16" />
+    </button>
+  </div>
+}

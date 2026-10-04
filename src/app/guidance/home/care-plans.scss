@@ -1,0 +1,169 @@
+.plans {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-padding-sys-padding-12);
+}
+
+.plans__title {
+  font-size: var(--title-small-sys-font-size);
+  line-height: var(--title-small-sys-line-height);
+  font-weight: 500;
+}
+
+.notice {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--spacing-padding-sys-padding-12);
+  color: var(--ink-muted);
+}
+
+/* ---- Member: their plan in one card ------------------------------------ */
+
+.card {
+  padding: var(--spacing-padding-sys-padding-20) var(--spacing-padding-sys-padding-24)
+    var(--spacing-padding-sys-padding-24);
+  border: 1px solid var(--line);
+  border-radius: var(--border-radius-sys-radius-lg);
+  background: var(--surface-surface-container-sys-surface-container-lowest);
+}
+
+.card__head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--spacing-padding-sys-padding-12) var(--spacing-padding-sys-padding-24);
+}
+
+.card__from {
+  color: var(--ink-muted);
+}
+
+.card app-care-plan-list {
+  display: block;
+  margin-top: var(--spacing-padding-sys-padding-24);
+}
+
+/* ---- Provider: one row per member, opening onto their plan ---------------- */
+
+.accordion {
+  overflow: hidden;
+  border: 1px solid var(--line);
+  border-radius: var(--border-radius-sys-radius-lg);
+  background: var(--surface-surface-container-sys-surface-container-lowest);
+}
+
+.plan + .plan {
+  border-top: 1px solid var(--line);
+}
+
+.plan__summary {
+  display: grid;
+  grid-template-columns: 40px minmax(0, 1fr) auto auto;
+  align-items: center;
+  gap: var(--spacing-padding-sys-padding-16);
+  padding: var(--spacing-padding-sys-padding-16) var(--spacing-padding-sys-padding-20);
+  list-style: none;
+  cursor: pointer;
+
+  &::-webkit-details-marker {
+    display: none;
+  }
+
+  &:hover {
+    background: var(--transparent-primary-sys-primary-08);
+  }
+
+  &:focus-visible {
+    box-shadow: inset var(--focus-ring);
+  }
+}
+
+.plan[open] .plan__chevron {
+  transform: rotate(180deg);
+}
+
+.plan__chevron {
+  color: var(--ink-muted);
+  transition: transform 150ms ease;
+}
+
+.plan__who {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+
+  strong {
+    font-weight: 500;
+  }
+
+  span {
+    color: var(--ink-muted);
+    font-size: var(--body-small-sys-font-size);
+    line-height: var(--body-small-sys-line-height);
+  }
+}
+
+.plan__body {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--spacing-padding-sys-padding-16);
+  padding: 0 var(--spacing-padding-sys-padding-20) var(--spacing-padding-sys-padding-20) 76px;
+
+  app-care-plan-list {
+    align-self: stretch;
+  }
+}
+
+.avatar {
+  display: grid;
+  place-items: center;
+  width: 40px;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: var(--add-on-primary-fixed-sys-primary-fixed);
+  color: var(--add-on-primary-fixed-sys-on-primary-fixed);
+  font-size: var(--label-medium-sys-font-size);
+  font-weight: 500;
+}
+
+/* ---- Progress: how much of a plan is done ---------------------------------- */
+
+.meter {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--spacing-padding-sys-padding-8);
+  color: var(--ink-muted);
+  font-size: var(--label-medium-sys-font-size);
+  white-space: nowrap;
+}
+
+.meter__track {
+  width: 96px;
+  height: 6px;
+  border-radius: 3px;
+  overflow: hidden;
+  background: var(--surface-surface-container-sys-surface-container-highest);
+}
+
+.meter__fill {
+  display: block;
+  height: 100%;
+  background: var(--custom-success-sys-success);
+}
+
+@media (max-width: 720px) {
+  .plan__summary {
+    grid-template-columns: 40px minmax(0, 1fr) auto;
+  }
+
+  .plan__summary .meter {
+    grid-column: 2;
+  }
+
+  .plan__body {
+    padding-left: var(--spacing-padding-sys-padding-20);
+  }
+}

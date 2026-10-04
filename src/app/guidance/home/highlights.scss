@@ -1,0 +1,72 @@
+:host {
+  position: relative;
+  display: grid;
+}
+
+.slides {
+  display: grid;
+}
+
+.slide {
+  grid-area: 1 / 1;
+  display: block;
+  height: 100%;
+  visibility: hidden;
+}
+
+.slide--current {
+  visibility: visible;
+}
+
+.dots {
+  position: absolute;
+  top: var(--spacing-padding-sys-padding-20);
+  right: var(--spacing-padding-sys-padding-20);
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-padding-sys-padding-6);
+}
+
+.dot {
+  width: 18px;
+  height: 3px;
+  padding: 0;
+  border: 0;
+  border-radius: 2px;
+  background: rgba(255, 255, 255, 0.4);
+  cursor: pointer;
+}
+
+.dot--current {
+  background: #fff;
+}
+
+.arrows {
+  position: absolute;
+  right: var(--spacing-padding-sys-padding-20);
+  bottom: var(--spacing-padding-sys-padding-20);
+  display: flex;
+  gap: var(--spacing-padding-sys-padding-8);
+}
+
+.control {
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: #fff;
+  color: var(--accent-primary-sys-primary-container);
+  cursor: pointer;
+}
+
+.control--small {
+  width: 18px;
+  height: 18px;
+  margin-left: var(--spacing-padding-sys-padding-4);
+  border: 1px solid rgba(255, 255, 255, 0.6);
+  background: transparent;
+  color: #fff;
+}

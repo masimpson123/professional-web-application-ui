@@ -44,7 +44,8 @@ Standalone Angular components with lazy-loaded routes:
 | `/data-stream` | data-stream | Search that streams results from several data stores as they arrive |
 | `/websocket` | websocket | STOMP pub/sub rooms |
 | `/auth` | auth | Firebase sign-in, protected API calls, and custom claims |
-| `/video` | video | Shared Zoom Video SDK session for everyone on the page |
+| `/guidance` | guidance | Intro to the Zoom telehealth app, with a button that launches it full screen |
+| `/guidance/app/**` | guidance | The Zoom telehealth app (GuidanceResources hackathon prototype): home, sessions, and a Zoom room per session. `/video` redirects to `/guidance` |
 | `/cube` | cube | Interactive three.js cube with face picking |
 | `/form` | form | Multi-step reactive form and a Signal Form |
 | `/resume` | resume | Opens the résumé PDF in a new tab and returns to `/root` |
@@ -53,9 +54,9 @@ Shared pieces:
 
 - `demos.ts` is the single source of truth for each demo's title, summary, stack, and route. The nav, the home page diagram, and every demo header read from it.
 - `demo-header/` renders the title, summary, and stack table at the top of each demo.
-- `src/styles.css` holds the design tokens (colors, type scale, radii) and shared patterns (`.stage`, `.steps`, `.row`, `.field`, `.status`).
+- `src/styles.css` holds the design tokens (colors, type scale, radii) and shared patterns (`.stage`, `.steps`, `.row`, `.field`, `.status`). Its element styles sit in `@scope` blocks that stop at `.guidance` and `.cdk-overlay-container`, so they never reach the Zoom telehealth app.
 
-The AI component dynamically loads other components via `NgComponentOutlet` based on the keyword at the end of the AI response. The machine-learning component dynamically loads `scatter-plot-xyz` for the 3D scatter plot. The video component loads the Zoom SDK only when someone joins.
+The AI component dynamically loads other components via `NgComponentOutlet` based on the keyword at the end of the AI response. The machine-learning component dynamically loads `scatter-plot-xyz` for the 3D scatter plot. The Zoom telehealth app (`guidance/`) is a separate app mounted under `/guidance/app`, with its own shell, services, and ComPsych design system; see `src/app/guidance/CLAUDE.md`. Its route has `data: { fullScreen: true }`, which makes `AppComponent` hide the shell bar and rail. Its services are provided on its route, not in root, and it loads the Zoom SDK only when a room is joined.
 
 ### Express backend (`index.js` + `tensorflow/`)
 
@@ -91,6 +92,7 @@ The WebSocket broker URL is derived from `springApiUrl`.
 - **Plotly.js** for the 3D scatter plot
 - **Firebase Auth** for authentication
 - **STOMP.js** for WebSocket pub/sub
-- **Zoom Video SDK** for the video session
+- **Zoom Video SDK** for the Zoom telehealth demo
+- **ComPsych UI components** (`@compsych-ui-components/*`) and **Angular CDK** for the Zoom telehealth app
 - **RxJS** for reactive data streams
 - **TypeScript 5.9** in strict mode

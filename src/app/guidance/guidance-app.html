@@ -1,0 +1,36 @@
+<compsych-header-nav
+  [level]="level()"
+  brandLabel="GuidanceResources"
+  [sidebarOpen]="menuOpen()"
+  [breadcrumbItems]="crumbs.trail()"
+  [showDocuments]="false"
+  [showLogout]="true"
+  [notificationCount]="2"
+  [avatarInitials]="viewer.initials()"
+  [actionButtons]="headerActions()"
+  (action)="onHeaderAction($event)"
+  (breadcrumbItemClick)="go($event)"
+  (breadcrumbHomeClick)="goHome()"
+/>
+
+<div class="body">
+  <main class="main">
+    <router-outlet />
+  </main>
+  @if (menuOpen()) {
+    <!-- The menu opens over the page; clicking off it or pressing Escape closes it. -->
+    <div class="scrim" aria-hidden="true" (click)="menuOpen.set(false)"></div>
+    <compsych-sidebar
+      class="menu"
+      [activeId]="activeMenuItem()"
+      (activeIdChange)="onMenuItem($event)"
+      (itemClick)="onMenuItem($event)"
+    />
+  }
+</div>
+
+<compsych-footer
+  copyright="Copyright © 2026 ComPsych® Corporation. All rights reserved."
+  [links]="footerLinks"
+  [subFooter]="crisisNote()"
+/>

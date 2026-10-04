@@ -1,0 +1,106 @@
+/* Sized by its own width, so the layout follows the space it's given. */
+:host {
+  display: block;
+  container: doc-row / inline-size;
+}
+
+.row {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: start;
+  gap: var(--spacing-padding-sys-padding-12);
+  padding: var(--spacing-padding-sys-padding-12) 0;
+}
+
+.kind {
+  display: grid;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  border-radius: var(--border-radius-sys-radius-sm);
+  background: var(--surface-surface-container-sys-surface-container-high);
+  color: var(--ink-muted);
+
+  /* Colour tells you what kind of thing it is: reading, doing, or a record. */
+  &[data-kind='article'],
+  &[data-kind='video'],
+  &[data-kind='guide'] {
+    background: var(--custom-info-sys-info-container);
+    color: var(--custom-info-sys-on-info-container);
+  }
+
+  &[data-kind='worksheet'] {
+    background: var(--accent-secondary-sys-secondary-container);
+    color: var(--accent-secondary-sys-on-secondary-container);
+  }
+
+  &[data-kind='form'] {
+    background: var(--custom-success-sys-success-container);
+    color: var(--custom-success-sys-on-success-container);
+  }
+}
+
+.body {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.title {
+  font-weight: 500;
+  overflow-wrap: anywhere;
+}
+
+.detail {
+  font-size: var(--body-small-sys-font-size);
+  line-height: var(--body-small-sys-line-height);
+  color: var(--ink-muted);
+}
+
+.actions {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-padding-sys-padding-8);
+  align-self: center;
+
+  &:empty {
+    display: none;
+  }
+}
+
+:host(.is-done) {
+  .title {
+    color: var(--ink-muted);
+  }
+
+  .kind {
+    opacity: 0.6;
+  }
+}
+
+/* Room to spare: title and detail on the left, the rest beside them on one line. */
+@container doc-row (min-width: 560px) {
+  .row {
+    align-items: center;
+    padding: var(--spacing-padding-sys-padding-8) 0;
+  }
+
+  .body {
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--spacing-padding-sys-padding-4) var(--spacing-padding-sys-padding-24);
+  }
+
+  .text {
+    flex: 1 1 240px;
+  }
+}

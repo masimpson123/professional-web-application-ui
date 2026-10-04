@@ -1,0 +1,116 @@
+.booking {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-padding-sys-padding-24);
+}
+
+.step {
+  margin-bottom: var(--spacing-padding-sys-padding-12);
+  font-size: var(--title-small-sys-font-size);
+  line-height: var(--title-small-sys-line-height);
+  font-weight: 500;
+}
+
+.hint {
+  margin: calc(-1 * var(--spacing-padding-sys-padding-8)) 0 var(--spacing-padding-sys-padding-12);
+  color: var(--ink-muted);
+  font-size: var(--body-small-sys-font-size);
+  line-height: var(--body-small-sys-line-height);
+}
+
+/* ---- Days: a strip of the next two weeks' open days ------------------------- */
+
+.days {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(92px, 1fr));
+  gap: var(--spacing-padding-sys-padding-8);
+}
+
+.day,
+.time {
+  border: 1px solid var(--line);
+  border-radius: var(--border-radius-sys-radius-md);
+  background: var(--surface-surface-container-sys-surface-container-lowest);
+  color: var(--ink);
+  cursor: pointer;
+  transition: border-color 120ms ease, background-color 120ms ease;
+
+  &:hover {
+    border-color: var(--accent-primary-sys-primary);
+  }
+}
+
+.day {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  padding: var(--spacing-padding-sys-padding-12) var(--spacing-padding-sys-padding-8);
+}
+
+.day__weekday,
+.day__open {
+  color: var(--ink-muted);
+  font-size: var(--label-small-sys-font-size);
+  line-height: var(--label-small-sys-line-height);
+}
+
+.day__date {
+  font-weight: 500;
+}
+
+/* Picked: filled, so the choice reads at a glance. */
+.day--picked,
+.time--picked {
+  border-color: var(--accent-primary-sys-primary);
+  background: var(--accent-primary-sys-primary);
+  color: var(--accent-primary-sys-on-primary);
+
+  .day__weekday,
+  .day__open {
+    color: inherit;
+  }
+}
+
+/* ---- Times ---------------------------------------------------------------- */
+
+.times {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(112px, 1fr));
+  gap: var(--spacing-padding-sys-padding-8);
+}
+
+.time {
+  padding: var(--spacing-padding-sys-padding-12);
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
+}
+
+/* ---- Done, notices, errors -------------------------------------------------- */
+
+.done {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-padding-sys-padding-8);
+}
+
+.done__title {
+  font-size: var(--title-medium-sys-font-size);
+  line-height: var(--title-medium-sys-line-height);
+  font-weight: 500;
+}
+
+.notice {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--spacing-padding-sys-padding-12);
+  color: var(--ink-muted);
+}
+
+.error {
+  padding: var(--spacing-padding-sys-padding-8) var(--spacing-padding-sys-padding-12);
+  border-radius: var(--border-radius-sys-radius-sm);
+  background: var(--error-sys-error-container);
+  color: var(--error-sys-on-error-container);
+}

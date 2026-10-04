@@ -1,0 +1,188 @@
+<section class="stage" aria-label="Video call">
+  <div class="stage__bar">
+    @switch (call.status()) {
+      @case ('connected') {
+        @if (call.reconnecting()) {
+          <span class="live live--reconnecting" role="status">
+            <span class="live__dot" aria-hidden="true"></span>Reconnecting…
+          </span>
+        } @else {
+          <span class="live"><span class="live__dot" aria-hidden="true"></span>In session</span>
+        }
+      }
+      @case ('connecting') {
+        <span class="live live--off">Connecting</span>
+      }
+      @default {
+        <span class="live live--off">Not connected</span>
+      }
+    }
+    <span class="private">
+      <app-icon name="lock" [size]="16" />
+      Private and encrypted
+    </span>
+  </div>
+
+  <!--
+    .screen paints the backdrop. Zoom's <video-player-container> sits on top and stays
+    transparent: a solid background on it (or anything between it and the players) can
+    hide the video. It's never re-created, so the call can render into it at any time.
+  -->
+  <div class="screen">
+    <video-player-container class="players">
+      <!-- One tile per person; the call renders each camera into its tile's [data-user-id]. -->
+      <div
+        #gallery
+        class="gallery"
+        [style.--columns]="columns()"
+        [hidden]="!connected() || anyoneSharing()"
+      >
+        @for (person of call.remotes(); track person.userId) {
+          <figure class="tile" [class.tile--video]="person.videoOn">
+            <div class="view" [attr.data-user-id]="person.userId" [hidden]="!person.videoOn"></div>
+            @if (!person.videoOn) {
+              <span class="monogram" aria-hidden="true">{{ initials(person.name) }}</span>
+            }
+            <figcaption class="nameplate">
+              {{ person.name }}
+              @if (person.muted) {
+                <app-icon name="mic-off" [size]="14" label="muted" />
+              }
+            </figcaption>
+          </figure>
+        }
+      </div>
+      <div #shareView class="view view--share" [hidden]="!connected() || !anyoneSharing()"></div>
+
+      @if (connected()) {
+        @if (!call.remotes().length && !anyoneSharing()) {
+          <div class="waiting">
+            <span class="monogram monogram--waiting" aria-hidden="true">{{ store.them().initials }}</span>
+            <p class="waiting__text">Waiting for {{ store.them().firstName }} to join</p>
+          </div>
+        }
+
+        @if (call.sharing()) {
+          <p class="nameplate nameplate--stage">You’re sharing your screen</p>
+        } @else if (call.remoteSharer(); as sharer) {
+          <p class="nameplate nameplate--stage">
+            {{ sharer.name }} is sharing their screen
+            @if (sharer.muted) {
+              <app-icon name="mic-off" [size]="14" label="muted" />
+            }
+          </p>
+        }
+      }
+
+      <figure class="self" [class.self--video]="call.cameraOn()" [hidden]="!connected()">
+        <div #selfView class="view" [hidden]="!call.cameraOn()"></div>
+        @if (!call.cameraOn()) {
+          <span class="self__initials" aria-hidden="true">{{ store.me().initials }}</span>
+        }
+        <figcaption>
+          You
+          @if (!call.micOn()) {
+            <app-icon name="mic-off" [size]="14" label="muted" />
+          }
+        </figcaption>
+      </figure>
+    </video-player-container>
+
+    @switch (call.status()) {
+      @case ('ready') {
+        <div class="overlay">
+          <h2 class="overlay__title">Ready to join?</h2>
+          <p class="overlay__body">
+            You’ll join with your microphone on and camera off. You can change both once you’re in.
+          </p>
+          <compsych-button size="large" label="Join session" leadingIcon="video" (click)="join()" />
+        </div>
+      }
+      @case ('connecting') {
+        <div class="overlay" role="status">
+          <p class="overlay__body">Connecting to your session…</p>
+        </div>
+      }
+      @case ('left') {
+        <div class="overlay">
+          <h2 class="overlay__title">You left the session</h2>
+          <p class="overlay__body">
+            Rejoin whenever you’re ready. Your documents stay available on the right.
+          </p>
+          <compsych-button label="Rejoin session" leadingIcon="video" (click)="join()" />
+        </div>
+      }
+      @case ('failed') {
+        <div class="overlay">
+          <h2 class="overlay__title">You’re not connected</h2>
+          <p class="overlay__body">{{ call.error() }}</p>
+          <compsych-button label="Try again" leadingIcon="rotate-cw" (click)="join()" />
+        </div>
+      }
+    }
+  </div>
+
+  <div
+    class="clock"
+    role="meter"
+    aria-label="Session time"
+    [attr.aria-valuenow]="elapsedMinutes()"
+    aria-valuemin="0"
+    [attr.aria-valuemax]="store.session().lengthMinutes"
+    [attr.aria-valuetext]="minutesLeft() + ' minutes left of ' + store.session().lengthMinutes"
+  >
+    <span class="clock__track" aria-hidden="true">
+      <span class="clock__fill" [style.transform]="'scaleX(' + elapsedFraction() + ')'"></span>
+    </span>
+    <span class="clock__time">
+      <strong>{{ clock() }}</strong> of {{ store.session().lengthMinutes }} min
+    </span>
+  </div>
+
+  @if (connected()) {
+    <div class="controls" role="toolbar" aria-label="Call controls">
+      <button
+        type="button"
+        class="control"
+        [class.control--off]="!call.micOn()"
+        [attr.aria-pressed]="!call.micOn()"
+        (click)="call.toggleMic()"
+      >
+        <app-icon [name]="call.micOn() ? 'mic' : 'mic-off'" />
+        {{ call.micOn() ? 'Mute' : 'Unmute' }}
+      </button>
+      <button
+        type="button"
+        class="control"
+        [class.control--off]="!call.cameraOn()"
+        [attr.aria-pressed]="call.cameraOn()"
+        (click)="call.toggleCamera()"
+      >
+        <app-icon [name]="call.cameraOn() ? 'video' : 'video-off'" />
+        {{ call.cameraOn() ? 'Stop video' : 'Start video' }}
+      </button>
+      <button
+        type="button"
+        class="control"
+        [attr.aria-pressed]="call.sharing()"
+        (click)="call.toggleShare()"
+      >
+        <app-icon name="monitor-up" />
+        {{ call.sharing() ? 'Stop sharing' : 'Share screen' }}
+      </button>
+
+      <compsych-button
+        class="controls__leave"
+        variant="danger"
+        size="large"
+        label="Leave session"
+        leadingIcon="phone-off"
+        (click)="call.leave()"
+      />
+    </div>
+  }
+
+  @if (call.error() && call.status() !== 'failed') {
+    <p class="error" role="alert">{{ call.error() }}</p>
+  }
+</section>

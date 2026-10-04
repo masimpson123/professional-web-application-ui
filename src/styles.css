@@ -54,147 +54,152 @@ body {
   text-rendering: optimizeLegibility;
 }
 
-h1,
-h2,
-h3 {
-  margin: 0;
-  line-height: 1.15;
-  text-wrap: balance;
-}
+/* Element styles stop at the Zoom telehealth app (and its dialogs), which brings its own design system. */
+@scope (:root) to (.guidance, .cdk-overlay-container) {
+  h1,
+  h2,
+  h3 {
+    margin: 0;
+    line-height: 1.15;
+    text-wrap: balance;
+  }
 
-h1 {
-  font-size: var(--step-4);
-  font-weight: 600;
-  letter-spacing: -0.025em;
-}
+  h1 {
+    font-size: var(--step-4);
+    font-weight: 600;
+    letter-spacing: -0.025em;
+  }
 
-h2 {
-  font-size: var(--step-2);
-  font-weight: 600;
-  letter-spacing: -0.015em;
-}
+  h2 {
+    font-size: var(--step-2);
+    font-weight: 600;
+    letter-spacing: -0.015em;
+  }
 
-h3 {
-  font-size: var(--step-1);
-  font-weight: 600;
-}
+  h3 {
+    font-size: var(--step-1);
+    font-weight: 600;
+  }
 
-p {
-  margin: 0;
-  max-width: var(--measure);
-  text-wrap: pretty;
-}
+  p {
+    margin: 0;
+    max-width: var(--measure);
+    text-wrap: pretty;
+  }
 
-a {
-  color: var(--ink);
-  text-decoration-color: var(--rule-strong);
-  text-underline-offset: 0.2em;
-}
+  a {
+    color: var(--ink);
+    text-decoration-color: var(--rule-strong);
+    text-underline-offset: 0.2em;
+  }
 
-a:hover {
-  text-decoration-color: var(--signal);
-}
+  a:hover {
+    text-decoration-color: var(--signal);
+  }
 
-code {
-  font-family: var(--font-code);
-  font-size: 0.9em;
-}
+  code {
+    font-family: var(--font-code);
+    font-size: 0.9em;
+  }
 
-:focus-visible {
-  outline: 2px solid var(--signal);
-  outline-offset: 2px;
-}
+  :focus-visible {
+    outline: 2px solid var(--signal);
+    outline-offset: 2px;
+  }
 
-::selection {
-  background: var(--signal-wash);
+  ::selection {
+    background: var(--signal-wash);
+  }
 }
 
 /* Controls */
 
-button,
-.button {
-  display: inline-block;
-  font: inherit;
-  font-size: var(--step--1);
-  font-weight: 600;
-  line-height: 1.2;
-  padding: 0.625rem 1rem;
-  border: 1px solid var(--rule-strong);
-  border-radius: var(--radius-control);
-  background: var(--surface);
-  color: var(--ink);
-  text-decoration: none;
-  cursor: pointer;
-  transition: border-color 0.12s, background-color 0.12s;
-}
+@scope (:root) to (.guidance, .cdk-overlay-container) {
+  button,
+  .button {
+    display: inline-block;
+    font: inherit;
+    font-size: var(--step--1);
+    font-weight: 600;
+    line-height: 1.2;
+    padding: 0.625rem 1rem;
+    border: 1px solid var(--rule-strong);
+    border-radius: var(--radius-control);
+    background: var(--surface);
+    color: var(--ink);
+    text-decoration: none;
+    cursor: pointer;
+    transition: border-color 0.12s, background-color 0.12s;
+  }
 
-button:hover:not(:disabled),
-.button:hover {
-  border-color: var(--ink);
-}
+  button:hover:not(:disabled),
+  .button:hover {
+    border-color: var(--ink);
+  }
 
-button.primary,
-.button.primary {
-  background: var(--ink);
-  border-color: var(--ink);
-  color: #fff;
-}
+  button.primary,
+  .button.primary {
+    background: var(--ink);
+    border-color: var(--ink);
+    color: #fff;
+  }
 
-button.primary:hover:not(:disabled),
-.button.primary:hover {
-  background: var(--ink-hover);
-}
+  button.primary:hover:not(:disabled),
+  .button.primary:hover {
+    background: var(--ink-hover);
+  }
 
-button:disabled {
-  cursor: not-allowed;
-  opacity: 0.45;
-}
+  button:disabled {
+    cursor: not-allowed;
+    opacity: 0.45;
+  }
 
-input:not([type='range']),
-textarea {
-  font: inherit;
-  color: var(--ink);
-  width: 100%;
-  max-width: 28rem;
-  padding: 0.5625rem 0.75rem;
-  border: 1px solid var(--rule-strong);
-  border-radius: var(--radius-control);
-  background: var(--surface);
-}
+  input:not([type='range']),
+  textarea {
+    font: inherit;
+    color: var(--ink);
+    width: 100%;
+    max-width: 28rem;
+    padding: 0.5625rem 0.75rem;
+    border: 1px solid var(--rule-strong);
+    border-radius: var(--radius-control);
+    background: var(--surface);
+  }
 
-textarea {
-  max-width: none;
-  min-height: 5.5rem;
-  resize: vertical;
-}
+  textarea {
+    max-width: none;
+    min-height: 5.5rem;
+    resize: vertical;
+  }
 
-input:not([type='range']):focus-visible,
-textarea:focus-visible {
-  outline-offset: 0;
-  border-color: var(--ink);
-}
+  input:not([type='range']):focus-visible,
+  textarea:focus-visible {
+    outline-offset: 0;
+    border-color: var(--ink);
+  }
 
-input::placeholder,
-textarea::placeholder {
-  color: #8a969e;
-}
+  input::placeholder,
+  textarea::placeholder {
+    color: #8a969e;
+  }
 
-input:disabled {
-  background: var(--paper);
-  color: var(--graphite);
-}
+  input:disabled {
+    background: var(--paper);
+    color: var(--graphite);
+  }
 
-input[type='range'] {
-  width: 100%;
-  max-width: 20rem;
-  accent-color: var(--ink);
-}
+  input[type='range'] {
+    width: 100%;
+    max-width: 20rem;
+    accent-color: var(--ink);
+  }
 
-label {
-  display: block;
-  font-size: var(--step--1);
-  font-weight: 600;
-  margin-bottom: 0.375rem;
+  label {
+    display: block;
+    font-size: var(--step--1);
+    font-weight: 600;
+    margin-bottom: 0.375rem;
+  }
 }
 
 /* Shared page patterns */

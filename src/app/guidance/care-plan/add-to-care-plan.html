@@ -1,0 +1,88 @@
+<compsych-dialog
+  variant="modal-leading-icon"
+  icon="library"
+  width="min(1040px, 94vw)"
+  [open]="open()"
+  [title]="'Add to ' + memberName() + '’s care plan'"
+  (closed)="close()"
+>
+  <div class="search">
+    <compsych-text-input
+      label="Search for a resource, topic, or life event"
+      placeholder="For example: sleep, grief, communication"
+      leadingIcon="search"
+      [value]="query()"
+      (valueChange)="query.set($event)"
+    />
+
+    <p class="search__heading" aria-live="polite">{{ heading() }}</p>
+
+    @let found = results();
+    <div class="results">
+      <ul class="grid">
+        @for (resource of found.items; track resource.id) {
+          @let added = inPlan(resource);
+          @let picked = selected().has(resource.id);
+          <li>
+            <compsych-card
+              variant="content"
+              appearance="gradient"
+              categoryStyle="label"
+              [icon]="kindIcon[resource.kind]"
+              [category]="kindLabel[resource.kind]"
+              [title]="resource.title"
+              [description]="resource.description"
+              [compact]="true"
+              [interactive]="!added"
+              [disabled]="added"
+              [selected]="picked"
+              [actionLabel]="added ? 'In care plan' : picked ? 'Selected' : 'Select'"
+              [actionLeadingIcon]="added || picked ? 'check' : 'plus'"
+              [actionDisabled]="added"
+              [aria-label]="resource.title + ', ' + kindLabel[resource.kind] + (added ? ', already in the care plan' : picked ? ', selected' : '')"
+              (cardClick)="toggle(resource)"
+            />
+          </li>
+        }
+      </ul>
+
+      @if (found.loading) {
+        <p class="notice" role="status">Loading resources…</p>
+      } @else if (found.failed) {
+        <div class="notice" role="alert">
+          <p>We couldn’t load resources. Check your internet connection, then try again.</p>
+          <compsych-button label="Try again" leadingIcon="rotate-cw" (click)="loadMore()" />
+        </div>
+      } @else if (!found.items.length) {
+        <p class="notice">Nothing matches that search. Try fewer or different words.</p>
+      } @else if (!found.done) {
+        <compsych-button class="more" variant="outlined" label="Show more resources" (click)="loadMore()" />
+      }
+    </div>
+  </div>
+
+  <input
+    #fileInput
+    type="file"
+    multiple
+    class="visually-hidden"
+    tabindex="-1"
+    aria-hidden="true"
+    (change)="onFilesChosen(fileInput)"
+  />
+  <compsych-button
+    cmpDialogActions
+    variant="outlined"
+    leadingIcon="upload"
+    label="Upload from computer"
+    (click)="chooseFiles()"
+  />
+  <compsych-button
+    cmpDialogActions
+    variant="filled"
+    leadingIcon="plus"
+    [label]="addLabel()"
+    [disabled]="!selected().size"
+    (click)="confirm()"
+  />
+</compsych-dialog>

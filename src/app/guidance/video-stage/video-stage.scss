@@ -1,0 +1,396 @@
+:host {
+  display: block;
+}
+
+/* Several elements here set `display`, which would otherwise override `hidden`. */
+[hidden] {
+  display: none !important;
+}
+
+/* Fills its grid cell; the video area takes whatever height is left. */
+.stage {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-padding-sys-padding-16);
+  padding: var(--spacing-padding-sys-padding-16);
+  border-radius: var(--border-radius-sys-radius-xl);
+  background: var(--room);
+  color: var(--accent-primary-sys-on-primary-container);
+}
+
+.stage__bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--spacing-padding-sys-padding-16);
+  padding: 0 var(--spacing-padding-sys-padding-4);
+  font-size: var(--label-medium-sys-font-size);
+  line-height: var(--label-medium-sys-line-height);
+}
+
+.live {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--spacing-padding-sys-padding-8);
+  font-weight: 500;
+}
+
+.live--reconnecting {
+  color: var(--add-on-secondary-fixed-sys-secondary-fixed-dim);
+
+  .live__dot {
+    background: currentColor;
+    animation: none;
+  }
+}
+
+.live--off {
+  color: var(--accent-primary-sys-on-primary-container-variant);
+  font-weight: normal;
+}
+
+.live__dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #4ade80;
+  box-shadow: 0 0 0 0 rgba(74, 222, 128, 0.6);
+  animation: breathe 4s ease-in-out infinite;
+}
+
+/* Slow enough to read as calm, not urgent. */
+@keyframes breathe {
+  50% {
+    box-shadow: 0 0 0 6px rgba(74, 222, 128, 0);
+  }
+}
+
+.private {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--spacing-padding-sys-padding-6);
+  color: var(--accent-primary-sys-on-primary-container-variant);
+}
+
+/* ---- Video area ---------------------------------------------------- */
+
+.screen {
+  display: grid;
+  grid-template: minmax(0, 1fr) / minmax(0, 1fr);
+  position: relative;
+  flex: 1;
+  min-height: 200px;
+  width: 100%;
+  overflow: hidden;
+  border-radius: var(--border-radius-sys-radius-lg);
+  background: var(--room-raised);
+}
+
+/*
+ * Zoom's render host: fills the backdrop, transparent by design. On join the SDK
+ * writes an inline `display: block; position: relative` onto it, so it's sized as
+ * the stretched grid cell rather than with positioning, which that would override.
+ */
+.players {
+  min-width: 0;
+  min-height: 0;
+}
+
+/* Containers the call renders into: Zoom <video-player>s or plain <video>s. */
+.view {
+  position: absolute;
+  inset: 0;
+
+  ::ng-deep :is(video-player, video, canvas) {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+}
+
+.view--share {
+  ::ng-deep :is(video-player, video, canvas) {
+    object-fit: contain;
+  }
+}
+
+/* Everyone else, in the smallest square grid that fits them. */
+.gallery {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  grid-template-columns: repeat(var(--columns, 1), minmax(0, 1fr));
+  grid-auto-rows: minmax(0, 1fr);
+  gap: var(--spacing-padding-sys-padding-8);
+}
+
+/* A single tile fills the screen edge to edge, as a one-to-one call should. */
+.gallery:has(> .tile:nth-child(2)) {
+  padding: var(--spacing-padding-sys-padding-8);
+}
+
+.tile {
+  position: relative;
+  margin: 0;
+  overflow: hidden;
+  display: grid;
+  place-items: center;
+  border-radius: var(--border-radius-sys-radius-md);
+
+  /* Backdrop only while there's no video, so it can't cover Zoom's player. */
+  &:not(.tile--video) {
+    background: var(--room-raised);
+  }
+}
+
+.gallery:has(> .tile:nth-child(2)) .tile:not(.tile--video) {
+  background: var(--room);
+}
+
+.waiting {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-content: center;
+  justify-items: center;
+  gap: var(--spacing-padding-sys-padding-24);
+  padding: var(--spacing-padding-sys-padding-24);
+  text-align: center;
+}
+
+.waiting__text {
+  max-width: 36ch;
+  color: var(--accent-primary-sys-on-primary-container-variant);
+}
+
+.monogram {
+  display: grid;
+  place-items: center;
+  width: clamp(96px, 22%, 168px);
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: var(--accent-primary-sys-primary);
+  box-shadow: 0 0 0 10px rgba(185, 220, 255, 0.08), 0 0 0 22px rgba(185, 220, 255, 0.04);
+  font-size: clamp(32px, 4vw, 56px);
+  font-weight: 500;
+  letter-spacing: 0.02em;
+}
+
+/* Smaller in a crowded gallery. */
+.gallery:has(> .tile:nth-child(2)) .monogram {
+  width: clamp(56px, 30%, 120px);
+  box-shadow: none;
+  font-size: clamp(20px, 2.5vw, 40px);
+}
+
+.monogram--waiting {
+  width: 112px;
+  opacity: 0.45;
+  box-shadow: none;
+}
+
+.nameplate {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--spacing-padding-sys-padding-6);
+  position: absolute;
+  left: var(--spacing-padding-sys-padding-12);
+  bottom: var(--spacing-padding-sys-padding-12);
+  max-width: calc(100% - 2 * var(--spacing-padding-sys-padding-12));
+  padding: var(--spacing-padding-sys-padding-4) var(--spacing-padding-sys-padding-12);
+  border-radius: var(--border-radius-sys-radius-sm);
+  background: rgba(7, 15, 54, 0.72);
+  font-size: var(--label-medium-sys-font-size);
+  line-height: var(--label-medium-sys-line-height);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Over the whole screen (screen sharing), rather than over one tile. */
+.nameplate--stage {
+  left: var(--spacing-padding-sys-padding-16);
+  bottom: var(--spacing-padding-sys-padding-16);
+}
+
+.self {
+  position: absolute;
+  right: var(--spacing-padding-sys-padding-16);
+  bottom: var(--spacing-padding-sys-padding-16);
+  width: clamp(112px, 22%, 220px);
+  aspect-ratio: 4 / 3;
+  margin: 0;
+  overflow: hidden;
+  display: grid;
+  place-items: center;
+  border-radius: var(--border-radius-sys-radius-md);
+  border: 1px solid var(--room-line);
+
+  /* Backdrop only while there's no video, so it can't cover Zoom's player. */
+  &:not(.self--video) {
+    background: var(--room);
+  }
+
+  figcaption {
+    position: absolute;
+    left: var(--spacing-padding-sys-padding-8);
+    bottom: var(--spacing-padding-sys-padding-6);
+    display: inline-flex;
+    align-items: center;
+    gap: var(--spacing-padding-sys-padding-4);
+    font-size: var(--label-small-sys-font-size);
+    line-height: var(--label-small-sys-line-height);
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+  }
+}
+
+.self__initials {
+  font-size: var(--title-small-sys-font-size);
+  color: var(--accent-primary-sys-on-primary-container-variant);
+}
+
+.overlay {
+  position: absolute;
+  z-index: 1;
+  background: var(--room-raised);
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacing-padding-sys-padding-12);
+  padding: var(--spacing-padding-sys-padding-24);
+  text-align: center;
+}
+
+.overlay__title {
+  font-size: var(--title-medium-sys-font-size);
+  line-height: var(--title-medium-sys-line-height);
+  font-weight: 500;
+}
+
+.overlay__body {
+  max-width: 36ch;
+  margin-bottom: var(--spacing-padding-sys-padding-8);
+  color: var(--accent-primary-sys-on-primary-container-variant);
+}
+
+/* ---- Session clock: elapsed share of the 50-minute hour -------------- */
+
+.clock {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-padding-sys-padding-12);
+  padding: 0 var(--spacing-padding-sys-padding-4);
+}
+
+.clock__track {
+  flex: 1;
+  height: 3px;
+  border-radius: 2px;
+  overflow: hidden;
+  background: var(--room-line);
+}
+
+.clock__fill {
+  display: block;
+  height: 100%;
+  background: var(--accent-primary-sys-on-primary-container-variant);
+  transform-origin: left;
+  transition: transform 1s linear;
+}
+
+.clock__time {
+  flex: none;
+  font-size: var(--label-medium-sys-font-size);
+  line-height: var(--label-medium-sys-line-height);
+  color: var(--accent-primary-sys-on-primary-container-variant);
+  font-variant-numeric: tabular-nums;
+
+  strong {
+    color: var(--accent-primary-sys-on-primary-container);
+    font-weight: 500;
+  }
+}
+
+/* ---- Controls ------------------------------------------------------ */
+
+.controls {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--spacing-padding-sys-padding-8);
+}
+
+.control {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--spacing-padding-sys-padding-8);
+  height: 44px;
+  padding: 0 var(--spacing-padding-sys-padding-16);
+  border: 1px solid var(--room-line);
+  border-radius: var(--border-radius-sys-radius-full);
+  background: transparent;
+  color: inherit;
+  font-size: var(--label-large-sys-font-size);
+  cursor: pointer;
+  transition: background-color 120ms ease, color 120ms ease;
+
+  &:hover {
+    background: var(--transparent-neutral-sys-white-10);
+  }
+
+  &:focus-visible {
+    box-shadow: 0 0 0 2px var(--room), 0 0 0 4px var(--accent-primary-sys-on-primary-container-variant);
+  }
+}
+
+/* Mic or camera off: the light fill makes "something is off" obvious at a glance. */
+.control--off {
+  border-color: transparent;
+  background: var(--accent-primary-sys-on-primary-container);
+  color: var(--room);
+
+  &:hover {
+    background: var(--accent-primary-sys-on-primary-container-variant);
+  }
+}
+
+.controls__leave {
+  margin-left: auto;
+}
+
+.error {
+  padding: var(--spacing-padding-sys-padding-8) var(--spacing-padding-sys-padding-12);
+  border-radius: var(--border-radius-sys-radius-sm);
+  background: var(--error-sys-error-container);
+  color: var(--error-sys-on-error-container);
+  font-size: var(--body-small-sys-font-size);
+  line-height: var(--body-small-sys-line-height);
+}
+
+@media (max-width: 1024px) {
+  .screen {
+    flex: none;
+    aspect-ratio: 16 / 10;
+  }
+}
+
+@media (max-width: 560px) {
+  .self {
+    top: var(--spacing-padding-sys-padding-12);
+    right: var(--spacing-padding-sys-padding-12);
+    bottom: auto;
+    width: 96px;
+  }
+
+  .control {
+    padding: 0 var(--spacing-padding-sys-padding-12);
+  }
+
+  .controls__leave {
+    margin-left: 0;
+  }
+}

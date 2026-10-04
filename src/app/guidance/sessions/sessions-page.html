@@ -1,0 +1,103 @@
+<div class="page">
+  <header class="intro">
+    <div>
+      <h1 class="intro__title">Your sessions</h1>
+      @if (summary()) {
+        <p class="intro__summary">{{ summary() }}</p>
+      }
+    </div>
+    @if (isMember()) {
+      <compsych-button
+        variant="filled"
+        leadingIcon="calendar-plus"
+        label="Book a session"
+        (click)="booking.set(true)"
+      />
+    }
+  </header>
+
+  @if (viewer.user.error()) {
+    <div class="notice" role="alert">
+      <p>We couldn’t load your sessions. Check your internet connection, then try again.</p>
+      <compsych-button label="Try again" leadingIcon="rotate-cw" (click)="viewer.user.reload()" />
+    </div>
+  } @else {
+    <section class="block" aria-labelledby="upcoming-heading">
+      <h2 class="block__title" id="upcoming-heading">Upcoming</h2>
+      <ng-container *ngTemplateOutlet="days; context: { $implicit: upcomingDays(), id: 'upcoming' }" />
+      <ng-container
+        *ngTemplateOutlet="
+          more;
+          context: {
+            $implicit: upcoming,
+            empty: 'No upcoming sessions.',
+            label: 'Show more upcoming sessions'
+          }
+        "
+      />
+    </section>
+
+    <section class="block" aria-labelledby="past-heading">
+      <h2 class="block__title" id="past-heading">Past</h2>
+      <ng-container *ngTemplateOutlet="days; context: { $implicit: pastDays(), id: 'past' }" />
+      <ng-container
+        *ngTemplateOutlet="
+          more;
+          context: {
+            $implicit: past,
+            empty: 'Your past sessions will show up here.',
+            label: 'Show more past sessions',
+            onScroll: true
+          }
+        "
+      />
+    </section>
+  }
+</div>
+
+@if (isMember()) {
+  <app-book-session [(open)]="booking" (booked)="upcoming.reload()" />
+}
+
+<ng-template #days let-days let-id="id">
+  @for (day of days; track day.key) {
+    <div class="day">
+      <h3 class="day__title" [id]="id + '-' + day.key">{{ day.label }}</h3>
+      <ul class="list" [attr.aria-labelledby]="id + '-' + day.key">
+        @for (item of day.sessions; track item.session.id) {
+          <li><app-session-row [item]="item" [now]="now()" /></li>
+        }
+      </ul>
+    </div>
+  }
+</ng-template>
+
+<!--
+  The end of a list: loading, a failed page to retry, more to load, or nothing at
+  all. With `onScroll`, the next page also loads as the end scrolls into view; the
+  button stays for keyboard and screen reader users.
+-->
+<ng-template #more let-feed let-empty="empty" let-label="label" let-onScroll="onScroll">
+  @let state = feed.state();
+  @if (state.loading) {
+    <p class="notice" role="status">Loading sessions…</p>
+  } @else if (state.failed) {
+    <div class="notice" role="alert">
+      <p>We couldn’t load more sessions. Check your internet connection, then try again.</p>
+      <compsych-button label="Try again" leadingIcon="rotate-cw" (click)="feed.loadMore()" />
+    </div>
+  } @else if (!state.items.length) {
+    <p class="notice">{{ empty }}</p>
+  } @else if (!state.done) {
+    @if (onScroll) {
+      <div class="sentinel" aria-hidden="true" appWhenVisible (visible)="feed.loadMore()"></div>
+    }
+    <compsych-button
+      class="more"
+      variant="outlined"
+      [label]="label"
+      (click)="feed.loadMore()"
+    />
+    <p class="notice notice--small">Showing {{ state.items.length }} of {{ state.total }}</p>
+  }
+</ng-template>

@@ -1,0 +1,108 @@
+<section class="plans" aria-labelledby="care-plans-heading">
+  <h2 #heading id="care-plans-heading" class="plans__title" tabindex="-1">
+    {{ role() === 'provider' ? 'Care plans' : 'Your care plan' }}
+  </h2>
+
+  @switch (store.view()) {
+    @case ('loading') {
+      <p class="notice" role="status">Loading care plans…</p>
+    }
+    @case ('failed') {
+      <div class="notice" role="alert">
+        <p>We couldn’t load care plans. Check your internet connection, then try again.</p>
+        <compsych-button label="Try again" leadingIcon="rotate-cw" (click)="store.retry()" />
+      </div>
+    }
+    @case ('ready') {
+      @if (role() === 'provider') {
+        <p class="notice">Your members’ progress, soonest session first. Open a care plan to see each item or add documents.</p>
+        <div class="accordion">
+          @for (plan of store.plans(); track plan.member.id) {
+            @let p = progress(plan);
+            <details class="plan">
+              <summary class="plan__summary">
+                <span class="avatar" aria-hidden="true">{{ plan.member.initials }}</span>
+                <span class="plan__who">
+                  <strong>{{ plan.member.name }}</strong>
+                  <span>
+                    @if (plan.nextSession) {
+                      Next session {{ plan.nextSession | date: 'EEE, MMM d' }}
+                    } @else {
+                      No session booked
+                    }
+                  </span>
+                </span>
+                <span class="meter">
+                  <span class="meter__track" aria-hidden="true">
+                    <span class="meter__fill" [style.width.%]="p.total ? (p.done / p.total) * 100 : 0"></span>
+                  </span>
+                  {{ p.done }} of {{ p.total }} done
+                </span>
+                <app-icon class="plan__chevron" name="chevron-down" [size]="20" />
+              </summary>
+              <div class="plan__body">
+                <app-care-plan-list
+                  [items]="plan.items"
+                  role="provider"
+                  [nextSession]="plan.nextSession"
+                  [memberName]="plan.member.firstName"
+                  (remove)="store.remove(plan, $event)"
+                />
+                <compsych-button
+                  class="plan__add"
+                  variant="outlined"
+                  size="small"
+                  label="Add to care plan"
+                  leadingIcon="plus"
+                  (click)="addingTo.set(plan)"
+                />
+              </div>
+            </details>
+          } @empty {
+            <p class="notice">None of your members has a care plan yet.</p>
+          }
+        </div>
+        @if (addingPlan(); as plan) {
+          <app-add-to-care-plan
+            [open]="true"
+            (openChange)="setAdding($event)"
+            [memberName]="plan.member.firstName"
+            [items]="plan.items"
+            (add)="store.addResources(plan, $event)"
+            (upload)="store.upload(plan, $event)"
+          />
+        }
+      } @else {
+        @for (plan of store.plans(); track plan.provider.id) {
+          @let p = progress(plan);
+          <div class="card">
+            <div class="card__head">
+              <p class="card__from">
+                From {{ personLabel(plan.provider) }}.
+                @if (plan.nextSession) {
+                  Complete it before your next session on {{ plan.nextSession | date: 'EEEE, MMM d' }}.
+                }
+              </p>
+              <span class="meter">
+                <span class="meter__track" aria-hidden="true">
+                  <span class="meter__fill" [style.width.%]="p.total ? (p.done / p.total) * 100 : 0"></span>
+                </span>
+                {{ p.done }} of {{ p.total }} done
+              </span>
+            </div>
+            <app-care-plan-list
+              [items]="plan.items"
+              role="member"
+              [nextSession]="plan.nextSession"
+              (doneChange)="store.setDone(plan, $event)"
+            />
+          </div>
+        } @empty {
+          <p class="notice">You don’t have a care plan yet. Your provider will add one after a session.</p>
+        }
+      }
+    }
+  }
+
+  <p class="visually-hidden" aria-live="polite">{{ store.announcement() }}</p>
+</section>

@@ -106,6 +106,21 @@ main {
   border-left: 1px solid var(--rule);
 }
 
+/* Full screen: the routed app is all there is. */
+:host(.full-screen) {
+  display: block;
+}
+
+:host(.full-screen) .shell-bar,
+:host(.full-screen) .rail {
+  display: none;
+}
+
+:host(.full-screen) main {
+  padding: 0;
+  border-left: 0;
+}
+
 @media (max-width: 960px) {
   :host {
     display: block;

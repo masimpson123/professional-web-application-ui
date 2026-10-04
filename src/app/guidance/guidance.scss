@@ -1,0 +1,52 @@
+/*
+ * The Zoom telehealth app's global styles, scoped to its shell (`.guidance`) and to
+ * the CDK overlay its dialogs open in. Design tokens come from
+ * @compsych-ui-components/shared (loaded ahead of this file in angular.json);
+ * everything here builds on them. The portfolio's element styles stop at these
+ * same two roots (see the @scope blocks in src/styles.css).
+ */
+
+.guidance,
+.cdk-overlay-container {
+  --compsych-font-family: 'Google Sans', 'DM Sans', system-ui, sans-serif;
+
+  /* App-level roles layered on the system tokens. */
+  --room: var(--accent-primary-sys-primary-container); /* the video stage */
+  --room-raised: #111c4d;
+  --room-line: rgba(185, 220, 255, 0.16);
+  --ink: var(--surface-surface-sys-on-surface);
+  --ink-muted: var(--surface-surface-sys-on-surface-variant);
+  --line: var(--outline-sys-outline-variant);
+  --focus-ring: 0 0 0 2px var(--surface-surface-container-sys-surface-container-lowest),
+    0 0 0 4px var(--accent-primary-sys-primary);
+
+  font-family: var(--compsych-font-family);
+  font-size: var(--body-medium-sys-font-size);
+  line-height: var(--body-medium-sys-line-height);
+  color: var(--ink);
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Element resets at the specificity they had as bare globals, so component styles still win. */
+:where(.guidance, .cdk-overlay-container) {
+  :is(h1, h2, h3, h4, p) {
+    margin: 0;
+  }
+
+  button {
+    font: inherit;
+  }
+
+  :focus-visible {
+    outline: none;
+    box-shadow: var(--focus-ring);
+  }
+
+  [hidden] {
+    display: none !important;
+  }
+}
+
+.guidance {
+  background: var(--surface-surface-sys-surface);
+}

@@ -22,6 +22,8 @@ module.exports = defineConfig([
       "@typescript-eslint/no-this-alias": "off",
       "@typescript-eslint/no-empty-object-type": "off",
       "no-constant-binary-expression": "off",
+      // Destructuring a field out with `...rest` is how the code drops it.
+      "@typescript-eslint/no-unused-vars": ["error", { ignoreRestSiblings: true }],
       "@angular-eslint/directive-selector": [
         "error",
         {

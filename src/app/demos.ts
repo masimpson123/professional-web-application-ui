@@ -4,7 +4,7 @@ export type DemoId =
   | 'data-stream'
   | 'websocket'
   | 'auth'
-  | 'video'
+  | 'guidance'
   | 'cube'
   | 'form';
 
@@ -26,7 +26,7 @@ export interface Demo {
 // Order matters: it drives the nav, the home page diagram rows, and the mobile index.
 // The diagram's service nodes (root.component.ts) are positioned for this order:
 // Spring callers must stay in consecutive rows, and Gemini, Identity Platform, and Zoom
-// sit beside the AI, auth, and video rows.
+// sit beside the AI, auth, and Zoom telehealth rows.
 export const DEMOS: Demo[] = [
   {
     id: 'machine-learning',
@@ -88,12 +88,12 @@ export const DEMOS: Demo[] = [
     calls: ['spring'],
   },
   {
-    id: 'video',
-    route: '/video',
-    title: 'Video session',
+    id: 'guidance',
+    route: '/guidance',
+    title: 'Zoom telehealth',
     group: 'Systems',
-    summary: 'Join one shared Zoom video call with everyone else on this page. The Spring service signs each visitor’s session token, so the Zoom secret never reaches the browser.',
-    client: 'Angular, Zoom Video SDK',
+    summary: 'A hackathon prototype for GuidanceResources: members and providers book sessions, work through care plans, and meet in a Zoom room for each session, with screen sharing. The Spring service signs each room’s token, so the Zoom secret never reaches the browser.',
+    client: 'Angular, Zoom Video SDK, ComPsych UI components',
     service: 'Spring Boot, JWT signing',
     platform: 'Zoom Video SDK, Cloud Run, Docker',
     calls: ['spring'],

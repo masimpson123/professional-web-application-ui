@@ -9,7 +9,10 @@ export const routes: Routes = [
     {path: 'resume', loadComponent: () => import('./resume/resume.component').then(c => c.ResumeComponent)},
     {path: 'form', loadComponent: () => import('./form/form.component').then(c => c.FormComponent)},
     {path: 'websocket', loadComponent: () => import('./websocket/websocket.component').then(c => c.WebsocketComponent)},
-    {path: 'video', loadComponent: () => import('./video/video.component').then(c => c.VideoComponent)},
+    {path: 'guidance', loadComponent: () => import('./guidance/guidance-intro.component').then(c => c.GuidanceIntroComponent)},
+    // The app fills the window: the portfolio hides its chrome for routes with `fullScreen`.
+    {path: 'guidance/app', data: {fullScreen: true}, loadChildren: () => import('./guidance/guidance.routes').then(r => r.routes)},
+    {path: 'video', redirectTo: 'guidance'},
     {path: 'machine-learning', loadComponent: () => import('./machine-learning/machine-learning.component').then(c => c.MachineLearningComponent)},
     {path: '**', loadComponent: () => import('./root/root.component').then(c => c.RootComponent)},
 ];

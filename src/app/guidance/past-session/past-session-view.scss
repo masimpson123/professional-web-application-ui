@@ -1,0 +1,64 @@
+/* The summary reads best at a comfortable line length; documents sit beside it. */
+:host {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(320px, 400px);
+  align-items: start;
+  gap: var(--spacing-padding-sys-padding-24);
+}
+
+.card {
+  padding: var(--spacing-padding-sys-padding-20) var(--spacing-padding-sys-padding-24)
+    var(--spacing-padding-sys-padding-24);
+  border: 1px solid var(--line);
+  border-radius: var(--border-radius-sys-radius-xl);
+  background: var(--surface-surface-container-sys-surface-container-lowest);
+}
+
+.card__title {
+  font-size: var(--title-small-sys-font-size);
+  line-height: var(--title-small-sys-line-height);
+  font-weight: 500;
+}
+
+.overview {
+  max-width: 68ch;
+  margin-top: var(--spacing-padding-sys-padding-12);
+}
+
+.group {
+  margin-top: var(--spacing-padding-sys-padding-24);
+  font-size: var(--label-large-sys-font-size);
+  line-height: var(--label-large-sys-line-height);
+  font-weight: 500;
+}
+
+.steps {
+  max-width: 68ch;
+  margin: var(--spacing-padding-sys-padding-8) 0 0;
+  padding-left: var(--spacing-padding-sys-padding-20);
+
+  li + li {
+    margin-top: var(--spacing-padding-sys-padding-6);
+  }
+}
+
+.list {
+  margin: var(--spacing-padding-sys-padding-4) 0 0;
+  padding: 0;
+  list-style: none;
+
+  li + li {
+    border-top: 1px solid var(--outline-sys-outline);
+  }
+}
+
+.empty {
+  padding: var(--spacing-padding-sys-padding-12) 0 0;
+  color: var(--ink-muted);
+}
+
+@media (max-width: 900px) {
+  :host {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}

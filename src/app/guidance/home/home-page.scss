@@ -1,0 +1,83 @@
+/* Scrolls inside the space between header and footer. */
+:host {
+  display: block;
+  position: relative;
+  min-height: 0;
+  overflow-y: auto;
+}
+
+.home {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-padding-sys-padding-24);
+  width: 100%;
+  max-width: 1440px;
+  margin: 0 auto;
+  padding: var(--spacing-padding-sys-padding-24) var(--spacing-padding-sys-padding-24)
+    var(--spacing-padding-sys-padding-48, 48px);
+}
+
+/* Welcome banner beside the highlights, the banner taking about 70%. */
+.top {
+  display: grid;
+  grid-template-columns: minmax(0, 2.4fr) minmax(320px, 1fr);
+  gap: var(--spacing-padding-sys-padding-12);
+  min-height: 264px;
+}
+
+.welcome,
+.highlights {
+  min-height: 264px;
+}
+
+.journeys {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-padding-sys-padding-20);
+}
+
+.section-title {
+  font-size: var(--title-small-sys-font-size);
+  line-height: var(--title-small-sys-line-height);
+  font-weight: 500;
+}
+
+.journeys__grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--spacing-padding-sys-padding-20);
+}
+
+/* ---- Ava ---------------------------------------------------------------- */
+
+.ava {
+  position: fixed;
+  right: var(--spacing-padding-sys-padding-24);
+  bottom: 72px;
+  z-index: 2;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--spacing-padding-sys-padding-8);
+  padding: var(--spacing-padding-sys-padding-12) var(--spacing-padding-sys-padding-16);
+  border: 0;
+  border-radius: var(--border-radius-sys-radius-full);
+  background: var(--surface-surface-container-sys-surface-container-lowest);
+  box-shadow: 0 2px 12px rgba(7, 15, 54, 0.16);
+  color: var(--ink);
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.ava__mark {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: conic-gradient(from 200deg, #f6a33a, #e8742c, #f4c46a, #f6a33a);
+}
+
+@media (max-width: 1024px) {
+  .top,
+  .journeys__grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}

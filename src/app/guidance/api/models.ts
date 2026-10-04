@@ -1,0 +1,176 @@
+export type Role = 'member' | 'provider';
+
+/** A featured article in the home page's carousel. */
+export interface Highlight {
+  id: string;
+  /** Lucide icon name. */
+  icon: string;
+  title: string;
+  description: string;
+  actionLabel: string;
+}
+
+export interface Person {
+  id: string;
+  name: string;
+  firstName: string;
+  initials: string;
+  credentials?: string;
+}
+
+/** "Maya Okafor, LPC", or just the name when there are no credentials. */
+export function personLabel(person: Person): string {
+  return person.credentials ? `${person.name}, ${person.credentials}` : person.name;
+}
+
+/** One booked appointment between a provider and a member. */
+export interface Session {
+  id: string;
+  /** Which session this is for the member with this provider: 1 for the intake, and so on. */
+  number: number;
+  providerId: string;
+  memberId: string;
+  /** ISO date-time the session starts. */
+  start: string;
+  lengthMinutes: number;
+  /** What the session is about, e.g. "Sleep and evening routines". */
+  focus: string;
+  /** The Zoom Video SDK session everyone in this session joins (the JWT `tpc`). Unique per session. */
+  zoomRoom: string;
+}
+
+/** A time a member can book a session with a provider. */
+export interface TimeSlot {
+  /** ISO date-time. */
+  start: string;
+  lengthMinutes: number;
+}
+
+export interface BookingRequest {
+  memberId: string;
+  providerId: string;
+  /** ISO date-time, one of the provider's open `TimeSlot`s. */
+  start: string;
+  /** What the member would like to focus on, if they said. */
+  focus?: string;
+}
+
+/** Which sessions to list: in progress and upcoming, or finished. */
+export type SessionWhen = 'upcoming' | 'past';
+
+export interface SessionsQuery {
+  when: SessionWhen;
+  /** Page size. */
+  limit?: number;
+  /** From the previous page's `nextCursor`, to get the page after it. */
+  cursor?: string;
+}
+
+/** One page of a list the server pages through. */
+export interface Page<T> {
+  items: T[];
+  /** Pass back as `cursor` for the next page; absent on the last page. */
+  nextCursor?: string;
+  /** How many there are across all pages. */
+  total: number;
+}
+
+/** A session as the sessions page lists it, with both people filled in. */
+export interface SessionSummary extends Session {
+  provider: Person;
+  member: Person;
+}
+
+/** Everything the session room needs. */
+export interface SessionDetail {
+  session: Session;
+  provider: Person;
+  member: Person;
+  /** What the provider shared during this session. */
+  shared: SessionDoc[];
+  /** What happened, once the provider has written it up. */
+  recap?: SessionRecap;
+  /** What the member is working through between sessions. */
+  carePlan: CarePlanItem[];
+  /** ISO date (yyyy-mm-dd) of the next session they have booked, if any. */
+  nextSession?: string;
+}
+
+/** What happened in a session, written up afterwards by the provider. */
+export interface SessionRecap {
+  overview: string;
+  /** What the member agreed to try before the next session. */
+  nextSteps: string[];
+}
+
+/** Where a session is relative to now. */
+export type SessionPhase = 'upcoming' | 'live' | 'ended';
+
+export function sessionEnd(session: Session): number {
+  return Date.parse(session.start) + session.lengthMinutes * 60_000;
+}
+
+export function sessionPhase(session: Session, now = Date.now()): SessionPhase {
+  if (now >= sessionEnd(session)) return 'ended';
+  return now >= Date.parse(session.start) ? 'live' : 'upcoming';
+}
+
+/** What a document is for, which drives its icon and the actions offered on it. */
+export type DocKind = 'article' | 'video' | 'guide' | 'worksheet' | 'summary' | 'form' | 'file';
+
+/** A document a provider shared. Only providers share documents; members don't upload. */
+export interface SessionDoc {
+  id: string;
+  title: string;
+  kind: DocKind;
+  /** Short descriptive detail, e.g. "7 min read" or "PDF, 240 KB". */
+  detail: string;
+  /** Object URL for files uploaded during this session. */
+  url?: string;
+}
+
+/** The kinds of document a member can be asked to read or complete. */
+export type CarePlanKind = 'article' | 'video' | 'guide' | 'worksheet' | 'file';
+
+/** The kinds of resource in the ComPsych resource library. */
+export type ResourceKind = 'article' | 'video' | 'guide' | 'worksheet';
+
+/** One item in the ComPsych resource library, which providers add to care plans. */
+export interface Resource {
+  id: string;
+  kind: ResourceKind;
+  title: string;
+  description: string;
+  /** Short detail, e.g. "7 min read" or "12 min video". */
+  detail: string;
+}
+
+export interface ResourceQuery {
+  /** Words to look for in titles and descriptions; empty lists the newest first. */
+  query?: string;
+  limit?: number;
+  /** From the previous page's `nextCursor`. */
+  cursor?: string;
+}
+
+/**
+ * One item in a member's care plan: something their provider gave them to read
+ * or complete between sessions.
+ */
+export interface CarePlanItem extends SessionDoc {
+  kind: CarePlanKind;
+  /** ISO date (yyyy-mm-dd). */
+  due: string;
+  done: boolean;
+  /** Worksheet progress, e.g. 3 of 6 prompts answered. */
+  progress?: { completed: number; total: number; unit: string };
+}
+
+/** Everything one member is working through for one provider. */
+export interface CarePlan {
+  member: Person;
+  provider: Person;
+  items: CarePlanItem[];
+  /** ISO date (yyyy-mm-dd) of their next session, when the plan is due; undefined if none is booked. */
+  nextSession?: string;
+}

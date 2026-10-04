@@ -1,0 +1,27 @@
+<section class="card" aria-labelledby="recap-heading">
+  <h2 id="recap-heading" class="card__title">Summary</h2>
+  @if (store.recap(); as recap) {
+    <p class="overview">{{ recap.overview }}</p>
+    @if (recap.nextSteps.length) {
+      <h3 class="group">Next steps</h3>
+      <ul class="steps">
+        @for (step of recap.nextSteps; track step) {
+          <li>{{ step }}</li>
+        }
+      </ul>
+    }
+  } @else {
+    <p class="empty">{{ noRecap() }}</p>
+  }
+</section>
+
+<section class="card" aria-labelledby="shared-heading">
+  <h2 id="shared-heading" class="card__title">Shared in this session</h2>
+  <ul class="list">
+    @for (doc of store.shared(); track doc.id) {
+      <li><app-doc-row [doc]="doc" /></li>
+    } @empty {
+      <li class="empty">Nothing was shared in this session.</li>
+    }
+  </ul>
+</section>
