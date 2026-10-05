@@ -1,4 +1,4 @@
-import { Component, ViewChild, ElementRef, Input, AfterViewInit, HostListener } from '@angular/core';
+import { Component, ViewChild, ElementRef, Input, AfterViewInit, HostListener, NgZone, OnDestroy, inject } from '@angular/core';
 import * as THREE from "three";
 import { DemoHeaderComponent } from '../demo-header/demo-header.component';
 
@@ -9,7 +9,7 @@ import { DemoHeaderComponent } from '../demo-header/demo-header.component';
   styleUrl: './cube.component.css',
   standalone: true
 })
-export class CubeComponent implements AfterViewInit {
+export class CubeComponent implements AfterViewInit, OnDestroy {
 
   @ViewChild('canvas') private canvasRef: ElementRef|null = null;
 
@@ -34,32 +34,17 @@ export class CubeComponent implements AfterViewInit {
     return this.canvasRef?.nativeElement;
   }
   private geometry = new THREE.BoxGeometry(1,1,1).toNonIndexed();
-  private material1 = new THREE.MeshPhongMaterial({
-  color: this.FACE_COLOR});
-  private material2 = new THREE.MeshPhongMaterial({
-  color: this.FACE_COLOR});
-  private material3 = new THREE.MeshPhongMaterial({
-  color: this.FACE_COLOR});
-  private material4 = new THREE.MeshPhongMaterial({
-  color: this.FACE_COLOR});
-  private material5 = new THREE.MeshPhongMaterial({
-  color: this.FACE_COLOR});
-  private material6 = new THREE.MeshPhongMaterial({
-  color: this.FACE_COLOR});
-  private cube: THREE.Mesh = new THREE.Mesh(this.geometry, [
-    this.material1,
-    this.material2,
-    this.material3,
-    this.material4,
-    this.material5,
-    this.material6]);
-  private edges = new THREE.EdgesGeometry(this.geometry);
+  // One material per face, so each face can be highlighted on its own.
+  private materials = Array.from({ length: 6 }, () => new THREE.MeshPhongMaterial({ color: this.FACE_COLOR }));
+  private cube: THREE.Mesh = new THREE.Mesh(this.geometry, this.materials);
   private wireframe = new THREE.WireframeGeometry( this.geometry );
   private lines = new THREE.LineSegments(this.wireframe, new THREE.LineBasicMaterial( { color: 0xffffff, linewidth: 100, linecap: 'round', linejoin:  'round' } ) );
   private light = new THREE.DirectionalLight(0xFFFFFF, 1);
   private fillLight = new THREE.AmbientLight(0xFFFFFF, .4);
   private renderer!: THREE.WebGLRenderer;
   private scene!: THREE.Scene;
+  private frame = 0;
+  private readonly zone = inject(NgZone);
 
   private raycaster: THREE.Raycaster;
   private mouse: THREE.Vector2;
@@ -97,6 +82,15 @@ export class CubeComponent implements AfterViewInit {
   ngAfterViewInit(): void {
     this.createScene();
     this.startRenderingLoop();
+  }
+
+  ngOnDestroy(): void {
+    cancelAnimationFrame(this.frame);
+    this.renderer?.dispose();
+    this.geometry.dispose();
+    this.wireframe.dispose();
+    this.materials.forEach(material => material.dispose());
+    this.lines.material.dispose();
   }
 
   private highlight(coordinates: number[]) {
@@ -158,13 +152,14 @@ export class CubeComponent implements AfterViewInit {
     this.renderer.setPixelRatio(devicePixelRatio);
     this.renderer.setSize(this.canvas.clientWidth, this.canvas.clientHeight, false);
 
-    const component: CubeComponent = this;
-    (function render() {
-      requestAnimationFrame(render);
-      component.animateCube();
-      component.renderer.render(component.scene, component.camera);
-      component.highlight(component.mouseCoordinates);
-    }());
+    // Each frame only touches the canvas, so keep it out of Angular's change detection.
+    const render = () => {
+      this.frame = requestAnimationFrame(render);
+      this.animateCube();
+      this.renderer.render(this.scene, this.camera);
+      this.highlight(this.mouseCoordinates);
+    };
+    this.zone.runOutsideAngular(render);
   }
 
   rotationUpdate(value: string|null) {

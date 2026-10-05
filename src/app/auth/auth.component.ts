@@ -12,6 +12,11 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { DemoHeaderComponent } from '../demo-header/demo-header.component';
 import { environment } from '../../environments/environment';
 
+// Module code runs once, so Firebase is initialised once however often the component is created.
+const auth = getAuth(initializeApp({
+  apiKey: "AIzaSyAAFqGwaHCiin9O3PJJfK59rulwJabe1sM",
+}));
+
 @Component({
   selector: 'app-auth',
   imports: [DemoHeaderComponent],
@@ -26,13 +31,8 @@ export class AuthComponent implements OnDestroy {
   stopListeningForAuthEvents: Unsubscribe;
   
   constructor(private http: HttpClient) {
-    if (!(window as any).msiofa) {
-      (window as any).msiofa = getAuth(initializeApp({
-        apiKey: "AIzaSyAAFqGwaHCiin9O3PJJfK59rulwJabe1sM",
-      }));
-    }
     this.stopListeningForAuthEvents = 
-      onAuthStateChanged((window as any).msiofa, async (user) => {
+      onAuthStateChanged(auth, async (user) => {
         if (user) this.token = await user.getIdToken();
     });
   }
@@ -53,7 +53,7 @@ export class AuthComponent implements OnDestroy {
     if (email === null) return;
     const password = prompt("Please enter a new password for your new account:");
     if (password === null) return;
-    createUserWithEmailAndPassword((window as any).msiofa, email, password)
+    createUserWithEmailAndPassword(auth, email, password)
       .then(() => {
         alert('Your account was successfully created. You are now signed in.');
       })
@@ -67,7 +67,7 @@ export class AuthComponent implements OnDestroy {
     if (email === null) return;
     const password = prompt("What is your password?");
     if (password === null) return;
-    signInWithEmailAndPassword((window as any).msiofa, email, password)
+    signInWithEmailAndPassword(auth, email, password)
       .then(() => {
         alert('You are now signed in.');
       })
@@ -78,7 +78,7 @@ export class AuthComponent implements OnDestroy {
   
   signOut() {
     this.token = '';
-    signOut((window as any).msiofa)
+    signOut(auth)
       .then(() => {
         alert('You are now signed out.');
       })

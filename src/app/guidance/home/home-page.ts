@@ -6,7 +6,7 @@ import { PageCrumbs } from '../page-crumbs';
 import { GUIDANCE_SESSIONS } from '../paths';
 import { Viewer } from '../session/viewer';
 import { CarePlans } from './care-plans';
-import { HomeCarePlans } from './home-care-plans';
+import { HomeCarePlans, planProgress } from './home-care-plans';
 import { Highlights } from './highlights';
 import { YourSessions } from './your-sessions';
 
@@ -62,7 +62,8 @@ export class HomePage {
     }
     const from = plan.provider.firstName;
     const when = plan.nextSession && formatDate(plan.nextSession, 'EEEE, MMMM d', 'en-US');
-    const left = plan.items.filter((item) => !item.done).length;
+    const { done, total } = planProgress(plan);
+    const left = total - done;
     const remaining = `${left} ${left === 1 ? 'item is' : 'items are'} left to complete.`;
     if (!left) {
       return {

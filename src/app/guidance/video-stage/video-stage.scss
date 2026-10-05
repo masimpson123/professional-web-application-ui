@@ -2,11 +2,6 @@
   display: block;
 }
 
-/* Several elements here set `display`, which would otherwise override `hidden`. */
-[hidden] {
-  display: none !important;
-}
-
 /* Fills its grid cell; the video area takes whatever height is left. */
 .stage {
   height: 100%;
@@ -97,22 +92,16 @@
   min-height: 0;
 }
 
-/* Containers the call renders into: Zoom <video-player>s or plain <video>s. */
+/* Containers the call renders Zoom's <video-player>s into. */
 .view {
   position: absolute;
   inset: 0;
 
-  ::ng-deep :is(video-player, video, canvas) {
+  ::ng-deep video-player {
     display: block;
     width: 100%;
     height: 100%;
     object-fit: cover;
-  }
-}
-
-.view--share {
-  ::ng-deep :is(video-player, video, canvas) {
-    object-fit: contain;
   }
 }
 
@@ -209,12 +198,6 @@
   text-overflow: ellipsis;
 }
 
-/* Over the whole screen (screen sharing), rather than over one tile. */
-.nameplate--stage {
-  left: var(--spacing-padding-sys-padding-16);
-  bottom: var(--spacing-padding-sys-padding-16);
-}
-
 .self {
   position: absolute;
   right: var(--spacing-padding-sys-padding-16);
@@ -293,44 +276,6 @@
   border-radius: var(--border-radius-sys-radius-full);
   background: var(--room-raised);
   white-space: nowrap;
-}
-
-/* ---- Session clock: elapsed share of the 50-minute hour -------------- */
-
-.clock {
-  display: flex;
-  align-items: center;
-  gap: var(--spacing-padding-sys-padding-12);
-  padding: 0 var(--spacing-padding-sys-padding-4);
-}
-
-.clock__track {
-  flex: 1;
-  height: 3px;
-  border-radius: 2px;
-  overflow: hidden;
-  background: var(--room-line);
-}
-
-.clock__fill {
-  display: block;
-  height: 100%;
-  background: var(--accent-primary-sys-on-primary-container-variant);
-  transform-origin: left;
-  transition: transform 1s linear;
-}
-
-.clock__time {
-  flex: none;
-  font-size: var(--label-medium-sys-font-size);
-  line-height: var(--label-medium-sys-line-height);
-  color: var(--accent-primary-sys-on-primary-container-variant);
-  font-variant-numeric: tabular-nums;
-
-  strong {
-    color: var(--accent-primary-sys-on-primary-container);
-    font-weight: 500;
-  }
 }
 
 /* ---- Controls ------------------------------------------------------ */

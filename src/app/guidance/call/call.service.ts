@@ -16,7 +16,6 @@ export interface CallViews {
   /** The tile that shows one other person's camera, or undefined if it isn't on screen. */
   remote: (userId: number) => HTMLElement | undefined;
   self: HTMLElement;
-  share: HTMLElement;
 }
 
 export interface JoinOptions {
@@ -25,8 +24,6 @@ export interface JoinOptions {
   displayName: string;
   /** The provider hosts; the member joins as a participant. */
   isHost: boolean;
-  /** Who else is booked in. Only the local preview uses this, to show them as placeholders. */
-  others?: string[];
 }
 
 /**
@@ -37,10 +34,6 @@ export abstract class CallService {
   abstract readonly status: Signal<CallStatus>;
   abstract readonly micOn: Signal<boolean>;
   abstract readonly cameraOn: Signal<boolean>;
-  /** You are sharing your screen. */
-  abstract readonly sharing: Signal<boolean>;
-  /** Whoever else is sharing their screen, or null. Only one screen is shared at a time. */
-  abstract readonly remoteSharer: Signal<RemoteParticipant | null>;
   /** Everyone else in the call, in the order they joined. Empty while you wait for others. */
   abstract readonly remotes: Signal<RemoteParticipant[]>;
   /** The connection dropped and is being restored; media may freeze meanwhile. */
@@ -58,7 +51,6 @@ export abstract class CallService {
   abstract leave(): Promise<void>;
   abstract toggleMic(): Promise<void>;
   abstract toggleCamera(): Promise<void>;
-  abstract toggleShare(): Promise<void>;
   /** Call from a click: connects the call's audio, which the browser only allows after a gesture. */
   abstract turnOnSound(): Promise<void>;
 }

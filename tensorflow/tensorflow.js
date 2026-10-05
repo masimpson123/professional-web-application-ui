@@ -1,5 +1,10 @@
 const tf = require('@tensorflow/tfjs-node');
 
+/** Scales `tensor` so that `min` becomes 0 and `max` becomes 1. */
+function normalize(tensor, min, max) {
+  return tensor.sub(min).div(max.sub(min));
+}
+
 async function trainUnivariateModel(trainingData) {
   if (!trainingData) throw new Error('No training data!');
   const model = tf.sequential();
@@ -9,7 +14,8 @@ async function trainUnivariateModel(trainingData) {
   model.add(tf.layers.dense({units: 32, activation: 'relu'}));
   model.add(tf.layers.dense({units: 1, useBias: true})); // output
 
-  const {inputs, labels} = getTensorsUnivariate(trainingData);
+  const tensors = getTensorsUnivariate(trainingData);
+  const {inputs, labels} = tensors;
 
   model.compile({
     optimizer: tf.train.adam(),
@@ -24,7 +30,9 @@ async function trainUnivariateModel(trainingData) {
     shuffle: true
   });
 
-  model.save(`file://${__dirname}/model-data/univariate`);
+  await model.save(`file://${__dirname}/model-data/univariate`);
+  tf.dispose(tensors);
+  model.dispose();
 
   return trainingReport;
 }
@@ -43,8 +51,8 @@ function getTensorsUnivariate(data) {
     const inputMin = inputTensor.min();
     const labelMax = labelTensor.max();
     const labelMin = labelTensor.min();
-    const normalizedInputs = inputTensor.sub(inputMin).div(inputMax.sub(inputMin));
-    const normalizedLabels = labelTensor.sub(labelMin).div(labelMax.sub(labelMin));
+    const normalizedInputs = normalize(inputTensor, inputMin, inputMax);
+    const normalizedLabels = normalize(labelTensor, labelMin, labelMax);
 
     return {
       inputs: normalizedInputs,
@@ -60,7 +68,8 @@ function getTensorsUnivariate(data) {
 async function getUnivariateLinearRegressionPredictions(trainingData) {
   if (!trainingData) throw new Error('No training data!');
   const model = await tf.loadLayersModel(`file://${__dirname}/model-data/univariate/model.json`);
-  const {inputMax, inputMin, labelMin, labelMax} = getTensorsUnivariate(trainingData);
+  const stats = getTensorsUnivariate(trainingData);
+  const {inputMax, inputMin, labelMin, labelMax} = stats;
   const [xValues, predictedValues] = tf.tidy(() => {
     const normalizedXValues = tf.linspace(0, 1, 100);
     const predictions = model.predict(normalizedXValues.reshape([100, 1]));
@@ -72,6 +81,8 @@ async function getUnivariateLinearRegressionPredictions(trainingData) {
       .add(labelMin);
     return [denormalizedXValues.dataSync(), denormalizedPredictedValues.dataSync()];
   });
+  tf.dispose(stats);
+  model.dispose();
   const predictedPoints = Array.from(xValues).map((val, i) => {
     return {input: val, label: predictedValues[i]}
   });
@@ -88,7 +99,8 @@ async function trainMultivariateModel(trainingData) {
 
   const model = tf.model({inputs: [inputA, inputB], outputs: output});
 
-  const {inputs1, inputs2, labels} = getTensorsMultivariate(trainingData);
+  const tensors = getTensorsMultivariate(trainingData);
+  const {inputs1, inputs2, labels} = tensors;
 
   model.compile({optimizer: 'adam', loss: 'meanSquaredError'});
 
@@ -99,7 +111,9 @@ async function trainMultivariateModel(trainingData) {
     shuffle: true
   });
 
-  model.save(`file://${__dirname}/model-data/multivariate`);
+  await model.save(`file://${__dirname}/model-data/multivariate`);
+  tf.dispose(tensors);
+  model.dispose();
 
   return trainingReport;
 }
@@ -123,9 +137,9 @@ function getTensorsMultivariate(data) {
     const input2Min = inputs2Tensor.min();
     const labelMax = labelsTensor.max();
     const labelMin = labelsTensor.min();
-    const normalizedInputs1 = inputs1Tensor.sub(input1Min).div(input1Max.sub(input1Min));
-    const normalizedInputs2 = inputs2Tensor.sub(input2Min).div(input2Max.sub(input2Min));
-    const normalizedLabels = labelsTensor.sub(labelMin).div(labelMax.sub(labelMin));
+    const normalizedInputs1 = normalize(inputs1Tensor, input1Min, input1Max);
+    const normalizedInputs2 = normalize(inputs2Tensor, input2Min, input2Max);
+    const normalizedLabels = normalize(labelsTensor, labelMin, labelMax);
 
     return {
       inputs1: normalizedInputs1,
@@ -142,27 +156,34 @@ function getTensorsMultivariate(data) {
 }
 
 async function getMultivariateLinearRegressionPredictions(trainingData) {
+  if (!trainingData) throw new Error('No training data!');
   const model = await tf.loadLayersModel(`file://${__dirname}/model-data/multivariate/model.json`);
-  const { input1Max, input1Min, input2Max, input2Min, labelMax, labelMin } = getTensorsMultivariate(trainingData);
-  const denormalizedPredictions = [];
-  for (feature1 = 10; feature1 <= 100; feature1 += 1) {
-    for (feature2 = 55; feature2 <= 100; feature2 += 1) {
-      const normalizedFeature1 = tf.tensor2d([[feature1/10]], [1, 1]).sub(input1Min).div(input1Max.sub(input1Min));
-      const normalizedFeature2 = tf.tensor2d([[feature2]], [1, 1]).sub(input2Min).div(input2Max.sub(input2Min));
-      const unitsSold = model.predict([
-        normalizedFeature1,
-        normalizedFeature2
-      ])
-        .mul(labelMax.sub(labelMin))
-        .add(labelMin)
-        .dataSync()[0];
-      denormalizedPredictions.push({
-        feature1: feature1/10,
-        feature2,
-        predictedLabel: Math.round(unitsSold) > 0 ? Math.round(unitsSold) : 0 
-      })
+  const stats = getTensorsMultivariate(trainingData);
+  const { input1Max, input1Min, input2Max, input2Min, labelMax, labelMin } = stats;
+  const features1 = [];
+  const features2 = [];
+  for (let feature1 = 10; feature1 <= 100; feature1 += 1) {
+    for (let feature2 = 55; feature2 <= 100; feature2 += 1) {
+      features1.push(feature1/10);
+      features2.push(feature2);
     }
   }
+  // Predict the whole grid in one batch; tidy frees every intermediate tensor.
+  const unitsSold = tf.tidy(() => {
+    const normalizedFeatures1 = normalize(tf.tensor2d(features1, [features1.length, 1]), input1Min, input1Max);
+    const normalizedFeatures2 = normalize(tf.tensor2d(features2, [features2.length, 1]), input2Min, input2Max);
+    return model.predict([normalizedFeatures1, normalizedFeatures2])
+      .mul(labelMax.sub(labelMin))
+      .add(labelMin)
+      .dataSync();
+  });
+  tf.dispose(stats);
+  model.dispose();
+  const denormalizedPredictions = features1.map((feature1, i) => ({
+    feature1,
+    feature2: features2[i],
+    predictedLabel: Math.round(unitsSold[i]) > 0 ? Math.round(unitsSold[i]) : 0
+  }));
   return {predictions: denormalizedPredictions};
 }
 

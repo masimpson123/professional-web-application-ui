@@ -1,6 +1,5 @@
 import { NgComponentOutlet } from '@angular/common';
 import { Component, ElementRef, Type, ViewChild, effect, signal } from '@angular/core';
-import * as tf from '@tensorflow/tfjs';
 import { form, Field, min, max, disabled } from '@angular/forms/signals';
 import { ThreeDimensionalData } from '../common-models/common-models';
 import { DemoHeaderComponent } from '../demo-header/demo-header.component';
@@ -19,15 +18,11 @@ const PREDICTION_COLOR = '#d2401e';
 export class MachineLearningComponent {
   @ViewChild('univariatelinearregressiongraph') univariateLinearRegressionGraph!: ElementRef<HTMLInputElement>;
   @ViewChild('univariatetrainingreport') univariateTrainingReportGraph!: ElementRef<HTMLInputElement>;
-  @ViewChild('univariatemodeltable') univariateModelTable!: ElementRef<HTMLInputElement>;
   @ViewChild('multivariatetrainingreport') multivariateTrainingReportGraph!: ElementRef<HTMLInputElement>;
   apiUrl = environment.expressApiUrl;
-  univariateModelData = null;
   univariateModelIsTraining = false;
   univariateData: LinearRegressionPoint[]|null = null;
   univariateTrainingReport = null;
-  univariateLinearRegressionPredictions = null;
-  univariateModelConfiguration: tf.LayersModel|null = null;
   univariateTrainingRequired = true;
   multivariateTrainingData: number[][]|null = null;
   multivariateTrainingReport = null;
@@ -148,18 +143,6 @@ export class MachineLearningComponent {
       })
       .catch(err => {
         alert(err.message);
-      });
-  }
-  getRenderUnivariateModelConfiguration() {
-    tf.loadLayersModel(this.apiUrl + 'tensorflow-get-univariate-model-configuration/model.json')
-      .then(modelConfiguration => {
-        this.univariateModelConfiguration = modelConfiguration;
-        const surface = {
-          drawArea: this.univariateModelTable.nativeElement
-        };
-        this.tfvis().then(({ show }) => {
-          show.modelSummary(surface, modelConfiguration);
-        });
       });
   }
   getRenderMultivariateTrainingData() {

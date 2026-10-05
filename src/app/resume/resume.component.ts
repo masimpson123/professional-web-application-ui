@@ -1,5 +1,6 @@
 import { Component } from '@angular/core';
 import { Router } from '@angular/router';
+import { RESUME_URL } from '../demos';
 
 @Component({
   selector: 'app-resume',
@@ -10,7 +11,7 @@ import { Router } from '@angular/router';
 })
 export class ResumeComponent {
   constructor(private router: Router) {
-    window.open('./assets/simpsonResume2026.pdf', '_blank');
+    window.open(RESUME_URL, '_blank');
     this.router.navigate(['root']);
   }
 }

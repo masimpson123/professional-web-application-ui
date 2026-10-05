@@ -35,7 +35,7 @@
         #gallery
         class="gallery"
         [style.--columns]="columns()"
-        [hidden]="!connected() || anyoneSharing()"
+        [hidden]="!connected()"
       >
         @for (person of call.remotes(); track person.userId) {
           <figure class="tile" [class.tile--video]="person.videoOn">
@@ -52,26 +52,12 @@
           </figure>
         }
       </div>
-      <div #shareView class="view view--share" [hidden]="!connected() || !anyoneSharing()"></div>
 
-      @if (connected()) {
-        @if (!call.remotes().length && !anyoneSharing()) {
-          <div class="waiting">
-            <span class="monogram monogram--waiting" aria-hidden="true">{{ store.them().initials }}</span>
-            <p class="waiting__text">Waiting for {{ store.them().firstName }} to join</p>
-          </div>
-        }
-
-        @if (call.sharing()) {
-          <p class="nameplate nameplate--stage">You’re sharing your screen</p>
-        } @else if (call.remoteSharer(); as sharer) {
-          <p class="nameplate nameplate--stage">
-            {{ sharer.name }} is sharing their screen
-            @if (sharer.muted) {
-              <app-icon name="mic-off" [size]="14" label="muted" />
-            }
-          </p>
-        }
+      @if (connected() && !call.remotes().length) {
+        <div class="waiting">
+          <span class="monogram monogram--waiting" aria-hidden="true">{{ store.them().initials }}</span>
+          <p class="waiting__text">Waiting for {{ store.them().firstName }} to join</p>
+        </div>
       }
 
       <figure class="self" [class.self--video]="call.cameraOn()" [hidden]="!connected()">
@@ -131,23 +117,6 @@
     }
   </div>
 
-  <div
-    class="clock"
-    role="meter"
-    aria-label="Session time"
-    [attr.aria-valuenow]="elapsedMinutes()"
-    aria-valuemin="0"
-    [attr.aria-valuemax]="store.session().lengthMinutes"
-    [attr.aria-valuetext]="minutesLeft() + ' minutes left of ' + store.session().lengthMinutes"
-  >
-    <span class="clock__track" aria-hidden="true">
-      <span class="clock__fill" [style.transform]="'scaleX(' + elapsedFraction() + ')'"></span>
-    </span>
-    <span class="clock__time">
-      <strong>{{ clock() }}</strong> of {{ store.session().lengthMinutes }} min
-    </span>
-  </div>
-
   @if (connected()) {
     <div class="controls" role="toolbar" aria-label="Call controls">
       <button
@@ -169,15 +138,6 @@
       >
         <app-icon [name]="call.cameraOn() ? 'video' : 'video-off'" />
         {{ call.cameraOn() ? 'Stop video' : 'Start video' }}
-      </button>
-      <button
-        type="button"
-        class="control"
-        [attr.aria-pressed]="call.sharing()"
-        (click)="call.toggleShare()"
-      >
-        <app-icon name="monitor-up" />
-        {{ call.sharing() ? 'Stop sharing' : 'Share screen' }}
       </button>
 
       <compsych-button

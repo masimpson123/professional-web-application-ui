@@ -6,9 +6,6 @@ WORKDIR /usr/app
 COPY package.json package-lock.json ./
 RUN npm ci
 COPY . .
-# Leftover from the old webpack build (OpenSSL 3 workaround). Angular now builds with esbuild,
-# and local builds and `node index.js` run without it, so this is likely safe to remove.
-ENV NODE_OPTIONS=--openssl-legacy-provider
 RUN npm run build
 EXPOSE 8080
 CMD ["node", "index.js"]

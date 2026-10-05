@@ -1,4 +1,4 @@
-import { Component, Input } from '@angular/core';
+import { Component, Input, OnChanges } from '@angular/core';
 import { PlotlyModule, PlotlyService } from 'angular-plotly.js';
 import { ThreeDimensionalData } from '../common-models/common-models';
 import Plotly from 'plotly.js-dist-min';
@@ -32,7 +32,7 @@ if (!PlotlyService.plotly) {
   `,
   styleUrl: './scatter-plot-xyz.component.css',
 })
-export class ScatterPlotXyzComponent {
+export class ScatterPlotXyzComponent implements OnChanges {
   @Input() xyzData: ThreeDimensionalData[][]|null = null;
   @Input() seriesColors: string[]|null = null;
   @Input() seriesNames: string[]|null = null;

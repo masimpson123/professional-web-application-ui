@@ -1,4 +1,4 @@
-import { Component, Input, Output, EventEmitter } from '@angular/core';
+import { Component, Input, Output, EventEmitter, OnInit } from '@angular/core';
 import { FormGroup, ReactiveFormsModule } from '@angular/forms';
 
 @Component({
@@ -7,7 +7,7 @@ import { FormGroup, ReactiveFormsModule } from '@angular/forms';
   templateUrl: './security-intake.component.html',
   styleUrl: './security-intake.component.css'
 })
-export class SecurityIntakeComponent {
+export class SecurityIntakeComponent implements OnInit {
   @Input() securityFormGroup!: FormGroup;
   @Output() securityFormGroupChange = new EventEmitter<FormGroup>();
 

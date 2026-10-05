@@ -92,7 +92,7 @@ export const DEMOS: Demo[] = [
     route: '/guidance',
     title: 'Zoom telehealth',
     group: 'Systems',
-    summary: 'A hackathon prototype for GuidanceResources: members and providers book sessions, work through care plans, and meet in a Zoom room for each session, with screen sharing. The Spring service signs each room’s token, so the Zoom secret never reaches the browser.',
+    summary: 'A hackathon prototype for GuidanceResources: members and providers book sessions, work through care plans, and meet in a Zoom room for each session. The Spring service signs each room’s token, so the Zoom secret never reaches the browser.',
     client: 'Angular, Zoom Video SDK, ComPsych UI components',
     service: 'Spring Boot, JWT signing',
     platform: 'Zoom Video SDK, Cloud Run, Docker',

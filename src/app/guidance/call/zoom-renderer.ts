@@ -31,7 +31,7 @@ import {
   tap,
 } from 'rxjs';
 
-/** How to show and hide one kind of stream (camera or shared screen). */
+/** How to show and hide a camera stream. */
 export interface StreamOps {
   /** Resolves with the element to show, or with anything else (Zoom's failure object) on failure. */
   attach(userId: number): Promise<unknown>;

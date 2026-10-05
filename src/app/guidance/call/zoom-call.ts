@@ -12,10 +12,9 @@ import {
   reduce,
   selectConnectionTarget,
   selectRemoteParticipants,
-  selectRemoteShareTarget,
-  selectRemoteSharer,
   selectRemoteVideoTargets,
   selectSelfVideoTarget,
+  selectSoundOff,
 } from './zoom-session.state';
 import { ZoomTokenError, ZoomTokens } from './zoom-tokens';
 
@@ -67,19 +66,11 @@ export class ZoomCall extends CallService {
   readonly status = computed(() => this.state().status);
   readonly micOn = computed(() => this.state().micOn);
   readonly cameraOn = computed(() => this.state().cameraOn);
-  readonly sharing = computed(() => this.state().sharing);
   readonly reconnecting = computed(() => this.state().reconnecting);
   readonly error = computed(() => this.state().error);
-  readonly soundOff = computed(() => {
-    const { status, leaving, audio, soundBlocked } = this.state();
-    return status === 'connected' && !leaving && (audio === 'off' || soundBlocked);
-  });
+  readonly soundOff = computed(() => selectSoundOff(this.state()));
   readonly remotes = computed(() => selectRemoteParticipants(this.state()), {
     equal: sameRemotes,
-  });
-  readonly remoteSharer = computed(() => {
-    const sharer = selectRemoteSharer(this.state());
-    return sharer ? (this.remotes().find((p) => p.userId === sharer.userId) ?? null) : null;
   });
   // ---- SDK handles -----------------------------------------------------------
 
@@ -160,53 +151,6 @@ export class ZoomCall extends CallService {
     });
   }
 
-  /**
-   * Starts or stops sharing our screen. Unlike the other streams, our own share
-   * preview isn't attached after the fact: the SDK draws it into an element we
-   * hand to `startShareScreen()`, so that element is managed here.
-   */
-  toggleShare(): Promise<void> {
-    return this.once('share', async () => {
-      const share = this.views()?.share;
-      if (!this.stream || !share) return;
-
-      if (this.sharing()) {
-        await this.stream.stopShareScreen();
-        this.clearSharePreview();
-        this.dispatch({ type: 'local-share', on: false });
-        return;
-      }
-      const sharer = this.remoteSharer();
-      if (sharer) {
-        const name = sharer.name || 'Someone else';
-        this.dispatch({
-          type: 'error',
-          message: `${name} is sharing. Only one screen can be shared at a time.`,
-        });
-        return;
-      }
-
-      const preview = this.stream.isStartShareScreenWithVideoElement()
-        ? document.createElement('video')
-        : document.createElement('canvas');
-      preview.dataset['sharePreview'] = '';
-      share.append(preview);
-      try {
-        await this.stream.startShareScreen(preview);
-        this.dispatch({ type: 'local-share', on: true });
-      } catch (err) {
-        preview.remove();
-        // Closing the browser's picker isn't worth reporting.
-        if (!/cancel|denied|permission/i.test(reasonOf(err))) {
-          this.dispatch({
-            type: 'error',
-            message: 'Screen sharing isn’t available in this browser.',
-          });
-        }
-      }
-    });
-  }
-
   // ---- Intake: the only way state changes -------------------------------------
 
   private dispatch(event: ZoomEvent): void {
@@ -240,7 +184,7 @@ export class ZoomCall extends CallService {
     window.addEventListener('pagehide', leaveOnHide);
     unhook.push(() => window.removeEventListener('pagehide', leaveOnHide));
 
-    // The app is zoneless and these handlers only dispatch, so no zone work is needed.
+    // These handlers only dispatch; the signals they change schedule any rendering.
     const on = (event: string, handler: (payload: any) => void) => {
       client.on(event, handler);
       unhook.push(() => client.off(event, handler));
@@ -256,21 +200,6 @@ export class ZoomCall extends CallService {
       ({ action, userId }: { action: 'Start' | 'Stop'; userId: number }) =>
         this.dispatch({ type: 'peer-video', userId, on: action === 'Start' }),
     );
-
-    on(
-      'active-share-change',
-      ({ state, userId }: { state: 'Active' | 'Inactive'; userId: number }) => {
-        // Our own share is tracked through `local-share`.
-        if (userId === client.getCurrentUserInfo()?.userId) return;
-        this.dispatch({ type: 'peer-share', userId, on: state === 'Active' });
-      },
-    );
-
-    // Sharing stopped from the browser's own "Stop sharing" bar.
-    on('passively-stop-share', () => {
-      this.clearSharePreview();
-      this.dispatch({ type: 'local-share', on: false });
-    });
 
     on(
       'connection-change',
@@ -295,10 +224,9 @@ export class ZoomCall extends CallService {
     });
 
     // Media broke mid-call: device unplugged, permission revoked, audio interrupted.
-    on('active-media-failed', ({ type }: { type: 'audio' | 'video' | 'sharing' }) => {
-      if (type === 'sharing') this.clearSharePreview();
-      this.dispatch({ type: 'media-failed', kind: type });
-    });
+    on('active-media-failed', ({ type }: { type: 'audio' | 'video' }) =>
+      this.dispatch({ type: 'media-failed', kind: type }),
+    );
 
     this.client = client;
     return client;
@@ -372,8 +300,11 @@ export class ZoomCall extends CallService {
       let joined: ZoomClient | undefined;
 
       (async () => {
-        const client = await this.ensureClient();
-        const token = await this.tokens.get(room, isHost ? 'host' : 'participant', this.key);
+        // Loading the SDK and fetching the token don't depend on each other.
+        const [client, token] = await Promise.all([
+          this.ensureClient(),
+          this.tokens.get(room, isHost ? 'host' : 'participant', this.key),
+        ]);
         // A room that was just closed may still be hanging up on the shared client.
         await pendingLeave;
         if (cancelled) return;
@@ -416,8 +347,9 @@ export class ZoomCall extends CallService {
    * `renderEach()` make the DOM match (see zoom-renderer.ts).
    */
   private startRendering(): void {
-    const target = (select: typeof selectSelfVideoTarget) =>
-      toObservable(computed(() => (this.views() ? select(this.state()) : null)));
+    const self = toObservable(
+      computed(() => (this.views() ? selectSelfVideoTarget(this.state()) : null)),
+    );
     const gallery = toObservable(
       computed(() => (this.views() ? selectRemoteVideoTargets(this.state()) : []), {
         equal: sameIds,
@@ -429,11 +361,6 @@ export class ZoomCall extends CallService {
       detach: (userId: number, el: HTMLElement) =>
         this.stream ? this.stream.detachVideo(userId, el as VideoPlayer) : Promise.resolve(),
     };
-    const share = {
-      attach: (userId: number) => this.requireStream().attachShareView(userId),
-      detach: (userId: number, el: HTMLElement) =>
-        this.stream ? this.stream.detachShareView(userId, el as VideoPlayer) : Promise.resolve(),
-    };
 
     merge(
       renderEach(gallery, {
@@ -441,15 +368,10 @@ export class ZoomCall extends CallService {
         container: (userId) => this.views()?.remote(userId),
         ops: video,
       }),
-      renderStream(target(selectSelfVideoTarget), {
+      renderStream(self, {
         name: 'self view',
         container: () => this.views()?.self,
         ops: video,
-      }),
-      renderStream(target(selectRemoteShareTarget), {
-        name: 'shared screen',
-        container: () => this.views()?.share,
-        ops: share,
       }),
     )
       .pipe(takeUntilDestroyed())
@@ -459,10 +381,6 @@ export class ZoomCall extends CallService {
   private requireStream(): ZoomStream {
     if (!this.stream) throw new Error('not in a session');
     return this.stream;
-  }
-
-  private clearSharePreview(): void {
-    this.views()?.share.querySelector('[data-share-preview]')?.remove();
   }
 
   /** Runs `action` unless the same kind of action is already running. */
@@ -558,7 +476,6 @@ function toSnapshot(user: ZoomUser): ZoomUserSnapshot {
     displayName: user.displayName,
     userKey: user.userKey ?? user.userIdentity,
     bVideoOn: user.bVideoOn,
-    sharerOn: user.sharerOn,
     muted: user.muted,
     isInFailover: user.isInFailover,
   };

@@ -32,7 +32,6 @@ export interface ZoomUserSnapshot {
   /** The token's `user_key`, echoed back by Zoom. */
   userKey?: string;
   bVideoOn: boolean;
-  sharerOn: boolean;
   muted?: boolean;
   isInFailover?: boolean;
 }
@@ -49,7 +48,6 @@ export interface SessionParticipant {
   /** Zoom's participant list has included them; until then this only holds an early event. */
   listed: boolean;
   videoOn: boolean;
-  sharing: boolean;
   muted: boolean;
   /** Zoom has lost contact and is waiting to see whether they come back. */
   failover: boolean;
@@ -81,8 +79,6 @@ export interface ZoomSessionState {
   /** `auto-play-audio-failed`: the browser won't play the call's sound until we click something. */
   soundBlocked: boolean;
   cameraOn: boolean;
-  /** We are sharing our screen. */
-  sharing: boolean;
   /** Plain-language problem to show, or empty. */
   error: string;
 }
@@ -98,7 +94,6 @@ export const initialZoomSessionState: ZoomSessionState = {
   speakerOnly: false,
   soundBlocked: false,
   cameraOn: false,
-  sharing: false,
   error: '',
 };
 
@@ -123,20 +118,17 @@ export type ZoomEvent =
   | { type: 'join-failed'; message: string }
   /**
    * The participant list changed (`user-added` / `-updated` / `-removed`).
-   * `authoritative` lists (after joining or reconnecting) also replace video and
-   * share state, which otherwise come from their own events (see `reduce`).
+   * `authoritative` lists (after joining or reconnecting) also replace video
+   * state, which otherwise comes from its own event (see `reduce`).
    */
   | { type: 'participants'; users: ZoomUserSnapshot[]; authoritative?: boolean }
   /** `peer-video-state-change`: someone else's camera turned on or off. */
   | { type: 'peer-video'; userId: number; on: boolean }
-  /** `active-share-change`: someone else started or stopped sharing. */
-  | { type: 'peer-share'; userId: number; on: boolean }
   /** `connection-change`. */
   | { type: 'connection'; state: 'Connected' | 'Reconnecting' | 'Closed' | 'Fail' }
-  /** Our own mic, camera, or screen share changed. */
+  /** Our own mic or camera changed. */
   | { type: 'local-mic'; on: boolean }
   | { type: 'local-camera'; on: boolean }
-  | { type: 'local-share'; on: boolean }
   /** We called `startAudio()`. */
   | { type: 'audio-starting' }
   /** `startAudio()` resolved, with our microphone or without it. */
@@ -146,7 +138,7 @@ export type ZoomEvent =
   /** `auto-play-audio-failed`. */
   | { type: 'sound-blocked' }
   /** `active-media-failed`: our media broke after it had started. */
-  | { type: 'media-failed'; kind: 'audio' | 'video' | 'sharing' }
+  | { type: 'media-failed'; kind: 'audio' | 'video' }
   /** A problem worth showing that doesn't change anything else. */
   | { type: 'error'; message: string }
   /** Our hang-up finished. */
@@ -195,12 +187,6 @@ export function reduce(state: ZoomSessionState, event: ZoomEvent): ZoomSessionSt
         participants: patch(state.participants, event.userId, { videoOn: event.on }),
       };
 
-    case 'peer-share':
-      return {
-        ...state,
-        participants: patch(state.participants, event.userId, { sharing: event.on }),
-      };
-
     case 'connection':
       switch (event.state) {
         case 'Connected':
@@ -238,8 +224,6 @@ export function reduce(state: ZoomSessionState, event: ZoomEvent): ZoomSessionSt
       return { ...state, audio: 'off', speakerOnly: false, micOn: false };
     case 'sound-blocked':
       return { ...state, soundBlocked: true };
-    case 'local-share':
-      return { ...state, sharing: event.on };
 
     case 'media-failed':
       switch (event.kind) {
@@ -249,12 +233,6 @@ export function reduce(state: ZoomSessionState, event: ZoomEvent): ZoomSessionSt
             cameraOn: false,
             error:
               'Your camera stopped. Check that no other app is using it, then start video again.',
-          };
-        case 'sharing':
-          return {
-            ...state,
-            sharing: false,
-            error: 'Screen sharing stopped unexpectedly. Try sharing again.',
           };
         case 'audio':
           return {
@@ -279,10 +257,9 @@ export function reduce(state: ZoomSessionState, event: ZoomEvent): ZoomSessionSt
  * Folds a participant list into what we already know.
  *
  * Zoom's list is the source of truth for *who is here*: names, keys, failover,
- * departures. For *camera and share state*, the dedicated events
- * (`peer-video-state-change`, `active-share-change`) are authoritative: they fire
- * for every change, while the list can lag behind them. So the list only sets
- * video/share for people we're seeing for the first time, or when the list is
+ * departures. For *camera state*, `peer-video-state-change` is authoritative: it
+ * fires for every change, while the list can lag behind it. So the list only sets
+ * video for people we're seeing for the first time, or when the list is
  * `authoritative` (right after joining or reconnecting, when we may have missed
  * events).
  */
@@ -300,7 +277,6 @@ function mergeParticipants(
       key: user.userKey || existing?.key,
       listed: true,
       videoOn: authoritative || !existing ? user.bVideoOn : existing.videoOn,
-      sharing: authoritative || !existing ? user.sharerOn : existing.sharing,
       muted: !!user.muted,
       failover: !!user.isInFailover,
     });
@@ -323,7 +299,6 @@ function patch(
     name: '',
     listed: false,
     videoOn: false,
-    sharing: false,
     muted: false,
     failover: false,
   };
@@ -345,7 +320,6 @@ function ended(state: ZoomSessionState): ZoomSessionState {
     speakerOnly: false,
     soundBlocked: false,
     cameraOn: false,
-    sharing: false,
   };
 }
 
@@ -376,12 +350,12 @@ function isBetterCopy(a: SessionParticipant, b: SessionParticipant): boolean {
   return a.failover !== b.failover ? !a.failover : a.userId > b.userId;
 }
 
-/** Whoever else is sharing their screen. Zoom allows one share at a time; the newest wins. */
-export function selectRemoteSharer(state: ZoomSessionState): SessionParticipant | undefined {
-  if (!isLive(state)) return undefined;
-  return selectRemotes(state)
-    .filter((p) => p.sharing)
-    .at(-1);
+/**
+ * We're in the call but can't hear it: audio isn't connected, or the browser
+ * blocked its sound.
+ */
+export function selectSoundOff(state: ZoomSessionState): boolean {
+  return isLive(state) && (state.audio === 'off' || state.soundBlocked);
 }
 
 /** Everyone else as the stage shows them. */
@@ -427,9 +401,4 @@ export function selectRemoteVideoTargets(state: ZoomSessionState): number[] {
 /** Our own camera, for the self-view. */
 export function selectSelfVideoTarget(state: ZoomSessionState): number | null {
   return isLive(state) && state.cameraOn ? (state.myId ?? null) : null;
-}
-
-/** Someone else's shared screen. */
-export function selectRemoteShareTarget(state: ZoomSessionState): number | null {
-  return selectRemoteSharer(state)?.userId ?? null;
 }
