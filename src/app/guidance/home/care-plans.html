@@ -1,7 +1,4 @@
-<section class="plans" aria-labelledby="care-plans-heading">
-  <h2 #heading id="care-plans-heading" class="plans__title" tabindex="-1">
-    {{ role() === 'provider' ? 'Care plans' : 'Your care plan' }}
-  </h2>
+<app-home-section key="care-plans" [heading]="role() === 'provider' ? 'Care plans' : 'Your care plan'">
 
   @switch (store.view()) {
     @case ('loading') {
@@ -105,4 +102,4 @@
   }
 
   <p class="visually-hidden" aria-live="polite">{{ store.announcement() }}</p>
-</section>
+</app-home-section>

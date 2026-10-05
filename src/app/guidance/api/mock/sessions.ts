@@ -1,4 +1,4 @@
-import { Person, Session, SessionAiSummary, SessionDoc, SessionRecap } from '../models';
+import { CheckIn, Person, Session, SessionAiSummary, SessionDoc, SessionRecap } from '../models';
 import { WIND_DOWN_PLAN } from './care-plans';
 import { HOUR, at, slot } from './dates';
 import { AISHA, DANIEL, ELENA, GRACE, JORDAN, MARCUS, MAYA, NOAH, PRIYA, SAM } from './people';
@@ -13,6 +13,8 @@ export interface SessionRecord extends Session {
   docs: SessionDoc[];
   recap?: SessionRecap;
   aiSummary?: SessionAiSummary;
+  /** The member's pre-session check-in, once they've done it. */
+  checkIn?: CheckIn;
 }
 
 export function booking(

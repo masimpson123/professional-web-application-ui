@@ -1,31 +1,21 @@
-.plans {
-  display: flex;
-  flex-direction: column;
-  gap: var(--spacing-padding-sys-padding-12);
-}
-
-.plans__title {
-  font-size: var(--title-small-sys-font-size);
-  line-height: var(--title-small-sys-line-height);
-  font-weight: 500;
-}
-
 .notice {
   display: flex;
   flex-direction: column;
   align-items: flex-start;
   gap: var(--spacing-padding-sys-padding-12);
+  padding: var(--spacing-padding-sys-padding-16) var(--spacing-padding-sys-padding-20);
   color: var(--ink-muted);
 }
 
-/* ---- Member: their plan in one card ------------------------------------ */
+/* ---- Member: each plan in its own block (the section card is the frame) ---- */
 
 .card {
-  padding: var(--spacing-padding-sys-padding-20) var(--spacing-padding-sys-padding-24)
-    var(--spacing-padding-sys-padding-24);
-  border: 1px solid var(--line);
-  border-radius: var(--border-radius-sys-radius-lg);
-  background: var(--surface-surface-container-sys-surface-container-lowest);
+  padding: var(--spacing-padding-sys-padding-16) var(--spacing-padding-sys-padding-20)
+    var(--spacing-padding-sys-padding-20);
+}
+
+.card + .card {
+  border-top: 1px solid var(--line);
 }
 
 .card__head {
@@ -48,10 +38,7 @@
 /* ---- Provider: one row per member, opening onto their plan ---------------- */
 
 .accordion {
-  overflow: hidden;
-  border: 1px solid var(--line);
-  border-radius: var(--border-radius-sys-radius-lg);
-  background: var(--surface-surface-container-sys-surface-container-lowest);
+  border-top: 1px solid var(--line);
 }
 
 .plan + .plan {

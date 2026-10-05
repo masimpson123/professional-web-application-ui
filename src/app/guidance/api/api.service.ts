@@ -19,6 +19,8 @@ import {
   BookingRequest,
   CarePlan,
   CarePlanItem,
+  CheckIn,
+  CheckInAnswers,
   Highlight,
   Page,
   Person,
@@ -47,6 +49,12 @@ import {
  */
 @Injectable()
 export class ApiService {
+  /**
+   * This is the demo's in-memory API. Mock-up-only shortcuts (like filling in a
+   * form) check it, so they go when real requests replace this file.
+   */
+  readonly demo = true;
+
   /** `GET /api/me`. There's no sign-in yet, so the demo signs in as either side. */
   getCurrentUser(role: Role): Observable<Person> {
     return respond('/api/me', () => (role === 'provider' ? MAYA : JORDAN));
@@ -164,7 +172,7 @@ export class ApiService {
     return respond(`/api/sessions/${id}`, () => {
       const record = SESSIONS.find((s) => s.id === id);
       if (!record) return undefined;
-      const { docs, recap, aiSummary, ...session } = record;
+      const { docs, recap, aiSummary, checkIn, ...session } = record;
 
       const series = SESSIONS.filter(
         (s) => s.memberId === session.memberId && s.providerId === session.providerId,
@@ -179,9 +187,39 @@ export class ApiService {
         recap,
         // Generated from the call's transcript, so there's none until the call has ended.
         aiSummary: sessionPhase(session) === 'ended' ? aiSummary : undefined,
+        checkIn,
         carePlan: planFor(session.memberId),
         nextSession: next && localDate(new Date(next.start)),
       };
+    });
+  }
+
+  /**
+   * `GET /api/members/:id/check-in-due`: the member's next session, if it's within
+   * two weeks (the questionnaires ask about the last two weeks), hasn't started, and
+   * has no check-in yet. Null when nothing is due.
+   */
+  getCheckInDue(memberId: string): Observable<SessionSummary | null> {
+    return respond(`/api/members/${memberId}/check-in-due`, () => {
+      const now = Date.now();
+      const next = SESSIONS.filter((s) => s.memberId === memberId && Date.parse(s.start) > now).sort(
+        byStart,
+      )[0];
+      const soon = next && Date.parse(next.start) - now <= CHECK_IN_WINDOW_MS;
+      return next && soon && !next.checkIn ? toSummary(next) : null;
+    });
+  }
+
+  /**
+   * `POST /api/sessions/:id/check-in`: the member sends their pre-session check-in.
+   * Their provider sees it before the session. 404s for an unknown session.
+   */
+  submitCheckIn(sessionId: string, answers: CheckInAnswers): Observable<CheckIn> {
+    return respond(`/api/sessions/${sessionId}/check-in`, () => {
+      const record = SESSIONS.find((s) => s.id === sessionId);
+      if (!record) return undefined;
+      record.checkIn = { ...answers, sessionId, completedAt: new Date().toISOString() };
+      return record.checkIn;
     });
   }
 
@@ -348,6 +386,9 @@ function describeFile(file: File): string {
   return `${ext}, ${size}`;
 }
 
+/** How far ahead a session's check-in opens: two weeks, the period the questions ask about. */
+const CHECK_IN_WINDOW_MS = 14 * 24 * 60 * 60_000;
+
 /** How long the fake server takes to answer. */
 const LATENCY_MS = 250;
 
@@ -382,7 +423,7 @@ function isBooked(providerId: string, slot: TimeSlot): boolean {
 /** Orders sessions by start time, then id, so every session has a unique place to page from. */
 const sortKey = (s: Session) => `${s.start}|${s.id}`;
 
-function toSummary({ docs, recap, aiSummary, ...session }: SessionRecord): SessionSummary {
+function toSummary({ docs, recap, aiSummary, checkIn, ...session }: SessionRecord): SessionSummary {
   return { ...session, provider: person(session.providerId), member: person(session.memberId) };
 }
 

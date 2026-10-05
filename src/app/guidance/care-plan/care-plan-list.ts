@@ -1,4 +1,4 @@
-import { NgTemplateOutlet, formatDate } from '@angular/common';
+import { formatDate } from '@angular/common';
 import { ChangeDetectionStrategy, Component, input, output, signal } from '@angular/core';
 import { BadgeComponent, ButtonComponent, DialogComponent } from '@compsych-ui-components/angular';
 import { DONE_WORDS } from '../documents/doc-kinds';
@@ -15,7 +15,7 @@ import { Icon } from '../shared/icon';
  */
 @Component({
   selector: 'app-care-plan-list',
-  imports: [BadgeComponent, ButtonComponent, DialogComponent, DocRow, Icon, NgTemplateOutlet],
+  imports: [BadgeComponent, ButtonComponent, DialogComponent, DocRow, Icon],
   templateUrl: './care-plan-list.html',
   styleUrl: './care-plan-list.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -43,6 +43,15 @@ export class CarePlanList {
     const next = this.nextSession();
     if (item.done || (next && item.due <= next)) return item.detail;
     return `${item.detail}, due ${formatDate(item.due, 'MMM d', 'en-US')}`;
+  }
+
+  /** Saves an uploaded document. The download button is a button, so this does what a download link would. */
+  protected download(item: CarePlanItem): void {
+    if (!item.url) return;
+    const link = document.createElement('a');
+    link.href = item.url;
+    link.download = item.title;
+    link.click();
   }
 
   protected confirmRemove(): void {

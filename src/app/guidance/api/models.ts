@@ -92,6 +92,8 @@ export interface SessionDetail {
   recap?: SessionRecap;
   /** What was said in the call, summarized by AI once the session has ended. */
   aiSummary?: SessionAiSummary;
+  /** The member's pre-session check-in, once they've done it. */
+  checkIn?: CheckIn;
   /** What the member is working through between sessions. */
   carePlan: CarePlanItem[];
   /** ISO date (yyyy-mm-dd) of the next session they have booked, if any. */
@@ -118,6 +120,38 @@ export interface SessionAiSummary {
   /** The main things talked about, in the order they came up. */
   topics: { title: string; detail: string }[];
 }
+
+/**
+ * How often, over the last two weeks: the answer scale shared by the PHQ-9 and
+ * GAD-7. 0 is "Not at all", 1 "Several days", 2 "More than half the days", and
+ * 3 "Nearly every day".
+ */
+export type Frequency = 0 | 1 | 2 | 3;
+
+/**
+ * A member's answers to the pre-session check-in: the PHQ-9 (mood) and GAD-7
+ * (anxiety) questionnaires, in question order.
+ */
+export interface CheckInAnswers {
+  phq9: Frequency[];
+  gad7: Frequency[];
+  /**
+   * How hard these problems have made work, home, and getting along with people,
+   * from 0 "Not difficult at all" to 3 "Extremely difficult". Only asked when at
+   * least one problem was reported.
+   */
+  difficulty?: Frequency;
+}
+
+/** A completed check-in, for one session. Only the member's provider reads the answers. */
+export interface CheckIn extends CheckInAnswers {
+  sessionId: string;
+  /** ISO date-time. */
+  completedAt: string;
+}
+
+/** Index of the PHQ-9 question about thoughts of self-harm, which any answer above 0 flags. */
+export const PHQ9_SELF_HARM = 8;
 
 /** Where a session is relative to now. */
 export type SessionPhase = 'upcoming' | 'live' | 'ended';

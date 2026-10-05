@@ -30,6 +30,24 @@
   min-height: 264px;
 }
 
+/*
+ * Sessions and care plans, side by side once each column has room for a session
+ * row (about 600px); stacked below that. They collapse together (HomeSections),
+ * and each keeps its own height.
+ */
+.columns {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  align-items: start;
+  gap: var(--spacing-padding-sys-padding-20);
+}
+
+@media (min-width: 1200px) {
+  .columns {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
 .journeys {
   display: flex;
   flex-direction: column;

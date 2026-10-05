@@ -27,6 +27,11 @@ export const routes: Routes = [
         loadComponent: () => import('./sessions/sessions-page').then((m) => m.SessionsPage),
       },
       {
+        path: 'sessions/:id/check-in',
+        title: 'Pre-session check-in | GuidanceResources',
+        loadComponent: () => import('./check-in/check-in-page').then((m) => m.CheckInPage),
+      },
+      {
         path: 'sessions/:id',
         title: 'Session | GuidanceResources',
         loadComponent: () => import('./room/room-page').then((m) => m.RoomPage),

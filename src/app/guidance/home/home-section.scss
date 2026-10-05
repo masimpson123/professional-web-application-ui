@@ -1,0 +1,67 @@
+:host {
+  display: block;
+  min-width: 0;
+}
+
+.panel {
+  display: block;
+  overflow: hidden;
+}
+
+.head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--spacing-padding-sys-padding-12) var(--spacing-padding-sys-padding-16);
+  padding: var(--spacing-padding-sys-padding-12) var(--spacing-padding-sys-padding-20);
+}
+
+.title {
+  font-size: var(--title-small-sys-font-size);
+  line-height: var(--title-small-sys-line-height);
+  font-weight: 500;
+}
+
+/* The whole heading is the disclosure button; it reads as a heading, not a pill. */
+.toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--spacing-padding-sys-padding-8);
+  margin-left: calc(-1 * var(--spacing-padding-sys-padding-8));
+  padding: var(--spacing-padding-sys-padding-4) var(--spacing-padding-sys-padding-8);
+  border: 0;
+  border-radius: var(--border-radius-sys-radius-sm);
+  background: none;
+  color: var(--ink);
+  font: inherit;
+  cursor: pointer;
+
+  &:hover {
+    background: var(--transparent-primary-sys-primary-08);
+  }
+}
+
+.chevron {
+  color: var(--ink-muted);
+  transition: transform 150ms ease;
+}
+
+.toggle[aria-expanded='true'] .chevron {
+  transform: rotate(180deg);
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--spacing-padding-sys-padding-12) var(--spacing-padding-sys-padding-16);
+  margin-left: auto;
+
+  &:empty {
+    display: none;
+  }
+}
+
+.body {
+  border-top: 1px solid var(--line);
+}

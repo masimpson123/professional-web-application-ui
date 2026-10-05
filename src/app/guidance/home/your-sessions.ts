@@ -6,6 +6,7 @@ import { ApiService } from '../api/api.service';
 import { BookSession } from '../sessions/book-session';
 import { HomeCarePlans } from './home-care-plans';
 import { Viewer } from '../session/viewer';
+import { HomeSection } from './home-section';
 import { Icon } from '../shared/icon';
 import { injectNow, listSession } from '../sessions/session-listing';
 import { SessionRow } from '../sessions/session-row';
@@ -20,7 +21,7 @@ const MAX_ON_HOME = 10;
  */
 @Component({
   selector: 'app-your-sessions',
-  imports: [BookSession, ButtonComponent, Icon, RouterLink, SessionRow],
+  imports: [BookSession, ButtonComponent, HomeSection, Icon, RouterLink, SessionRow],
   templateUrl: './your-sessions.html',
   styleUrl: './your-sessions.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,

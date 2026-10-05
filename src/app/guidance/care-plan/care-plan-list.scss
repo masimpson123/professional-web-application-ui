@@ -17,34 +17,19 @@
   color: var(--ink-muted);
 }
 
-.link-action {
-  display: inline-flex;
-  align-items: center;
-  gap: var(--spacing-padding-sys-padding-4);
-  padding: var(--spacing-padding-sys-padding-6) var(--spacing-padding-sys-padding-8);
-  border-radius: var(--border-radius-sys-radius-sm);
-  color: var(--accent-primary-sys-primary);
-  font-size: var(--label-medium-sys-font-size);
-  font-weight: 500;
-  text-decoration: none;
-
-  &:hover {
-    background: var(--transparent-primary-sys-primary-08);
-  }
-}
-
 /*
- * The checkbox (or, for the provider, the status) and an upload's download link.
- * Under the title, the checkbox comes first so it lines up with the text above.
+ * Under the title: the member's checkbox, with an upload's download button after
+ * it on the same line, or (in a narrow row) the provider's status. The checkbox
+ * comes first so it lines up with the text above.
  */
 .plan-action {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  gap: var(--spacing-padding-sys-padding-8) var(--spacing-padding-sys-padding-16);
+  gap: var(--spacing-padding-sys-padding-4) var(--spacing-padding-sys-padding-8);
   margin-top: var(--spacing-padding-sys-padding-6);
 
-  .link-action {
+  .download {
     order: 1;
   }
 
@@ -108,27 +93,43 @@
   box-shadow: var(--focus-ring);
 }
 
-/* In a wide row (see doc-row) these sit beside the title, not under it. */
+/*
+ * A wide row (doc-row lays extras out beside the title from 560px). The member's
+ * checkbox sits in fixed columns so the checkboxes line up from row to row, with
+ * a slot just before it for an upload's download button. The provider has
+ * nothing left under the title: their status moves to the right, with the
+ * download and remove buttons.
+ */
 @container doc-row (min-width: 560px) {
-  /*
-   * Fixed columns, so the checkboxes line up from row to row: the download link,
-   * when there is one, sits in its own column just before the checkbox.
-   */
-  .plan-action {
+  .list:not(.list--provider) .plan-action {
     display: grid;
-    grid-template-columns: 112px 150px;
-    column-gap: var(--spacing-padding-sys-padding-8);
+    grid-template-columns: 40px 150px;
+    column-gap: var(--spacing-padding-sys-padding-4);
     margin-top: 0;
 
-    /* One row: `order` (from the stacked layout) would otherwise push the link onto a second one. */
-    .link-action {
+    /* One row: `order` (from the stacked layout) would otherwise push the download onto a second one. */
+    .download {
       grid-area: 1 / 1;
       justify-self: end;
     }
 
-    > :not(.link-action) {
+    > :not(.download) {
       grid-area: 1 / 2;
       justify-self: start;
     }
+  }
+
+  .list--provider .plan-action {
+    display: none;
+  }
+}
+
+/*
+ * The provider's status: under the title and detail in a narrow row, on the right
+ * with the buttons in a wide one. Both are rendered; only one ever shows.
+ */
+@container doc-row (width < 560px) {
+  .item-status--side {
+    display: none;
   }
 }

@@ -1,9 +1,7 @@
-<section class="sessions" aria-labelledby="your-sessions-heading">
-  <div class="sessions__head">
-    <h2 id="your-sessions-heading" class="sessions__title">Your sessions</h2>
+<app-home-section key="sessions" heading="Your sessions">
+  <div slot="actions" class="actions">
     @if (isMember()) {
       <compsych-button
-        class="sessions__book"
         variant="tonal"
         size="small"
         leadingIcon="calendar-plus"
@@ -45,7 +43,7 @@
       }
     }
   }
-</section>
+</app-home-section>
 
 @if (isMember()) {
   <app-book-session [(open)]="booking" (booked)="onBooked()" />

@@ -1,70 +1,84 @@
-<ul class="list">
+<ul class="list" [class.list--provider]="role() === 'provider'">
   @for (item of items(); track item.id) {
     @let words = doneWords[item.kind];
+    @let status = item.done ? words.done : 'Not started';
     <li>
       <app-doc-row [doc]="item" [done]="item.done" [detailText]="detail(item)">
+        <!--
+          Under or beside the title: the member's checkbox (with an upload's download
+          button just before it) or, in a narrow row, the provider's status. In a wide
+          row the status sits on the right with the provider's buttons instead; only
+          one of the two ever shows.
+        -->
         <div slot="body" class="plan-action">
-          @if (item.url) {
-            <a class="link-action" [href]="item.url" [attr.download]="item.title">
-              <app-icon name="download" [size]="18" />
-              Download<span class="visually-hidden">: {{ item.title }}</span>
-            </a>
+          @if (role() === 'provider') {
+            <compsych-badge
+              class="item-status item-status--below"
+              size="md"
+              [variant]="item.done ? 'positive' : 'filled'"
+              [label]="status"
+            />
           }
-          <ng-container
-            *ngTemplateOutlet="
-              planAction;
-              context: {
-                $implicit: item,
-                verb: words.verb,
-                doneLabel: words.done
-              }
-            "
-          />
+          @if (role() === 'member' && item.url) {
+            <compsych-button
+              class="download"
+              variant="text"
+              size="small"
+              leadingIcon="download"
+              [iconOnly]="true"
+              [ariaLabel]="'Download ' + item.title"
+              (click)="download(item)"
+            />
+          }
+          @if (role() === 'member') {
+            <label class="check">
+              <input
+                type="checkbox"
+                [checked]="item.done"
+                (change)="doneChange.emit({ id: item.id, done: $any($event.target).checked })"
+              />
+              <span class="check__box" aria-hidden="true"><app-icon name="check" [size]="16" /></span>
+              <span class="check__label">
+                {{ item.done ? words.done : words.verb }}<span class="visually-hidden">: {{ item.title }}</span>
+              </span>
+            </label>
+          }
         </div>
-        <ng-container *ngTemplateOutlet="removeAction; context: { $implicit: item }" />
+
+        <!-- On the right, together: where the item stands (in a wide row), downloading an upload, and taking it out of the plan. -->
+        @if (role() === 'provider') {
+          <compsych-badge
+            class="item-status item-status--side"
+            size="md"
+            [variant]="item.done ? 'positive' : 'filled'"
+            [label]="status"
+          />
+          @if (item.url) {
+            <compsych-button
+              class="download"
+              variant="text"
+              size="small"
+              leadingIcon="download"
+              [iconOnly]="true"
+              [ariaLabel]="'Download ' + item.title"
+              (click)="download(item)"
+            />
+          }
+          <compsych-button
+            variant="text"
+            size="small"
+            leadingIcon="trash-2"
+            [iconOnly]="true"
+            [ariaLabel]="'Remove ' + item.title + ' from the care plan'"
+            (click)="removing.set(item)"
+          />
+        }
       </app-doc-row>
     </li>
   } @empty {
     <li class="empty">Nothing in the care plan yet.</li>
   }
 </ul>
-
-<!-- The member ticks items off; the provider sees where each one stands. -->
-<ng-template #planAction let-item let-verb="verb" let-doneLabel="doneLabel">
-  @if (role() === 'provider') {
-    <compsych-badge
-      size="md"
-      [variant]="item.done ? 'positive' : 'filled'"
-      [label]="item.done ? doneLabel : 'Not started'"
-    />
-  } @else {
-    <label class="check">
-      <input
-        type="checkbox"
-        [checked]="item.done"
-        (change)="doneChange.emit({ id: item.id, done: $any($event.target).checked })"
-      />
-      <span class="check__box" aria-hidden="true"><app-icon name="check" [size]="16" /></span>
-      <span class="check__label">
-        {{ item.done ? doneLabel : verb }}<span class="visually-hidden">: {{ item.title }}</span>
-      </span>
-    </label>
-  }
-</ng-template>
-
-<!-- Providers can take an item out of the plan; members work through it. -->
-<ng-template #removeAction let-item>
-  @if (role() === 'provider') {
-    <compsych-button
-      variant="text"
-      size="small"
-      leadingIcon="trash-2"
-      [iconOnly]="true"
-      [ariaLabel]="'Remove ' + item.title + ' from the care plan'"
-      (click)="removing.set(item)"
-    />
-  }
-</ng-template>
 
 @if (removing(); as item) {
   <compsych-dialog

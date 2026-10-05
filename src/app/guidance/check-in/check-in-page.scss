@@ -1,0 +1,245 @@
+/* Scrolls inside the space between header and footer, like the home page. */
+:host {
+  display: block;
+  min-height: 0;
+  overflow-y: auto;
+}
+
+/* A comfortable reading width: one question at a time down the page. */
+.page {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-padding-sys-padding-24);
+  width: 100%;
+  max-width: 800px;
+  margin: 0 auto;
+  padding: var(--spacing-padding-sys-padding-24) var(--spacing-padding-sys-padding-24)
+    var(--spacing-padding-sys-padding-48);
+}
+
+.title {
+  font-size: var(--title-medium-sys-font-size);
+  line-height: var(--title-medium-sys-line-height);
+  font-weight: 500;
+  letter-spacing: -0.01em;
+}
+
+.link {
+  color: var(--accent-primary-sys-primary);
+  font-weight: 500;
+}
+
+.notice,
+.thanks {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--spacing-padding-sys-padding-12);
+  color: var(--ink-muted);
+
+  .title {
+    color: var(--ink);
+  }
+}
+
+.thanks__icon {
+  color: var(--custom-success-sys-success);
+}
+
+/* ---- Intro ---------------------------------------------------------------- */
+
+.intro {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-padding-sys-padding-8);
+}
+
+.intro__when {
+  color: var(--ink-muted);
+}
+
+.intro__body {
+  max-width: 64ch;
+}
+
+/* ---- Questions ------------------------------------------------------------ */
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-padding-sys-padding-20);
+}
+
+.section__title {
+  font-size: var(--title-small-sys-font-size);
+  line-height: var(--title-small-sys-line-height);
+  font-weight: 500;
+}
+
+.section__instrument {
+  margin-left: var(--spacing-padding-sys-padding-8);
+  color: var(--ink-muted);
+  font-size: var(--label-medium-sys-font-size);
+  font-weight: 400;
+}
+
+.section__stem {
+  margin-top: var(--spacing-padding-sys-padding-4);
+  color: var(--ink-muted);
+}
+
+.question {
+  margin: 0;
+  padding: var(--spacing-padding-sys-padding-20) 0 0;
+  border: 0;
+
+  & + .question {
+    margin-top: var(--spacing-padding-sys-padding-20);
+    border-top: 1px solid var(--line);
+  }
+}
+
+.question--last {
+  padding-top: 0;
+}
+
+/*
+ * A legend sits on its fieldset's top border, which here is the divider between
+ * questions. Floated, it's an ordinary block above the answers instead.
+ */
+.question__text {
+  float: left;
+  width: 100%;
+  padding: 0;
+  font-weight: 500;
+
+  + * {
+    clear: both;
+  }
+}
+
+.question__number {
+  color: var(--ink-muted);
+  font-variant-numeric: tabular-nums;
+}
+
+/* The four answers as tiles: four across with room, two, then one. */
+.options {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: var(--spacing-padding-sys-padding-8);
+  margin-top: var(--spacing-padding-sys-padding-12);
+}
+
+.option {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-padding-sys-padding-8);
+  padding: var(--spacing-padding-sys-padding-12);
+  border: 1px solid var(--outline-sys-outline);
+  border-radius: var(--border-radius-sys-radius-sm);
+  font-size: var(--label-large-sys-font-size);
+  line-height: var(--label-large-sys-line-height);
+  cursor: pointer;
+  transition: background-color 120ms ease, border-color 120ms ease;
+
+  &:hover {
+    background: var(--transparent-primary-sys-primary-08);
+  }
+
+  input {
+    flex: none;
+    margin: 0;
+    accent-color: var(--accent-primary-sys-primary);
+  }
+
+  &:has(input:checked) {
+    border-color: var(--accent-primary-sys-primary);
+    background: var(--custom-info-sys-info-container);
+    color: var(--custom-info-sys-on-info-container);
+  }
+
+  &:has(input:focus-visible) {
+    box-shadow: var(--focus-ring);
+  }
+}
+
+@media (max-width: 720px) {
+  .options {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 420px) {
+  .options {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+/* ---- Crisis resources --------------------------------------------------------- */
+
+.crisis {
+  display: flex;
+  gap: var(--spacing-padding-sys-padding-12);
+  margin-top: var(--spacing-padding-sys-padding-16);
+  padding: var(--spacing-padding-sys-padding-16);
+  border-radius: var(--border-radius-sys-radius-md);
+  background: var(--custom-warning-sys-warning-container);
+  color: var(--custom-warning-sys-on-warning-container);
+
+  p + p {
+    margin-top: var(--spacing-padding-sys-padding-8);
+  }
+
+  a {
+    color: inherit;
+    font-weight: 600;
+  }
+}
+
+.crisis__icon {
+  margin-top: 1px;
+}
+
+.crisis__title {
+  font-weight: 600;
+}
+
+/* ---- Sending ---------------------------------------------------------------- */
+
+.submit {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--spacing-padding-sys-padding-12);
+}
+
+.submit__progress {
+  color: var(--ink-muted);
+  font-size: var(--label-large-sys-font-size);
+}
+
+.submit__error {
+  color: var(--error-sys-error);
+}
+
+/* ---- Mock-up only ------------------------------------------------------------- */
+
+/* Set apart from the form, so it doesn't read as part of the real check-in. */
+.demo {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--spacing-padding-sys-padding-12);
+  padding: var(--spacing-padding-sys-padding-12) var(--spacing-padding-sys-padding-16);
+  border: 1px dashed var(--outline-sys-outline);
+  border-radius: var(--border-radius-sys-radius-md);
+}
+
+.demo__label {
+  color: var(--ink-muted);
+  font-size: var(--label-medium-sys-font-size);
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}

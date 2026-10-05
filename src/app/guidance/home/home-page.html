@@ -17,8 +17,10 @@
     <app-highlights class="highlights" />
   </div>
 
-  <app-your-sessions />
-  <app-care-plans #carePlans />
+  <div class="columns">
+    <app-your-sessions />
+    <app-care-plans #carePlans />
+  </div>
 
   <!-- Members' ways into GuidanceResources services; providers don't need them. -->
   @if (!isProvider()) {

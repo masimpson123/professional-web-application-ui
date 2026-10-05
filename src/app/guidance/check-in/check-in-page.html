@@ -1,0 +1,147 @@
+<div class="page">
+  @switch (view()) {
+    @case ('loading') {
+      <p class="notice" role="status">Opening your check-in…</p>
+    }
+    @case ('failed') {
+      <div class="notice" role="alert">
+        <p>We couldn’t open your check-in. Check your internet connection, then try again.</p>
+        <compsych-button label="Try again" leadingIcon="rotate-cw" (click)="retry()" />
+      </div>
+    }
+    @case ('missing') {
+      <div class="notice">
+        <h1 class="title">We couldn’t find that check-in</h1>
+        <p>It may be for a session that was cancelled, or one that isn’t yours.</p>
+        <a class="link" [routerLink]="homeUrl">Back to home</a>
+      </div>
+    }
+    @case ('closed') {
+      <div class="notice">
+        <h1 class="title">This check-in has closed</h1>
+        <p>Your session has started, so there’s no need to check in now. You can talk it through with {{ provider().firstName }} instead.</p>
+        <a class="link" [routerLink]="homeUrl">Back to home</a>
+      </div>
+    }
+    @case ('done') {
+      <div class="notice">
+        <h1 class="title">You’ve already checked in</h1>
+        <p>{{ provider().firstName }} has your answers for your session on {{ when() }}.</p>
+        <a class="link" [routerLink]="homeUrl">Back to home</a>
+      </div>
+    }
+    @case ('thanks') {
+      <div class="thanks">
+        <app-icon class="thanks__icon" name="clipboard-check" [size]="28" />
+        <h1 id="check-in-thanks" class="title" tabindex="-1">Thanks, {{ firstName() }}. Your check-in is saved.</h1>
+        <p>
+          {{ provider().firstName }} will look it over before your session on {{ when() }}, so you can spend
+          more of it on what matters to you.
+        </p>
+        @if (selfHarm()) {
+          <ng-container *ngTemplateOutlet="crisis" />
+        }
+        <a class="link" [routerLink]="homeUrl">Back to home</a>
+      </div>
+    }
+    @case ('form') {
+      <header class="intro">
+        <h1 class="title">Pre-session check-in</h1>
+        <p class="intro__when">For your session with {{ providerLabel() }} on {{ when() }} · About 5 minutes</p>
+        <p class="intro__body">
+          These questions help {{ provider().firstName }} see how you’ve been doing, so your session can start
+          with what matters most. There are no right or wrong answers.
+        </p>
+      </header>
+
+      <form class="form" novalidate (submit)="$event.preventDefault(); send()">
+        @for (q of questionnaires; track q.id) {
+          <compsych-card variant="blank" padding="md">
+            <section class="section" [attr.aria-labelledby]="q.id + '-title'">
+              <h2 [id]="q.id + '-title'" class="section__title">
+                {{ q.title }} <span class="section__instrument">{{ q.instrument }}</span>
+              </h2>
+              <p class="section__stem">{{ q.stem }}</p>
+
+              @for (item of q.items; track $index; let i = $index) {
+                @let answer = checkIn[q.id][i];
+                <fieldset class="question" [attr.data-unanswered]="answer().invalid() ? '' : null">
+                  <legend class="question__text">
+                    <span class="question__number">{{ i + 1 }}.</span> {{ item }}
+                  </legend>
+                  <div class="options">
+                    @for (option of frequencies; track option.value) {
+                      <label class="option">
+                        <input type="radio" [field]="answer" [value]="'' + option.value" />
+                        <span>{{ option.label }}</span>
+                      </label>
+                    }
+                  </div>
+                  @if (q.id === 'phq9' && i === selfHarmIndex && selfHarm()) {
+                    <div role="alert">
+                      <ng-container *ngTemplateOutlet="crisis" />
+                    </div>
+                  }
+                </fieldset>
+              }
+            </section>
+          </compsych-card>
+        }
+
+        @if (anyProblem()) {
+          <compsych-card variant="blank" padding="md">
+            <fieldset class="question question--last" [attr.data-unanswered]="checkIn.difficulty().invalid() ? '' : null">
+              <legend class="question__text">{{ difficulty.question }}</legend>
+              <div class="options">
+                @for (option of difficulty.options; track option.value) {
+                  <label class="option">
+                    <input type="radio" [field]="checkIn.difficulty" [value]="'' + option.value" />
+                    <span>{{ option.label }}</span>
+                  </label>
+                }
+              </div>
+            </fieldset>
+          </compsych-card>
+        }
+
+        <div class="submit">
+          <p class="submit__progress" aria-live="polite">{{ total() - unanswered() }} of {{ total() }} answered</p>
+          @if (error()) {
+            <p class="submit__error" role="alert">{{ error() }}</p>
+          }
+          <compsych-button type="submit" size="large" label="Send check-in" [loading]="checkIn().submitting()" />
+        </div>
+
+        <!-- Mock-up only (ApiService.demo): skip straight to a filled-in form. -->
+        @if (demo) {
+          <div class="demo">
+            <span class="demo__label">Demo only</span>
+            <compsych-button
+              variant="outlined"
+              size="small"
+              leadingIcon="wand-sparkles"
+              label="Fill in sample answers"
+              (click)="fillInSample()"
+            />
+          </div>
+        }
+      </form>
+    }
+  }
+</div>
+
+<!-- Shown as soon as question 9 is answered with anything but "Not at all", and again once sent. -->
+<ng-template #crisis>
+  <div class="crisis">
+    <app-icon class="crisis__icon" name="life-buoy" [size]="22" />
+    <div>
+      <p class="crisis__title">You don’t have to wait for your session.</p>
+      <p>
+        If you’re thinking about hurting yourself, call or text <a href="tel:988">988</a> to reach the
+        Suicide &amp; Crisis Lifeline, any time, day or night. If you’re in danger right now, call
+        <a href="tel:911">911</a>.
+      </p>
+      <p>{{ provider().firstName }} will see this answer before your session.</p>
+    </div>
+  </div>
+</ng-template>
