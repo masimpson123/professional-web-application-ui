@@ -9,6 +9,6 @@ A port of the hackathon-2026 "Sessions for GuidanceResources" prototype, mounted
 - All mock data lives in `api/mock/`, and only `ApiService` (`api/api.service.ts`) imports it. Everything else gets data from `ApiService`, as Observables, like HTTP responses. Lists that can grow without limit are paged on the server.
 - Never use `providedIn: 'root'`. App-wide services are provided on the route in `guidance.routes.ts`; per-page ones in the page's `providers`.
 - Link with the constants in `paths.ts`, never absolute paths: the app lives under the portfolio's `/guidance/app`.
-- Images live in `public/telehealth/`. Never name a `public/` folder after a route: Express's static server would treat `/guidance` as that folder and redirect it to `/guidance/`.
+- Images and sample documents (like the mock uploads) live in `public/telehealth/`. Never name a `public/` folder after a route: Express's static server would treat `/guidance` as that folder and redirect it to `/guidance/`.
 - Global styles go in `guidance.scss`, scoped to `.guidance` and `.cdk-overlay-container` (dialogs render in the CDK overlay, outside the shell).
 - Zoom tokens come from the Spring service's `GET /zoom-token?session=&role=&userKey=` (`call/zoom-tokens.ts`). The SDK secret never reaches the browser. Room names must look like `cs-<hex>`; the server rejects anything else.

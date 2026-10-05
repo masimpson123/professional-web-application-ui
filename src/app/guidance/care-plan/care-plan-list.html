@@ -3,18 +3,13 @@
     @let words = doneWords[item.kind];
     <li>
       <app-doc-row [doc]="item" [done]="item.done" [detailText]="detail(item)">
-        @if (item.progress && !item.done) {
-          <span slot="body" class="progress">
-            <span class="progress__track" aria-hidden="true">
-              <span
-                class="progress__fill"
-                [style.width.%]="(item.progress.completed / item.progress.total) * 100"
-              ></span>
-            </span>
-            {{ progressLabel(item) }}
-          </span>
-        }
         <div slot="body" class="plan-action">
+          @if (item.url) {
+            <a class="link-action" [href]="item.url" [attr.download]="item.title">
+              <app-icon name="download" [size]="18" />
+              Download<span class="visually-hidden">: {{ item.title }}</span>
+            </a>
+          }
           <ng-container
             *ngTemplateOutlet="
               planAction;
@@ -26,12 +21,6 @@
             "
           />
         </div>
-        @if (item.url) {
-          <a class="link-action" [href]="item.url" [attr.download]="item.title">
-            <app-icon name="download" [size]="18" />
-            Download<span class="visually-hidden">: {{ item.title }}</span>
-          </a>
-        }
         <ng-container *ngTemplateOutlet="removeAction; context: { $implicit: item }" />
       </app-doc-row>
     </li>
@@ -46,7 +35,7 @@
     <compsych-badge
       size="md"
       [variant]="item.done ? 'positive' : 'filled'"
-      [label]="item.done ? doneLabel : item.progress?.completed ? 'In progress' : 'Not started'"
+      [label]="item.done ? doneLabel : 'Not started'"
     />
   } @else {
     <label class="check">

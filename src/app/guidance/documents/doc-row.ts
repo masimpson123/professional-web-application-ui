@@ -5,8 +5,8 @@ import { KIND_ICON, KIND_LABEL } from './doc-kinds';
 
 /**
  * One document in a list: kind icon, title, a line of detail, and an
- * actions slot on the right. Extra lines (e.g. progress) are projected
- * into the body via `[slot=body]`.
+ * actions slot on the right. Extra lines (e.g. a care plan item's
+ * checkbox) are projected into the body via `[slot=body]`.
  *
  * Responsive to its own width, not the window's: in a narrow column (the
  * session room's care plan panel) everything stacks under the title; given

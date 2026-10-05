@@ -50,9 +50,4 @@ export class CarePlanList {
     this.removing.set(undefined);
     if (item) this.remove.emit(item);
   }
-
-  protected progressLabel(item: CarePlanItem): string {
-    const p = item.progress;
-    return p ? `${p.completed} of ${p.total} ${p.unit}` : '';
-  }
 }

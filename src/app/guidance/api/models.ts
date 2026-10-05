@@ -178,8 +178,6 @@ export interface CarePlanItem extends SessionDoc {
   /** ISO date (yyyy-mm-dd). */
   due: string;
   done: boolean;
-  /** Worksheet progress, e.g. 3 of 6 prompts answered. */
-  progress?: { completed: number; total: number; unit: string };
 }
 
 /** Everything one member is working through for one provider. */

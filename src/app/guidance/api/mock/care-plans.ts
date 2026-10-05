@@ -1,8 +1,19 @@
-import { CarePlanItem } from '../models';
+import { CarePlanItem, SessionDoc } from '../models';
 import { day } from './dates';
-import { AISHA, JORDAN, PRIYA } from './people';
+import { JORDAN, PRIYA } from './people';
+
+/** A document Maya uploaded for Jordan in session 3, so it's also shared in that session. */
+export const WIND_DOWN_PLAN: SessionDoc = {
+  id: 'upload-wind-down-plan',
+  title: 'Wind-down plan.pdf',
+  kind: 'file',
+  detail: 'PDF, 1 KB',
+  url: 'telehealth/wind-down-plan.pdf',
+};
 
 // ---- Care plans, by member -------------------------------------------------------------
+// Every item is a ComPsych library resource (see resources.ts) or, once added in
+// the app, a document the provider uploaded.
 
 export const CARE_PLANS: Record<string, CarePlanItem[]> = {
   [JORDAN.id]: [
@@ -23,22 +34,19 @@ export const CARE_PLANS: Record<string, CarePlanItem[]> = {
       done: true,
     },
     {
-      id: 'plan-thought-record',
-      title: 'Thought record: catching the first thought',
+      id: 'plan-daily-routine',
+      title: 'Build a daily routine',
       kind: 'worksheet',
       detail: 'About 10 minutes',
       due: day(7),
       done: false,
-      progress: { completed: 3, total: 6, unit: 'prompts' },
     },
     {
-      id: 'plan-sleep-log',
-      title: 'Weekly sleep log',
-      kind: 'worksheet',
-      detail: 'A minute each morning',
-      due: day(14),
+      ...WIND_DOWN_PLAN,
+      kind: 'file',
+      id: `plan-${WIND_DOWN_PLAN.id}`,
+      due: day(7),
       done: false,
-      progress: { completed: 2, total: 7, unit: 'nights' },
     },
   ],
   [PRIYA.id]: [
@@ -49,17 +57,6 @@ export const CARE_PLANS: Record<string, CarePlanItem[]> = {
       detail: '5 min read',
       due: day(7),
       done: false,
-    },
-  ],
-  [AISHA.id]: [
-    {
-      id: 'plan-aisha-sleep-log',
-      title: 'Shift-work sleep log',
-      kind: 'worksheet',
-      detail: 'A minute after each shift',
-      due: day(0),
-      done: false,
-      progress: { completed: 4, total: 5, unit: 'shifts' },
     },
   ],
 };

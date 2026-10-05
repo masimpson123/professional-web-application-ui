@@ -1,4 +1,5 @@
 import { Person, Session, SessionAiSummary, SessionDoc, SessionRecap } from '../models';
+import { WIND_DOWN_PLAN } from './care-plans';
 import { HOUR, at, slot } from './dates';
 import { AISHA, DANIEL, ELENA, GRACE, JORDAN, MARCUS, MAYA, NOAH, PRIYA, SAM } from './people';
 
@@ -92,6 +93,7 @@ const CURRENT: SessionRecord[] = [
     docs: [
       { id: 's3-breathing', title: 'Box breathing: a four-minute reset', kind: 'article', detail: '4 min read' },
       { id: 's3-hygiene', title: 'Sleep hygiene checklist', kind: 'worksheet', detail: 'Completed' },
+      WIND_DOWN_PLAN,
     ],
     recap: {
       overview:

@@ -33,6 +33,10 @@
   }
 }
 
+/*
+ * The checkbox (or, for the provider, the status) and an upload's download link.
+ * Under the title, the checkbox comes first so it lines up with the text above.
+ */
 .plan-action {
   display: flex;
   flex-wrap: wrap;
@@ -40,36 +44,14 @@
   gap: var(--spacing-padding-sys-padding-8) var(--spacing-padding-sys-padding-16);
   margin-top: var(--spacing-padding-sys-padding-6);
 
+  .link-action {
+    order: 1;
+  }
+
   /* Pull the hit area out so the checkbox lines up with the text above. */
   .check {
     margin-left: calc(-1 * var(--spacing-padding-sys-padding-8));
   }
-}
-
-/* ---- Worksheet progress ------------------------------------------- */
-
-.progress {
-  display: flex;
-  align-items: center;
-  gap: var(--spacing-padding-sys-padding-8);
-  margin-top: var(--spacing-padding-sys-padding-6);
-  font-size: var(--label-small-sys-font-size);
-  line-height: var(--label-small-sys-line-height);
-  color: var(--ink-muted);
-}
-
-.progress__track {
-  width: 72px;
-  height: 4px;
-  border-radius: 2px;
-  overflow: hidden;
-  background: var(--surface-surface-container-sys-surface-container-highest);
-}
-
-.progress__fill {
-  display: block;
-  height: 100%;
-  background: var(--accent-secondary-sys-secondary);
 }
 
 /* ---- Member's done checkbox ---------------------------------------- */
@@ -128,17 +110,25 @@
 
 /* In a wide row (see doc-row) these sit beside the title, not under it. */
 @container doc-row (min-width: 560px) {
-  .plan-action,
-  .progress {
-    margin-top: 0;
-  }
-
-  /* Fixed widths, so the bars and checkboxes line up from row to row. */
-  .progress {
-    width: 180px;
-  }
-
+  /*
+   * Fixed columns, so the checkboxes line up from row to row: the download link,
+   * when there is one, sits in its own column just before the checkbox.
+   */
   .plan-action {
-    width: 150px;
+    display: grid;
+    grid-template-columns: 112px 150px;
+    column-gap: var(--spacing-padding-sys-padding-8);
+    margin-top: 0;
+
+    /* One row: `order` (from the stacked layout) would otherwise push the link onto a second one. */
+    .link-action {
+      grid-area: 1 / 1;
+      justify-self: end;
+    }
+
+    > :not(.link-action) {
+      grid-area: 1 / 2;
+      justify-self: start;
+    }
   }
 }
