@@ -11,7 +11,16 @@
       <p class="done__title">You’re booked</p>
       <p>
         {{ session.start | date: 'EEEE, MMMM d' }} at {{ session.start | date: 'h:mm a' }}, for
-        {{ session.lengthMinutes }} minutes. It’s in your sessions, and you’ll join it from there.
+        {{ session.lengthMinutes }} minutes.
+        @switch (session.format) {
+          @case ('phone') {
+            {{ session.provider.firstName }} will call you{{ phone() ? ' at ' + phone() : '' }}. It’s in your sessions.
+          }
+          @case ('in-person') {
+            It’s in person{{ office() ? ' at ' + office()!.name + ', ' + officeAddress(office()!) : '' }}, and in your sessions.
+          }
+          @default { It’s in your sessions, and you’ll join it from there. }
+        }
       </p>
     </div>
   } @else {
@@ -33,6 +42,48 @@
       }
       @case ('choose') {
         <div class="booking">
+          <section aria-labelledby="pick-format">
+            <h3 id="pick-format" class="step">How would you like to meet?</h3>
+            <div class="formats" role="group" aria-labelledby="pick-format">
+              @for (option of formats; track option.value) {
+                <button
+                  type="button"
+                  class="format"
+                  [class.format--picked]="option.value === format()"
+                  [attr.aria-pressed]="option.value === format()"
+                  (click)="format.set(option.value)"
+                >
+                  <app-icon [name]="option.icon" [size]="20" />
+                  <span class="format__label">{{ option.label }}</span>
+                  <span class="format__description">{{ option.description }}</span>
+                </button>
+              }
+            </div>
+            @switch (format()) {
+              @case ('phone') {
+                <p class="hint format__note">
+                  <app-icon name="phone" [size]="16" />
+                  @if (phone()) {
+                    {{ provider()!.firstName }} will call you at {{ phone() }}.
+                  } @else {
+                    {{ provider()!.firstName }} will call you on the number you gave us.
+                  }
+                </p>
+              }
+              @case ('in-person') {
+                @if (office(); as office) {
+                  <p class="hint format__note">
+                    <app-icon name="map-pin" [size]="16" />
+                    <span>
+                      {{ office.name }}, {{ officeAddress(office) }}.
+                      <a [href]="directionsUrl(office)" target="_blank" rel="noopener">Get directions</a>
+                    </span>
+                  </p>
+                }
+              }
+            }
+          </section>
+
           <section aria-labelledby="pick-day">
             <h3 id="pick-day" class="step">Choose a day</h3>
             <div class="days" role="group" aria-labelledby="pick-day">

@@ -23,6 +23,25 @@ function fromLibrary(resourceId: string, dueInDays: number, done = false): CareP
   return { id: `plan-${id}`, kind, title, detail, due: day(dueInDays), done };
 }
 
+// ---- The provider's message at the top of each plan, by member ----------------------------
+// Short and personal, so the plan reads as care from someone, not a list of tasks.
+
+export const CARE_PLAN_NOTES: Record<string, string> = {
+  [JORDAN.id]:
+    'Hi Jordan, good to see you this week. The wind-down plan we made is in here, with a read on worry at night. Try the routine on work nights, and we’ll look at how it went next session.',
+  [PRIYA.id]:
+    'Hi Priya, great work holding that boundary. Finish the return-to-work plan when you can, and bring any questions for HR to our next session.',
+  [MARCUS.id]:
+    'Hi Marcus, you did really well with the breathing today. Practise grounding on a calm day first, so it’s ready when the train gets busy.',
+  [ELENA.id]:
+    'Hi Elena, thank you for sharing so much about the move. Here’s a short read on talking with the kids. We’ll plan the conversation together next time.',
+  [SAM.id]: 'Hi Sam, welcome. Here are a couple of things to look at before we meet. There’s no right way to do them.',
+  [AISHA.id]: 'Hi Aisha, nice work on the sleep checklist. Try the worry article before your next stretch of night shifts.',
+  [DANIEL.id]: 'Hi Daniel, thank you for today. The holidays can bring a lot up. Go gently, and reach out if you need to before we meet.',
+  [GRACE.id]: 'Hi Grace, “good enough” is a skill, and you’re practising it. Try box breathing before your next exam.',
+  [NOAH.id]: 'Hi Noah, good to meet you. Read the article on anger at home, and notice one early sign before next time.',
+};
+
 // ---- Care plans, by member -------------------------------------------------------------
 // Every item is a ComPsych library resource (see resources.ts) or, once added in
 // the app, a document the provider uploaded. Items are due by the member's next

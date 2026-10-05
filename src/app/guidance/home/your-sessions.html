@@ -29,7 +29,7 @@
       @if (shown().length) {
         <ul class="list">
           @for (item of shown(); track item.session.id) {
-            <li><app-session-row [item]="item" [showDay]="true" [now]="now()" /></li>
+            <li><app-session-row [item]="item" [showDay]="true" [now]="now()" [actions]="true" (checkIn)="checkIn.emit($event)" /></li>
           }
         </ul>
         @if (more()) {

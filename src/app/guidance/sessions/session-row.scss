@@ -12,7 +12,8 @@
   text-decoration: none;
   transition: background-color 120ms ease;
 
-  &:hover {
+  /* Only a row that links somewhere lights up; the home page's rows have buttons instead. */
+  &:is(a):hover {
     background: var(--transparent-primary-sys-primary-08);
 
     .row__action {
@@ -34,6 +35,22 @@
 .row--live {
   box-shadow: inset 4px 0 0 var(--accent-primary-sys-primary);
   background: var(--transparent-primary-sys-primary-08);
+}
+
+/* The home page's buttons, on the right where the link's "Open room" would be. */
+.row__buttons {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: var(--spacing-padding-sys-padding-8);
+}
+
+/* A status and the check-in reminder can both show; they wrap rather than crowd the row. */
+.row__status {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: var(--spacing-padding-sys-padding-4);
 }
 
 .row__time {
@@ -79,6 +96,22 @@
   color: var(--ink-muted);
   white-space: nowrap;
   text-overflow: ellipsis;
+}
+
+/* Phone and in-person sessions: who calls whom, or where to go. It wraps, so a full address fits. */
+.row__where {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--spacing-padding-sys-padding-6);
+  margin-top: var(--spacing-padding-sys-padding-2);
+  color: var(--ink);
+  font-size: var(--body-small-sys-font-size);
+  line-height: var(--body-small-sys-line-height);
+
+  app-icon {
+    margin-top: 2px;
+    color: var(--accent-primary-sys-primary);
+  }
 }
 
 .row__action {

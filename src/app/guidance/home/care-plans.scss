@@ -30,6 +30,10 @@
   color: var(--ink-muted);
 }
 
+.card__note {
+  margin-top: var(--spacing-padding-sys-padding-16);
+}
+
 .card app-care-plan-list {
   display: block;
   margin-top: var(--spacing-padding-sys-padding-24);

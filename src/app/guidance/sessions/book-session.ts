@@ -12,7 +12,9 @@ import {
 import { rxResource } from '@angular/core/rxjs-interop';
 import { ButtonComponent, DialogComponent, TextInputComponent } from '@compsych-ui-components/angular';
 import { ApiService } from '../api/api.service';
-import { SessionSummary, TimeSlot, personLabel } from '../api/models';
+import { SessionFormat, SessionSummary, TimeSlot, directionsUrl, officeAddress, personLabel } from '../api/models';
+import { Icon } from '../shared/icon';
+import { SESSION_FORMATS } from './session-format';
 import { Viewer } from '../session/viewer';
 
 interface Day {
@@ -22,13 +24,14 @@ interface Day {
 }
 
 /**
- * How a member books a session with their provider, like Calendly: pick a day,
- * pick one of the provider's open times, optionally say what to focus on, and
- * confirm. The new session gets its own room and shows up in their sessions.
+ * How a member books a session with their provider, like Calendly: choose how to
+ * meet (video, phone, or in person), pick a day and one of the provider's open
+ * times, optionally say what to focus on, and confirm. The new session shows up
+ * in their sessions.
  */
 @Component({
   selector: 'app-book-session',
-  imports: [ButtonComponent, DatePipe, DialogComponent, TextInputComponent],
+  imports: [ButtonComponent, DatePipe, DialogComponent, Icon, TextInputComponent],
   templateUrl: './book-session.html',
   styleUrl: './book-session.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -76,6 +79,15 @@ export class BookSession {
   });
   protected readonly focus = signal('');
 
+  protected readonly formats = SESSION_FORMATS;
+  /** Video unless they choose otherwise, as booking worked before there was a choice. */
+  protected readonly format = signal<SessionFormat>('video');
+  /** The member's number, for "Maya will call you at …". */
+  protected readonly phone = computed(() => (this.viewer.user.hasValue() ? this.viewer.user.value().phone : undefined));
+  protected readonly office = computed(() => this.provider()?.office);
+  protected readonly officeAddress = officeAddress;
+  protected readonly directionsUrl = directionsUrl;
+
   protected readonly booking = signal(false);
   protected readonly error = signal('');
   protected readonly confirmed = signal<SessionSummary | undefined>(undefined);
@@ -111,7 +123,7 @@ export class BookSession {
     this.booking.set(true);
     this.error.set('');
     this.api
-      .bookSession({ memberId, providerId: provider.id, start, focus: this.focus() })
+      .bookSession({ memberId, providerId: provider.id, start, format: this.format(), focus: this.focus() })
       .subscribe({
         next: (session) => {
           this.booking.set(false);
@@ -139,6 +151,7 @@ export class BookSession {
   protected close(): void {
     this.open.set(false);
     this.focus.set('');
+    this.format.set('video');
     this.error.set('');
     this.confirmed.set(undefined);
   }

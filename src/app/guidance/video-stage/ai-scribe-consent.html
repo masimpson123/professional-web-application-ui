@@ -1,0 +1,60 @@
+<compsych-dialog
+  variant="modal-leading-icon"
+  icon="sparkles"
+  width="min(520px, 94vw)"
+  [open]="open()"
+  [title]="'Can ' + provider() + ' use AI to help take notes?'"
+  (closed)="cancel()"
+>
+  <ul class="points">
+    <li>
+      <app-icon name="mic" [size]="20" />
+      An AI tool listens during the session and drafts notes for {{ provider() }}.
+    </li>
+    <li>
+      <app-icon name="circle-check" [size]="20" />
+      {{ provider() }} checks and edits every note before it is saved.
+    </li>
+    <li>
+      <app-icon name="lock" [size]="20" />
+      Saying no does not affect your care. You can turn it off during the session.
+    </li>
+  </ul>
+
+  <fieldset class="choice" [attr.aria-invalid]="missingChoice() || null">
+    <legend class="visually-hidden">Allow AI notes in this session?</legend>
+    <label class="choice__option">
+      <input type="radio" [field]="consent.aiScribe" value="declined" />
+      <span>No, don’t allow</span>
+    </label>
+    <label class="choice__option">
+      <input type="radio" [field]="consent.aiScribe" value="allowed" />
+      <span>Yes, allow</span>
+    </label>
+  </fieldset>
+  @if (missingChoice()) {
+    <p class="message message--error" role="alert">Choose whether to allow AI notes to join.</p>
+  }
+
+  <label class="remember">
+    <input type="checkbox" [field]="consent.remember" />
+    <span>
+      Save my preference and do not ask again
+      <span class="remember__hint">You can change it any time in My profile.</span>
+    </span>
+  </label>
+
+  @if (error()) {
+    <p class="message message--error" role="alert">{{ error() }}</p>
+  }
+
+  <compsych-button cmpDialogActions variant="outlined" fullWidth label="Cancel" (click)="cancel()" />
+  <compsych-button
+    cmpDialogActions
+    variant="filled"
+    fullWidth
+    label="Join video session"
+    [loading]="consent().submitting()"
+    (click)="join()"
+  />
+</compsych-dialog>

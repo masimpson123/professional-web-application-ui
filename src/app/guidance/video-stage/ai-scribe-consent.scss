@@ -1,0 +1,103 @@
+/* Dialogs render in the CDK overlay; these styles are this component's own. */
+
+.points {
+  display: grid;
+  gap: var(--spacing-padding-sys-padding-12);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+
+  li {
+    display: grid;
+    grid-template-columns: 20px minmax(0, 1fr);
+    gap: var(--spacing-padding-sys-padding-12);
+    align-items: start;
+  }
+
+  app-icon {
+    color: var(--accent-primary-sys-primary);
+  }
+}
+
+/* Yes or no, side by side as two pills; nothing is chosen until they choose. */
+.choice {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--spacing-padding-sys-padding-12);
+  margin: var(--spacing-padding-sys-padding-20) 0 0;
+  padding: 0;
+  border: 0;
+}
+
+.choice__option {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 48px;
+  padding: var(--spacing-padding-sys-padding-8) var(--spacing-padding-sys-padding-16);
+  border: 1px solid var(--outline-sys-outline);
+  border-radius: var(--border-radius-sys-radius-full);
+  color: var(--accent-primary-sys-primary);
+  font-size: var(--label-large-sys-font-size);
+  font-weight: 500;
+  text-align: center;
+  cursor: pointer;
+  transition: background-color 120ms ease, border-color 120ms ease;
+
+  &:hover {
+    background: var(--transparent-primary-sys-primary-08);
+  }
+
+  input {
+    position: absolute;
+    opacity: 0;
+    width: 1px;
+    height: 1px;
+  }
+
+  &:has(input:checked) {
+    border-color: var(--accent-primary-sys-primary);
+    background: var(--custom-info-sys-info-container);
+    color: var(--custom-info-sys-on-info-container);
+  }
+
+  &:has(input:focus-visible) {
+    box-shadow: var(--focus-ring);
+  }
+}
+
+.choice[aria-invalid] .choice__option {
+  border-color: var(--error-sys-error);
+}
+
+.remember {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--spacing-padding-sys-padding-12);
+  margin-top: var(--spacing-padding-sys-padding-20);
+  cursor: pointer;
+
+  input {
+    flex: none;
+    width: 18px;
+    height: 18px;
+    margin: 2px 0 0;
+    accent-color: var(--accent-primary-sys-primary);
+  }
+}
+
+.remember__hint {
+  display: block;
+  color: var(--ink-muted);
+  font-size: var(--body-small-sys-font-size);
+  line-height: var(--body-small-sys-line-height);
+}
+
+.message {
+  margin-top: var(--spacing-padding-sys-padding-8);
+}
+
+.message--error {
+  color: var(--error-sys-error);
+}

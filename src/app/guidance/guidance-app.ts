@@ -12,7 +12,7 @@ import {
 } from '@compsych-ui-components/angular';
 import { filter, map } from 'rxjs';
 import { PageCrumbs } from './page-crumbs';
-import { GUIDANCE_EXIT, GUIDANCE_HOME, GUIDANCE_SESSIONS } from './paths';
+import { GUIDANCE_EXIT, GUIDANCE_HOME, GUIDANCE_PROFILE, GUIDANCE_SESSIONS } from './paths';
 import { Viewer } from './session/viewer';
 
 /**
@@ -88,6 +88,7 @@ export class GuidanceApp {
     if (id === 'menu-toggle') this.menuOpen.update((open) => !open);
     else if (id === 'logo') this.router.navigateByUrl(GUIDANCE_HOME);
     else if (id === 'calendar-checked') this.router.navigateByUrl(GUIDANCE_SESSIONS);
+    else if (id === 'avatar') this.router.navigateByUrl(GUIDANCE_PROFILE);
     else if (id === 'exit-demo') this.router.navigateByUrl(GUIDANCE_EXIT);
     else if (id === 'switch-view') {
       this.viewer.setRole(this.viewer.role() === 'provider' ? 'member' : 'provider');

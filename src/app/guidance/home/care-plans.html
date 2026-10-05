@@ -38,6 +38,9 @@
                 <app-icon class="plan__chevron" name="chevron-down" [size]="20" />
               </summary>
               <div class="plan__body">
+                @if (plan.note) {
+                  <app-provider-note [from]="plan.provider" [text]="plan.note" />
+                }
                 <app-care-plan-list
                   [items]="plan.items"
                   role="provider"
@@ -87,6 +90,9 @@
                 {{ p.done }} of {{ p.total }} done
               </span>
             </div>
+            @if (plan.note) {
+              <app-provider-note class="card__note" [from]="plan.provider" [text]="plan.note" />
+            }
             <app-care-plan-list
               [items]="plan.items"
               role="member"

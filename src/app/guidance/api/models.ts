@@ -16,7 +16,34 @@ export interface Person {
   firstName: string;
   initials: string;
   credentials?: string;
+  /** Members: the number their provider calls for a phone session. */
+  phone?: string;
+  /** Providers: where in-person sessions happen. */
+  office?: Office;
 }
+
+/** A provider's office, for in-person sessions. */
+export interface Office {
+  name: string;
+  /** Street address, one line per entry. */
+  address: string[];
+}
+
+/** "401 N Michigan Ave, Suite 1200, Chicago, IL 60611" */
+export function officeAddress(office: Office): string {
+  return office.address.join(', ');
+}
+
+/** Directions to an office, in the member's maps app or Google Maps. */
+export function directionsUrl(office: Office): string {
+  return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(officeAddress(office))}`;
+}
+
+/**
+ * How a session happens: on video in the app, by phone (the provider calls the
+ * member), or in person at the provider's office.
+ */
+export type SessionFormat = 'video' | 'phone' | 'in-person';
 
 /** "Maya Okafor, LPC", or just the name when there are no credentials. */
 export function personLabel(person: Person): string {
@@ -35,6 +62,7 @@ export interface Session {
   lengthMinutes: number;
   /** What the session is about, e.g. "Sleep and evening routines". */
   focus: string;
+  format: SessionFormat;
   /** The Zoom Video SDK session everyone in this session joins (the JWT `tpc`). Unique per session. */
   zoomRoom: string;
 }
@@ -51,6 +79,7 @@ export interface BookingRequest {
   providerId: string;
   /** ISO date-time, one of the provider's open `TimeSlot`s. */
   start: string;
+  format: SessionFormat;
   /** What the member would like to focus on, if they said. */
   focus?: string;
 }
@@ -79,6 +108,10 @@ export interface Page<T> {
 export interface SessionSummary extends Session {
   provider: Person;
   member: Person;
+  /** The member's pre-session check-in for this session is waiting for them. */
+  checkInDue: boolean;
+  /** What the member said they'd like to focus on, the first step of the check-in. */
+  checkInFocus?: CheckInFocus;
 }
 
 /** Everything the session room needs. */
@@ -94,8 +127,14 @@ export interface SessionDetail {
   aiSummary?: SessionAiSummary;
   /** The member's pre-session check-in, once they've done it. */
   checkIn?: CheckIn;
+  /** What the member would like to focus on, the first step of the check-in. */
+  checkInFocus?: CheckInFocus;
+  /** Whether the member lets the provider use AI scribe in this session, once they've said. */
+  aiScribe?: AiScribeConsent;
   /** What the member is working through between sessions. */
   carePlan: CarePlanItem[];
+  /** The provider's short message at the top of the care plan, if they've written one. */
+  carePlanNote?: string;
   /** ISO date (yyyy-mm-dd) of the next session they have booked, if any. */
   nextSession?: string;
 }
@@ -150,8 +189,34 @@ export interface CheckIn extends CheckInAnswers {
   completedAt: string;
 }
 
+/**
+ * The first step of the pre-session check-in: what the member would like to
+ * focus on, shared with their provider before the session.
+ */
+export interface CheckInFocus {
+  /** Topics they chose, by label ("Sleep", "Something else"). */
+  topics: string[];
+  /** Anything else they want to talk about, in their words. */
+  note: string;
+}
+
 /** Index of the PHQ-9 question about thoughts of self-harm, which any answer above 0 flags. */
 export const PHQ9_SELF_HARM = 8;
+
+/**
+ * A member's answer about AI scribe: an AI tool that listens during the session
+ * and drafts notes for the provider, who checks and edits them.
+ */
+export type AiScribeConsent = 'allowed' | 'declined';
+
+/** A member's settings, from My profile. */
+export interface MemberSettings {
+  /**
+   * Their saved answer about AI scribe, used for every session without asking.
+   * Undefined until they choose "Save my preference": then they're asked each time.
+   */
+  aiScribe?: AiScribeConsent;
+}
 
 /** Where a session is relative to now. */
 export type SessionPhase = 'upcoming' | 'live' | 'ended';
@@ -219,6 +284,8 @@ export interface CarePlan {
   member: Person;
   provider: Person;
   items: CarePlanItem[];
+  /** The provider's short message at the top of the plan, if they've written one. */
+  note?: string;
   /** ISO date (yyyy-mm-dd) of their next session, when the plan is due; undefined if none is booked. */
   nextSession?: string;
 }

@@ -19,6 +19,9 @@
   </header>
 
   <div class="panel__body">
+    @if (store.carePlanNote(); as note) {
+      <app-provider-note class="panel__note" [from]="store.provider()" [text]="note" />
+    }
     <app-care-plan-list
       [items]="store.carePlan()"
       [role]="store.role()"

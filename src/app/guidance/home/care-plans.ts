@@ -4,6 +4,7 @@ import { ButtonComponent } from '@compsych-ui-components/angular';
 import { CarePlan, personLabel } from '../api/models';
 import { AddToCarePlan } from '../care-plan/add-to-care-plan';
 import { CarePlanList } from '../care-plan/care-plan-list';
+import { ProviderNote } from '../care-plan/provider-note';
 import { Viewer } from '../session/viewer';
 import { Icon } from '../shared/icon';
 import { HomeCarePlans, planProgress } from './home-care-plans';
@@ -16,7 +17,7 @@ import { HomeSection } from './home-section';
  */
 @Component({
   selector: 'app-care-plans',
-  imports: [AddToCarePlan, ButtonComponent, CarePlanList, DatePipe, HomeSection, Icon],
+  imports: [AddToCarePlan, ButtonComponent, CarePlanList, DatePipe, HomeSection, Icon, ProviderNote],
   templateUrl: './care-plans.html',
   styleUrl: './care-plans.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,

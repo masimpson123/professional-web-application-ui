@@ -18,6 +18,7 @@ import { CarePlanPanel } from '../care-plan/care-plan-panel';
 import { PageCrumbs } from '../page-crumbs';
 import { GUIDANCE_SESSIONS } from '../paths';
 import { PastSessionView } from '../past-session/past-session-view';
+import { SessionPlace } from './session-place';
 import { ApiService } from '../api/api.service';
 import { personLabel, sessionEnd, sessionPhase } from '../api/models';
 import { SessionStore } from '../session/session.store';
@@ -25,12 +26,13 @@ import { Viewer } from '../session/viewer';
 import { VideoStage } from '../video-stage/video-stage';
 
 /**
- * One session. Until it's over that's its room, a video call beside its
- * documents; afterwards it's a summary of what happened and what was shared.
+ * One session. Until it's over that's its room: a video call (or, for a phone or
+ * in-person session, where it happens) beside its documents; afterwards it's a
+ * summary of what happened and what was shared.
  */
 @Component({
   selector: 'app-room-page',
-  imports: [ButtonComponent, CarePlanPanel, PastSessionView, RouterLink, VideoStage],
+  imports: [ButtonComponent, CarePlanPanel, PastSessionView, RouterLink, SessionPlace, VideoStage],
   templateUrl: './room-page.html',
   styleUrl: './room-page.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,

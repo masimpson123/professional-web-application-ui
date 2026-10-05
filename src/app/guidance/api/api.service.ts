@@ -3,6 +3,7 @@ import { Injectable } from '@angular/core';
 import { Observable, map, timer } from 'rxjs';
 import {
   CARE_PLANS,
+  CARE_PLAN_NOTES,
   FORMER_MEMBERS,
   HIGHLIGHTS,
   JORDAN,
@@ -10,18 +11,22 @@ import {
   PEOPLE,
   RESOURCES,
   SESSIONS,
+  SETTINGS,
   WORKING_HOURS,
   type SessionRecord,
   day,
   localDate,
 } from './mock';
 import {
+  AiScribeConsent,
   BookingRequest,
   CarePlan,
   CarePlanItem,
   CheckIn,
   CheckInAnswers,
+  CheckInFocus,
   Highlight,
+  MemberSettings,
   Page,
   Person,
   Resource,
@@ -139,7 +144,7 @@ export class ApiService {
    * `POST /api/sessions`: a member books one of a provider's open times. The new
    * session gets its own Zoom room. 409s if the time was taken in the meantime.
    */
-  bookSession({ memberId, providerId, start, focus }: BookingRequest): Observable<SessionSummary> {
+  bookSession({ memberId, providerId, start, format, focus }: BookingRequest): Observable<SessionSummary> {
     return respond('/api/sessions', () => {
       const hours = WORKING_HOURS[providerId];
       const slot = { start, lengthMinutes: hours?.lengthMinutes ?? 50 };
@@ -154,6 +159,8 @@ export class ApiService {
         start,
         lengthMinutes: slot.lengthMinutes,
         focus: focus?.trim() || 'Check-in',
+        format,
+        // Every session gets a room, so a phone or in-person one can still move to video.
         zoomRoom: `cs-${crypto.randomUUID().replaceAll('-', '').slice(0, 12)}`,
         docs: [],
       };
@@ -172,7 +179,7 @@ export class ApiService {
     return respond(`/api/sessions/${id}`, () => {
       const record = SESSIONS.find((s) => s.id === id);
       if (!record) return undefined;
-      const { docs, recap, aiSummary, checkIn, ...session } = record;
+      const { docs, recap, aiSummary, checkIn, checkInFocus, aiScribe, ...session } = record;
 
       const series = SESSIONS.filter(
         (s) => s.memberId === session.memberId && s.providerId === session.providerId,
@@ -188,10 +195,36 @@ export class ApiService {
         // Generated from the call's transcript, so there's none until the call has ended.
         aiSummary: sessionPhase(session) === 'ended' ? aiSummary : undefined,
         checkIn,
+        checkInFocus,
+        aiScribe,
         carePlan: planFor(session.memberId),
+        carePlanNote: CARE_PLAN_NOTES[session.memberId],
         nextSession: next && localDate(new Date(next.start)),
       };
     });
+  }
+
+  /**
+   * `PUT /api/sessions/:id/ai-scribe`: the member says whether their provider may
+   * use AI scribe in this session. They can change it during the session.
+   */
+  setAiScribe(sessionId: string, consent: AiScribeConsent): Observable<AiScribeConsent> {
+    return respond(`/api/sessions/${sessionId}/ai-scribe`, () => {
+      const record = SESSIONS.find((s) => s.id === sessionId);
+      if (!record) return undefined;
+      record.aiScribe = consent;
+      return consent;
+    });
+  }
+
+  /** `GET /api/members/:id/settings`: the member's settings, from My profile. */
+  getSettings(memberId: string): Observable<MemberSettings> {
+    return respond(`/api/members/${memberId}/settings`, () => SETTINGS[memberId] ?? {});
+  }
+
+  /** `PUT /api/members/:id/settings`: replaces the member's settings. */
+  saveSettings(memberId: string, settings: MemberSettings): Observable<MemberSettings> {
+    return respond(`/api/members/${memberId}/settings`, () => (SETTINGS[memberId] = settings));
   }
 
   /**
@@ -201,12 +234,21 @@ export class ApiService {
    */
   getCheckInDue(memberId: string): Observable<SessionSummary | null> {
     return respond(`/api/members/${memberId}/check-in-due`, () => {
-      const now = Date.now();
-      const next = SESSIONS.filter((s) => s.memberId === memberId && Date.parse(s.start) > now).sort(
-        byStart,
-      )[0];
-      const soon = next && Date.parse(next.start) - now <= CHECK_IN_WINDOW_MS;
-      return next && soon && !next.checkIn ? toSummary(next) : null;
+      const due = dueCheckIn(memberId);
+      return due ? toSummary(due) : null;
+    });
+  }
+
+  /**
+   * `PUT /api/sessions/:id/check-in/focus`: the check-in's first step, what the
+   * member would like to focus on. Their provider sees it before the session.
+   */
+  saveCheckInFocus(sessionId: string, focus: CheckInFocus): Observable<CheckInFocus> {
+    return respond(`/api/sessions/${sessionId}/check-in/focus`, () => {
+      const record = SESSIONS.find((s) => s.id === sessionId);
+      if (!record) return undefined;
+      record.checkInFocus = focus;
+      return focus;
     });
   }
 
@@ -255,6 +297,7 @@ export class ApiService {
           provider: person(providerId),
           member: person(memberId),
           items: planFor(memberId),
+          note: CARE_PLAN_NOTES[memberId],
           nextSession: nextSessionDate(providerId, memberId),
         }))
         .sort((a, b) => (a.nextSession ?? '9999').localeCompare(b.nextSession ?? '9999'));
@@ -423,8 +466,25 @@ function isBooked(providerId: string, slot: TimeSlot): boolean {
 /** Orders sessions by start time, then id, so every session has a unique place to page from. */
 const sortKey = (s: Session) => `${s.start}|${s.id}`;
 
-function toSummary({ docs, recap, aiSummary, checkIn, ...session }: SessionRecord): SessionSummary {
-  return { ...session, provider: person(session.providerId), member: person(session.memberId) };
+function toSummary({ docs, recap, aiSummary, checkIn, checkInFocus, aiScribe, ...session }: SessionRecord): SessionSummary {
+  return {
+    ...session,
+    provider: person(session.providerId),
+    member: person(session.memberId),
+    checkInDue: dueCheckIn(session.memberId)?.id === session.id,
+    checkInFocus,
+  };
+}
+
+/**
+ * The session whose check-in the member should do now: their next one, if it's
+ * within two weeks, hasn't started, and has no check-in yet.
+ */
+function dueCheckIn(memberId: string): SessionRecord | undefined {
+  const now = Date.now();
+  const next = SESSIONS.filter((s) => s.memberId === memberId && Date.parse(s.start) > now).sort(byStart)[0];
+  const soon = next && Date.parse(next.start) - now <= CHECK_IN_WINDOW_MS;
+  return next && soon && !next.checkIn ? next : undefined;
 }
 
 function person(id: string): Person {

@@ -1,0 +1,75 @@
+<div class="page">
+  <h1 class="title">My profile</h1>
+
+  @if (user(); as user) {
+    <compsych-card variant="blank" padding="md">
+      <section class="section" aria-labelledby="details-heading">
+        <h2 id="details-heading" class="section__title">Your details</h2>
+        <dl class="details">
+          <div>
+            <dt>Name</dt>
+            <dd>{{ user.name }}</dd>
+          </div>
+          @if (user.credentials) {
+            <div>
+              <dt>Credentials</dt>
+              <dd>{{ user.credentials }}</dd>
+            </div>
+          }
+        </dl>
+      </section>
+    </compsych-card>
+
+    @if (isMember()) {
+      <compsych-card variant="blank" padding="md">
+        <section class="section" aria-labelledby="sessions-heading">
+          <h2 id="sessions-heading" class="section__title">Your sessions</h2>
+
+          @if (!settings.loaded()) {
+            <p class="muted" role="status">Loading your settings…</p>
+          } @else if (settings.aiScribe(); as aiScribe) {
+            <div class="setting">
+              <div class="setting__text">
+                <label class="setting__label" for="ai-scribe">Allow AI notes in my sessions</label>
+                <p id="ai-scribe-help" class="muted">
+                  An AI tool listens during your sessions and drafts notes for your provider, who checks and
+                  edits every note. Saying no does not affect your care.
+                </p>
+              </div>
+              <input
+                id="ai-scribe"
+                class="switch"
+                type="checkbox"
+                role="switch"
+                aria-describedby="ai-scribe-help"
+                [checked]="aiScribe === 'allowed'"
+                [disabled]="saving()"
+                (change)="setAiScribe($any($event.target).checked)"
+              />
+            </div>
+            <compsych-button
+              variant="text"
+              size="small"
+              label="Ask me before each session instead"
+              [disabled]="saving()"
+              (click)="askEachTime()"
+            />
+          } @else {
+            <p class="muted">
+              You’ll be asked whether your provider can use AI to help take notes when you join each session.
+              Choose “Save my preference” then, and you can change it here.
+            </p>
+          }
+
+          @if (error()) {
+            <p class="error" role="alert">{{ error() }}</p>
+          }
+        </section>
+      </compsych-card>
+    }
+  } @else {
+    <p class="muted" role="status">Loading…</p>
+  }
+
+  <p class="visually-hidden" aria-live="polite">{{ announcement() }}</p>
+</div>

@@ -1,10 +1,11 @@
-import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, inject, output, signal } from '@angular/core';
 import { rxResource } from '@angular/core/rxjs-interop';
 import { RouterLink } from '@angular/router';
 import { ButtonComponent } from '@compsych-ui-components/angular';
 import { ApiService } from '../api/api.service';
 import { BookSession } from '../sessions/book-session';
 import { HomeCarePlans } from './home-care-plans';
+import { SessionSummary } from '../api/models';
 import { Viewer } from '../session/viewer';
 import { HomeSection } from './home-section';
 import { Icon } from '../shared/icon';
@@ -35,6 +36,8 @@ export class YourSessions {
   protected readonly isMember = computed(() => this.viewer.role() === 'member');
   /** The booking dialog is open. */
   protected readonly booking = signal(false);
+  /** The member chose Pre-Session Check-In on a session; the home page runs it. */
+  readonly checkIn = output<SessionSummary>();
 
   /** Just the first page from the server: the next few sessions, not all of them. */
   private readonly sessions = rxResource({

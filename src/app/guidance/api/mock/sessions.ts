@@ -1,4 +1,4 @@
-import { CheckIn, Person, Session, SessionAiSummary, SessionDoc, SessionRecap } from '../models';
+import { AiScribeConsent, CheckIn, CheckInFocus, Person, SessionFormat, Session, SessionAiSummary, SessionDoc, SessionRecap } from '../models';
 import { WIND_DOWN_PLAN } from './care-plans';
 import { HOUR, at, slot } from './dates';
 import { AISHA, DANIEL, ELENA, GRACE, JORDAN, MARCUS, MAYA, NOAH, PRIYA, SAM } from './people';
@@ -15,6 +15,10 @@ export interface SessionRecord extends Session {
   aiSummary?: SessionAiSummary;
   /** The member's pre-session check-in, once they've done it. */
   checkIn?: CheckIn;
+  /** What the member would like to focus on, the check-in's first step. */
+  checkInFocus?: CheckInFocus;
+  /** The member's answer about AI scribe for this session, once they've given it. */
+  aiScribe?: AiScribeConsent;
 }
 
 export function booking(
@@ -27,7 +31,8 @@ export function booking(
     docs = [],
     recap,
     aiSummary,
-  }: { docs?: SessionDoc[]; recap?: SessionRecap; aiSummary?: SessionAiSummary } = {},
+    format = 'video',
+  }: { docs?: SessionDoc[]; recap?: SessionRecap; aiSummary?: SessionAiSummary; format?: SessionFormat } = {},
 ): SessionRecord {
   return {
     id: `${member.id}-${number}`,
@@ -37,6 +42,7 @@ export function booking(
     start,
     lengthMinutes: 50,
     focus,
+    format,
     zoomRoom,
     docs,
     recap,
@@ -124,7 +130,7 @@ const CURRENT: SessionRecord[] = [
     ],
   }),
   booking(JORDAN, 5, slot(7), 'Reviewing the thought record', 'cs-8cffafcfd312'),
-  booking(JORDAN, 6, slot(14), 'Planning for the holidays', 'cs-c2125b0f3ece'),
+  booking(JORDAN, 6, slot(14), 'Planning for the holidays', 'cs-c2125b0f3ece', { format: 'phone' }),
 
   // The rest of Maya's caseload: earlier today, later today, and the coming days.
   booking(PRIYA, 6, slot(-7, -3), 'Setting boundaries with a manager', 'cs-b4b1c883c8ae', {
@@ -165,7 +171,7 @@ const CURRENT: SessionRecord[] = [
       ],
     },
   }),
-  booking(PRIYA, 8, slot(7, -3), 'First week back', 'cs-42ec53077f55'),
+  booking(PRIYA, 8, slot(7, -3), 'First week back', 'cs-42ec53077f55', { format: 'phone' }),
 
   booking(MARCUS, 1, slot(-7, -2), 'Getting started', 'cs-e858486edf92', {
     docs: [{ id: 'm1-intake', title: 'Intake summary', kind: 'summary', detail: 'Note' }],
@@ -233,7 +239,7 @@ const CURRENT: SessionRecord[] = [
   }),
 
   booking(SAM, 1, slot(0, 1), 'Getting started', 'cs-bc012c5c73a0'),
-  booking(SAM, 2, at(3, '15:00'), 'Building a daily routine', 'cs-b0d993607f5f'),
+  booking(SAM, 2, at(3, '15:00'), 'Building a daily routine', 'cs-b0d993607f5f', { format: 'in-person' }),
 
   booking(AISHA, 4, slot(-7, 2), 'Sleep after night shifts', 'cs-52062534512c', {
     docs: [
@@ -259,7 +265,7 @@ const CURRENT: SessionRecord[] = [
   booking(DANIEL, 3, at(1, '09:00'), 'Grief and the holidays', 'cs-5ee01a6134b0'),
   booking(GRACE, 8, at(1, '13:30'), 'Perfectionism at school', 'cs-74e428a447bb'),
   booking(NOAH, 2, at(2, '10:00'), 'Anger at home', 'cs-e5088575d1e4'),
-  booking(DANIEL, 4, at(8, '09:00'), 'Grief and the holidays, continued', 'cs-61e660d884e3'),
+  booking(DANIEL, 4, at(8, '09:00'), 'Grief and the holidays, continued', 'cs-61e660d884e3', { format: 'in-person' }),
   booking(GRACE, 9, at(8, '13:30'), 'Exam season', 'cs-428c025ee5dc'),
 ];
 

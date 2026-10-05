@@ -1,4 +1,4 @@
-<section class="stage" aria-label="Video call">
+<section #stage class="stage" [class.stage--full]="fullScreen()" aria-label="Video call">
   <div class="stage__bar">
     @switch (call.status()) {
       @case ('connected') {
@@ -17,9 +17,31 @@
         <span class="live live--off">Not connected</span>
       }
     }
-    <span class="private">
-      <app-icon name="lock" [size]="16" />
-      Private and encrypted
+    <span class="bar__end">
+      <!-- The provider needs to know whether they may use AI scribe; only the member decides. -->
+      @if (store.isProvider()) {
+        <span class="ai-notes" [class.ai-notes--on]="store.aiScribe() === 'allowed'">
+          <app-icon name="sparkles" [size]="16" />
+          @switch (store.aiScribe()) {
+            @case ('allowed') { AI notes allowed }
+            @case ('declined') { AI notes not allowed }
+            @default { AI notes: waiting for {{ store.them().firstName }} }
+          }
+        </span>
+      }
+      <span class="private">
+        <app-icon name="lock" [size]="16" />
+        Private and encrypted
+      </span>
+      <button
+        type="button"
+        class="bar-button"
+        [attr.aria-pressed]="fullScreen()"
+        (click)="toggleFullScreen()"
+      >
+        <app-icon [name]="fullScreen() ? 'minimize-2' : 'maximize-2'" [size]="16" />
+        {{ fullScreen() ? 'Exit full screen' : 'Full screen' }}
+      </button>
     </span>
   </div>
 
@@ -140,6 +162,20 @@
         {{ call.cameraOn() ? 'Stop video' : 'Start video' }}
       </button>
 
+      @if (!store.isProvider() && store.aiScribe()) {
+        <button
+          type="button"
+          class="control"
+          [class.control--off]="store.aiScribe() !== 'allowed'"
+          [attr.aria-pressed]="store.aiScribe() === 'allowed'"
+          [disabled]="savingAiScribe()"
+          (click)="toggleAiScribe()"
+        >
+          <app-icon name="sparkles" />
+          {{ store.aiScribe() === 'allowed' ? 'Stop AI notes' : 'Allow AI notes' }}
+        </button>
+      }
+
       <compsych-button
         class="controls__leave"
         variant="danger"
@@ -155,3 +191,5 @@
     <p class="error" role="alert">{{ call.error() }}</p>
   }
 </section>
+
+<app-ai-scribe-consent [(open)]="askingConsent" (answered)="connect()" />

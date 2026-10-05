@@ -2,6 +2,7 @@ import { Routes } from '@angular/router';
 import { ApiService } from './api/api.service';
 import { GuidanceApp } from './guidance-app';
 import { PageCrumbs } from './page-crumbs';
+import { Settings } from './session/settings';
 import { Viewer } from './session/viewer';
 
 /**
@@ -13,7 +14,7 @@ export const routes: Routes = [
   {
     path: '',
     component: GuidanceApp,
-    providers: [ApiService, Viewer, PageCrumbs],
+    providers: [ApiService, Viewer, Settings, PageCrumbs],
     children: [
       {
         path: '',
@@ -25,6 +26,11 @@ export const routes: Routes = [
         path: 'sessions',
         title: 'Sessions | GuidanceResources',
         loadComponent: () => import('./sessions/sessions-page').then((m) => m.SessionsPage),
+      },
+      {
+        path: 'profile',
+        title: 'My profile | GuidanceResources',
+        loadComponent: () => import('./profile/profile-page').then((m) => m.ProfilePage),
       },
       {
         path: 'sessions/:id/check-in',

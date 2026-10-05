@@ -6,7 +6,11 @@
         <p class="room__when">{{ when() }} · {{ store.session().focus }}</p>
       </div>
 
-      <app-video-stage class="room__stage" />
+      @if (store.session().format === 'video') {
+        <app-video-stage class="room__stage" />
+      } @else {
+        <app-session-place class="room__stage" />
+      }
       <app-care-plan-panel class="room__docs" />
     </div>
   }

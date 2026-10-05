@@ -1,7 +1,7 @@
 import { Injectable, computed, inject, signal } from '@angular/core';
 import { Observable, tap, throwError } from 'rxjs';
 import { ApiService } from '../api/api.service';
-import { CarePlanItem, SessionDetail, SessionRecap } from '../api/models';
+import { AiScribeConsent, CarePlanItem, SessionDetail, SessionRecap } from '../api/models';
 import { DONE_WORDS } from '../documents/doc-kinds';
 import { Viewer } from './viewer';
 
@@ -26,8 +26,13 @@ export class SessionStore {
   private readonly savedRecap = signal<SessionRecap | undefined>(undefined);
   /** The provider's notes on what happened, once written. Members can only read them. */
   readonly recap = this.savedRecap.asReadonly();
+  private readonly savedAiScribe = signal<AiScribeConsent | undefined>(undefined);
+  /** Whether the member lets the provider use AI scribe in this session, once they've said. */
+  readonly aiScribe = this.savedAiScribe.asReadonly();
   /** What was said in the call, summarized by AI once it has ended. */
   readonly aiSummary = computed(() => this.require().aiSummary);
+  /** The provider's short message at the top of the care plan. */
+  readonly carePlanNote = computed(() => this.require().carePlanNote);
   /** ISO date of the next booked session, when the care plan is due; undefined if none is booked. */
   readonly nextSession = computed(() => this.require().nextSession);
 
@@ -49,7 +54,19 @@ export class SessionStore {
     this.detail.set(detail);
     this.carePlan.set(detail.carePlan);
     this.savedRecap.set(detail.recap);
+    this.savedAiScribe.set(detail.aiScribe);
     this.announcement.set('');
+  }
+
+  /** Member action: allow or decline AI scribe for this session. They can change it during the call. */
+  setAiScribe(consent: AiScribeConsent): Observable<AiScribeConsent> {
+    if (this.isProvider()) return throwError(() => new Error('only the member decides about AI scribe'));
+    return this.api.setAiScribe(this.session().id, consent).pipe(
+      tap((saved) => {
+        this.savedAiScribe.set(saved);
+        this.announcement.set(saved === 'allowed' ? 'AI notes are on for this session.' : 'AI notes are off for this session.');
+      }),
+    );
   }
 
   /** Provider action: save their notes on this session. Errors are left to the caller to show. */

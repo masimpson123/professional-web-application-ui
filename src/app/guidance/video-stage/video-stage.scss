@@ -14,6 +14,22 @@
   color: var(--accent-primary-sys-on-primary-container);
 }
 
+/*
+ * Full screen. In the browser's full screen the stage is the whole screen already;
+ * where that isn't available, it covers the window instead. Either way the care
+ * plan and the rest of the page are out of sight.
+ */
+.stage--full {
+  position: fixed;
+  inset: 0;
+  z-index: 10;
+  border-radius: 0;
+}
+
+.stage:fullscreen {
+  border-radius: 0;
+}
+
 .stage__bar {
   display: flex;
   align-items: center;
@@ -59,6 +75,50 @@
   50% {
     box-shadow: 0 0 0 6px rgba(74, 222, 128, 0);
   }
+}
+
+.bar__end {
+  display: inline-flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: flex-end;
+  gap: var(--spacing-padding-sys-padding-8);
+}
+
+.bar-button {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--spacing-padding-sys-padding-6);
+  padding: var(--spacing-padding-sys-padding-4) var(--spacing-padding-sys-padding-12);
+  border: 1px solid var(--room-line);
+  border-radius: var(--border-radius-sys-radius-full);
+  background: transparent;
+  color: var(--accent-primary-sys-on-primary-container);
+  font: inherit;
+  cursor: pointer;
+
+  &:hover {
+    background: var(--transparent-neutral-sys-white-10);
+  }
+
+  &:focus-visible {
+    box-shadow: 0 0 0 2px var(--room), 0 0 0 4px var(--accent-primary-sys-on-primary-container-variant);
+  }
+}
+
+/* The provider's view: whether the member allows AI scribe in this session. */
+.ai-notes {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--spacing-padding-sys-padding-6);
+  padding: var(--spacing-padding-sys-padding-4) var(--spacing-padding-sys-padding-12);
+  border: 1px solid var(--room-line);
+  border-radius: var(--border-radius-sys-radius-full);
+  color: var(--accent-primary-sys-on-primary-container-variant);
+}
+
+.ai-notes--on {
+  color: var(--accent-primary-sys-on-primary-container);
 }
 
 .private {
