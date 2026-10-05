@@ -147,10 +147,19 @@ svg {
 }
 
 .detail {
-  min-height: 3.2em;
+  display: grid;
   margin-top: 1rem;
   max-width: var(--measure);
   color: var(--graphite);
+}
+
+.detail > p {
+  grid-area: 1 / 1;
+  visibility: hidden;
+}
+
+.detail > .shown {
+  visibility: visible;
 }
 
 .detail strong {

@@ -21,7 +21,7 @@
 .top {
   display: grid;
   grid-template-columns: minmax(0, 2.4fr) minmax(320px, 1fr);
-  gap: var(--spacing-padding-sys-padding-12);
+  gap: var(--spacing-padding-sys-padding-20);
   min-height: 264px;
 }
 

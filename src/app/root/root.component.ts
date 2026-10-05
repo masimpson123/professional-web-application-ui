@@ -1,4 +1,4 @@
-import { Component, computed, signal } from '@angular/core';
+import { Component, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { DEMOS, DemoId, RESUME_URL, ServiceId } from '../demos';
 
@@ -65,7 +65,6 @@ export class RootComponent {
   readonly clientOnlyBottom = this.rowTop(DEMOS.length - 1) + NODE_HEIGHT;
 
   readonly active = signal<DemoId | null>(null);
-  readonly activeDemo = computed(() => DEMOS.find(demo => demo.id === this.active()) ?? null);
 
   // Services a demo depends on, directly or through the Spring service.
   private readonly reach: Record<DemoId, ServiceId[]> = {

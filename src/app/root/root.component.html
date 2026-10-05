@@ -61,14 +61,18 @@
       }
     </svg>
 
+    <!-- Every caption sits in the same cell, so the tallest sets the height and swapping them never moves the page. -->
     <figcaption class="detail" aria-hidden="true">
-      @if (activeDemo(); as demo) {
-        <strong>{{ demo.title }}.</strong> {{ demo.summary }}
-        @if (demo.origin) {
-          <span class="origin">Origin: {{ demo.origin }}.</span>
-        }
-      } @else {
+      <p [class.shown]="!active()">
         Point at a demo to trace the services it calls. Demos on the left call Cloud Run services in the middle, which call managed APIs on the right.
+      </p>
+      @for (demo of demos; track demo.id) {
+        <p [class.shown]="demo.id === active()">
+          <strong>{{ demo.title }}.</strong> {{ demo.summary }}
+          @if (demo.origin) {
+            <span class="origin">Origin: {{ demo.origin }}.</span>
+          }
+        </p>
       }
     </figcaption>
   </figure>
