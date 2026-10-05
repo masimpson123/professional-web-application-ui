@@ -1,6 +1,7 @@
 import { Injectable, computed, inject, signal } from '@angular/core';
+import { Observable, tap, throwError } from 'rxjs';
 import { ApiService } from '../api/api.service';
-import { CarePlanItem, SessionDetail } from '../api/models';
+import { CarePlanItem, SessionDetail, SessionRecap } from '../api/models';
 import { DONE_WORDS } from '../documents/doc-kinds';
 import { Viewer } from './viewer';
 
@@ -22,8 +23,11 @@ export class SessionStore {
   readonly session = computed(() => this.require().session);
   readonly provider = computed(() => this.require().provider);
   readonly member = computed(() => this.require().member);
-  /** What happened, once the provider has written it up. */
-  readonly recap = computed(() => this.require().recap);
+  private readonly savedRecap = signal<SessionRecap | undefined>(undefined);
+  /** The provider's notes on what happened, once written. Members can only read them. */
+  readonly recap = this.savedRecap.asReadonly();
+  /** What was said in the call, summarized by AI once it has ended. */
+  readonly aiSummary = computed(() => this.require().aiSummary);
   /** ISO date of the next booked session, when the care plan is due; undefined if none is booked. */
   readonly nextSession = computed(() => this.require().nextSession);
 
@@ -44,7 +48,19 @@ export class SessionStore {
   open(detail: SessionDetail): void {
     this.detail.set(detail);
     this.carePlan.set(detail.carePlan);
+    this.savedRecap.set(detail.recap);
     this.announcement.set('');
+  }
+
+  /** Provider action: save their notes on this session. Errors are left to the caller to show. */
+  saveRecap(recap: SessionRecap): Observable<SessionRecap> {
+    if (!this.isProvider()) return throwError(() => new Error('only the provider can edit notes'));
+    return this.api.saveRecap(this.session().id, recap).pipe(
+      tap((saved) => {
+        this.savedRecap.set(saved);
+        this.announcement.set('Your notes are saved.');
+      }),
+    );
   }
 
   /** Member action: tick an item off their care plan, or untick it. Saved right away. */

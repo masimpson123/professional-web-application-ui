@@ -1,8 +1,13 @@
-/* The summary reads best at a comfortable line length; documents sit beside it. */
+/* The summaries read best at a comfortable line length; documents sit beside them. */
 :host {
   display: grid;
   grid-template-columns: minmax(0, 1fr) minmax(320px, 400px);
   align-items: start;
+  gap: var(--spacing-padding-sys-padding-24);
+}
+
+.main {
+  display: grid;
   gap: var(--spacing-padding-sys-padding-24);
 }
 
@@ -20,6 +25,13 @@
   font-weight: 500;
 }
 
+.card__head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--spacing-padding-sys-padding-8);
+}
+
 .overview {
   max-width: 68ch;
   margin-top: var(--spacing-padding-sys-padding-12);
@@ -32,14 +44,137 @@
   font-weight: 500;
 }
 
-.steps {
+/*
+ * Named apart from the portfolio's global .steps, which would otherwise reach in
+ * here and stack its own spacing on top of this.
+ */
+.next-steps {
   max-width: 68ch;
-  margin: var(--spacing-padding-sys-padding-8) 0 0;
-  padding-left: var(--spacing-padding-sys-padding-20);
+  margin: var(--spacing-padding-sys-padding-12) 0 0;
+  padding: 0;
+  list-style: none;
+  counter-reset: step;
+
+  li {
+    counter-increment: step;
+    display: grid;
+    grid-template-columns: 28px minmax(0, 1fr);
+    align-items: center;
+    column-gap: var(--spacing-padding-sys-padding-12);
+    padding: var(--spacing-padding-sys-padding-12) 0;
+  }
+
+  li:first-child {
+    padding-top: 0;
+  }
+
+  li:last-child {
+    padding-bottom: 0;
+  }
 
   li + li {
-    margin-top: var(--spacing-padding-sys-padding-6);
+    border-top: 1px solid var(--line);
   }
+
+  li::before {
+    content: counter(step);
+    display: grid;
+    place-items: center;
+    width: 28px;
+    aspect-ratio: 1;
+    border: 1px solid var(--outline-sys-outline);
+    border-radius: 50%;
+    font-size: var(--label-medium-sys-font-size);
+    font-weight: 500;
+    font-variant-numeric: tabular-nums;
+  }
+}
+
+.topics {
+  max-width: 68ch;
+  margin: var(--spacing-padding-sys-padding-8) 0 0;
+
+  div + div {
+    margin-top: var(--spacing-padding-sys-padding-12);
+  }
+
+  dt {
+    font-weight: 500;
+  }
+
+  dd {
+    margin: var(--spacing-padding-sys-padding-2) 0 0;
+    color: var(--ink-muted);
+  }
+}
+
+.note {
+  margin-top: var(--spacing-padding-sys-padding-20);
+  font-size: var(--label-medium-sys-font-size);
+  line-height: var(--label-medium-sys-line-height);
+  color: var(--ink-muted);
+}
+
+.card__action {
+  margin-left: auto;
+}
+
+/* The provider's notes, while they edit them. */
+.editor {
+  display: grid;
+  gap: var(--spacing-padding-sys-padding-8);
+  max-width: 68ch;
+  margin-top: var(--spacing-padding-sys-padding-12);
+}
+
+.editor__label {
+  padding: 0;
+  font-size: var(--label-large-sys-font-size);
+  line-height: var(--label-large-sys-line-height);
+  font-weight: 500;
+}
+
+.editor__overview {
+  width: 100%;
+  box-sizing: border-box;
+  padding: var(--spacing-padding-sys-padding-12) var(--spacing-padding-sys-padding-16);
+  border: 1px solid var(--outline-sys-outline);
+  border-radius: var(--border-radius-sys-radius-sm);
+  background: var(--surface-surface-container-sys-surface-container-lowest);
+  color: var(--ink);
+  font: inherit;
+  resize: vertical;
+}
+
+.editor__steps {
+  display: grid;
+  justify-items: start;
+  gap: var(--spacing-padding-sys-padding-8);
+  margin: var(--spacing-padding-sys-padding-12) 0 0;
+  padding: 0;
+  border: 0;
+
+  compsych-text-input {
+    justify-self: stretch;
+  }
+}
+
+.editor__hint {
+  margin-top: var(--spacing-padding-sys-padding-8);
+  font-size: var(--label-medium-sys-font-size);
+  line-height: var(--label-medium-sys-line-height);
+  color: var(--ink-muted);
+}
+
+.editor__error {
+  color: var(--error-sys-error);
+}
+
+.editor__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--spacing-padding-sys-padding-8);
+  margin-top: var(--spacing-padding-sys-padding-8);
 }
 
 .list {

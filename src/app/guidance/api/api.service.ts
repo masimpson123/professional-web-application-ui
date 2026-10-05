@@ -27,11 +27,13 @@ import {
   Role,
   Session,
   SessionDetail,
+  SessionRecap,
   SessionDoc,
   SessionSummary,
   SessionsQuery,
   TimeSlot,
   sessionEnd,
+  sessionPhase,
 } from './models';
 
 /**
@@ -162,7 +164,7 @@ export class ApiService {
     return respond(`/api/sessions/${id}`, () => {
       const record = SESSIONS.find((s) => s.id === id);
       if (!record) return undefined;
-      const { docs, recap, ...session } = record;
+      const { docs, recap, aiSummary, ...session } = record;
 
       const series = SESSIONS.filter(
         (s) => s.memberId === session.memberId && s.providerId === session.providerId,
@@ -175,9 +177,24 @@ export class ApiService {
         member: person(session.memberId),
         shared: docs,
         recap,
+        // Generated from the call's transcript, so there's none until the call has ended.
+        aiSummary: sessionPhase(session) === 'ended' ? aiSummary : undefined,
         carePlan: planFor(session.memberId),
         nextSession: next && localDate(new Date(next.start)),
       };
+    });
+  }
+
+  /**
+   * `PUT /api/sessions/:id/recap`: the provider writes or edits their notes on a
+   * session. Members can read the notes but not change them. 404s for an unknown id.
+   */
+  saveRecap(sessionId: string, recap: SessionRecap): Observable<SessionRecap> {
+    return respond(`/api/sessions/${sessionId}/recap`, () => {
+      const record = SESSIONS.find((s) => s.id === sessionId);
+      if (!record) return undefined;
+      record.recap = recap;
+      return recap;
     });
   }
 
@@ -365,7 +382,7 @@ function isBooked(providerId: string, slot: TimeSlot): boolean {
 /** Orders sessions by start time, then id, so every session has a unique place to page from. */
 const sortKey = (s: Session) => `${s.start}|${s.id}`;
 
-function toSummary({ docs, recap, ...session }: SessionRecord): SessionSummary {
+function toSummary({ docs, recap, aiSummary, ...session }: SessionRecord): SessionSummary {
   return { ...session, provider: person(session.providerId), member: person(session.memberId) };
 }
 

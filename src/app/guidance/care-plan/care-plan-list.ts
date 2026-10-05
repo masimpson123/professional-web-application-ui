@@ -1,6 +1,6 @@
 import { NgTemplateOutlet, formatDate } from '@angular/common';
 import { ChangeDetectionStrategy, Component, input, output, signal } from '@angular/core';
-import { ButtonComponent, ChipComponent, DialogComponent } from '@compsych-ui-components/angular';
+import { BadgeComponent, ButtonComponent, DialogComponent } from '@compsych-ui-components/angular';
 import { DONE_WORDS } from '../documents/doc-kinds';
 import { DocRow } from '../documents/doc-row';
 import { CarePlanItem, Role } from '../api/models';
@@ -15,7 +15,7 @@ import { Icon } from '../shared/icon';
  */
 @Component({
   selector: 'app-care-plan-list',
-  imports: [ButtonComponent, ChipComponent, DialogComponent, DocRow, Icon, NgTemplateOutlet],
+  imports: [BadgeComponent, ButtonComponent, DialogComponent, DocRow, Icon, NgTemplateOutlet],
   templateUrl: './care-plan-list.html',
   styleUrl: './care-plan-list.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,

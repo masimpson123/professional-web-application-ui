@@ -1,7 +1,7 @@
 import { formatDate } from '@angular/common';
 import { DestroyRef, Signal, computed, inject, signal } from '@angular/core';
 import { toObservable, toSignal } from '@angular/core/rxjs-interop';
-import { ChipUsage } from '@compsych-ui-components/angular';
+import { BadgeVariant } from '@compsych-ui-components/angular';
 import {
   EMPTY,
   Observable,
@@ -24,7 +24,7 @@ export interface ListedSession {
   session: SessionSummary;
   phase: SessionPhase;
   /** Only for what's happening now or very soon. */
-  status?: { label: string; usage: ChipUsage };
+  status?: { label: string; variant: BadgeVariant };
 }
 
 export interface SessionDay {
@@ -152,8 +152,8 @@ export function listSession(session: SessionSummary, now: number): ListedSession
   const phase = sessionPhase(session, now);
   const minutesAway = Math.ceil((Date.parse(session.start) - now) / 60_000);
   const status: ListedSession['status'] =
-    phase === 'live' ? { label: 'In progress', usage: 'positive' }
-    : phase === 'upcoming' && minutesAway <= 60 ? { label: `Starts in ${minutesAway} min`, usage: 'informative' }
+    phase === 'live' ? { label: 'In progress', variant: 'positive' }
+    : phase === 'upcoming' && minutesAway <= 60 ? { label: `Starts in ${minutesAway} min`, variant: 'filled' }
     : undefined;
   return { session, phase, status };
 }

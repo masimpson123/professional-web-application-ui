@@ -1,13 +1,17 @@
-import { Person, Session, SessionDoc, SessionRecap } from '../models';
+import { Person, Session, SessionAiSummary, SessionDoc, SessionRecap } from '../models';
 import { HOUR, at, slot } from './dates';
 import { AISHA, DANIEL, ELENA, GRACE, JORDAN, MARCUS, MAYA, NOAH, PRIYA, SAM } from './people';
 
 // ---- Sessions -------------------------------------------------------------------
 
-/** A session as stored, with what was shared in it and, once written, its recap. */
+/**
+ * A session as stored, with what was shared in it and, once written, its recap.
+ * Finished sessions also have the AI summary generated from the call.
+ */
 export interface SessionRecord extends Session {
   docs: SessionDoc[];
   recap?: SessionRecap;
+  aiSummary?: SessionAiSummary;
 }
 
 export function booking(
@@ -16,7 +20,11 @@ export function booking(
   start: string,
   focus: string,
   zoomRoom: string,
-  { docs = [], recap }: { docs?: SessionDoc[]; recap?: SessionRecap } = {},
+  {
+    docs = [],
+    recap,
+    aiSummary,
+  }: { docs?: SessionDoc[]; recap?: SessionRecap; aiSummary?: SessionAiSummary } = {},
 ): SessionRecord {
   return {
     id: `${member.id}-${number}`,
@@ -29,6 +37,7 @@ export function booking(
     zoomRoom,
     docs,
     recap,
+    aiSummary,
   };
 }
 
@@ -45,6 +54,16 @@ const CURRENT: SessionRecord[] = [
         'We got to know each other and talked about what brought you in: stress from rotating shifts that has been spilling into your evenings and your sleep. We went over how our sessions work and what stays confidential, and you said that in a few months you’d like to be falling asleep without replaying the workday.',
       nextSteps: ['During the week, jot down when stress shows up and what was happening at the time.'],
     },
+    aiSummary: {
+      overview:
+        'Jordan and Maya met for the first time. Jordan described stress from rotating shifts that carries into evenings and sleep. Maya explained how sessions work and what stays confidential, and they agreed on a first goal.',
+      topics: [
+        { title: 'What brought Jordan in', detail: 'Rotating shifts and last-minute changes leave Jordan replaying the workday at night.' },
+        { title: 'How sessions work', detail: 'Maya went over session length, confidentiality and the consent form, which Jordan signed.' },
+        { title: 'Goals', detail: 'In a few months Jordan would like to fall asleep without going over work.' },
+        { title: 'Before next time', detail: 'Jordan will note when stress shows up during the week and what was happening.' },
+      ],
+    },
   }),
   booking(JORDAN, 2, slot(-14), 'Naming what drives the stress', 'cs-1e56fc82445d', {
     docs: [
@@ -57,6 +76,15 @@ const CURRENT: SessionRecord[] = [
       nextSteps: [
         'Finish the work stress timeline and bring it next time.',
         'Keep one evening this week free for family.',
+      ],
+    },
+    aiSummary: {
+      overview:
+        'Jordan and Maya looked at where the stress comes from. Last-minute shift changes and feeling unable to turn down extra hours came up most. A values card sort showed how much family time matters to Jordan.',
+      topics: [
+        { title: 'Sources of stress', detail: 'Shift changes announced at short notice, and pressure to accept extra hours.' },
+        { title: 'Values card sort', detail: 'Family time ranked highest, which helps explain why the schedule weighs so heavily.' },
+        { title: 'Work stress timeline', detail: 'Jordan started a timeline of stressful moments and will finish it before the next session.' },
       ],
     },
   }),
@@ -72,6 +100,16 @@ const CURRENT: SessionRecord[] = [
         'Try box breathing once you’re in bed.',
         'Leave your phone outside the bedroom on work nights.',
         'Fill in the sleep log each morning.',
+      ],
+    },
+    aiSummary: {
+      overview:
+        'The session focused on evenings. Jordan has been checking the shift app in bed and then lying awake planning the next day. Jordan and Maya practised box breathing and built a wind-down routine.',
+      topics: [
+        { title: 'Evenings and screens', detail: 'Checking the shift app in bed tends to start a cycle of planning and worry.' },
+        { title: 'Box breathing', detail: 'They practised the four-count breath together, and Jordan found it calming.' },
+        { title: 'Wind-down routine', detail: 'A routine that starts 30 minutes before bed, with the phone left outside the bedroom on work nights.' },
+        { title: 'Sleep log', detail: 'Jordan will fill in the sleep log each morning so they can review it together.' },
       ],
     },
   }),
@@ -94,6 +132,15 @@ const CURRENT: SessionRecord[] = [
         'We talked through a hard conversation with your manager about workload and practised a few ways to say no without over-explaining. You noticed how much guilt comes up whenever you set a limit, even a small one.',
       nextSteps: ['Set one small boundary at work and notice how it goes.'],
     },
+    aiSummary: {
+      overview:
+        'Priya and Maya talked through a hard conversation with Priya’s manager about workload. They practised ways to say no without over-explaining, and Priya noticed how much guilt comes with setting a limit.',
+      topics: [
+        { title: 'Conversation with the manager', detail: 'Priya wants to raise her workload but worries about how it will be received.' },
+        { title: 'Saying no', detail: 'They rehearsed short, clear responses that don’t over-explain.' },
+        { title: 'Guilt', detail: 'Priya noticed guilt comes up even when a limit is small.' },
+      ],
+    },
   }),
   booking(PRIYA, 7, slot(0, -3), 'Returning to work after leave', 'cs-27523d57cd4e', {
     docs: [
@@ -103,6 +150,15 @@ const CURRENT: SessionRecord[] = [
       overview:
         'You go back to work in two weeks. We walked through what the first few days might look like, where you’d like support, and how to answer colleagues’ questions about your leave. We started a return-to-work plan you can take to HR.',
       nextSteps: ['Finish the return-to-work plan.', 'Ask HR whether a phased start is possible.'],
+    },
+    aiSummary: {
+      overview:
+        'Priya returns to work in two weeks. She and Maya walked through the first few days, where Priya would like support, and how to answer colleagues’ questions about her leave. They started a return-to-work plan for HR.',
+      topics: [
+        { title: 'The first few days', detail: 'What a typical first day might look like and which parts feel hardest.' },
+        { title: 'Questions from colleagues', detail: 'A few short answers Priya is comfortable giving about her leave.' },
+        { title: 'Return-to-work plan', detail: 'Started together. Priya will finish it and ask HR about a phased start.' },
+      ],
     },
   }),
   booking(PRIYA, 8, slot(7, -3), 'First week back', 'cs-42ec53077f55'),
@@ -114,6 +170,15 @@ const CURRENT: SessionRecord[] = [
         'We met for the first time and talked about the panic attacks that started this spring, mostly on crowded trains and in shops. We agreed to begin by understanding what happens in your body during panic.',
       nextSteps: ['Each time panic shows up, note where you were and how strong it felt, from 1 to 10.'],
     },
+    aiSummary: {
+      overview:
+        'Marcus and Maya met for the first time. Marcus described panic attacks that started this spring, mostly on crowded trains and in shops. They agreed to start by understanding what happens in the body during panic.',
+      topics: [
+        { title: 'When panic happens', detail: 'Mostly in crowded places: the morning train and busy shops.' },
+        { title: 'Panic and the body', detail: 'Maya explained the physical side of panic, and why it feels so urgent.' },
+        { title: 'Panic log', detail: 'Marcus will note each episode, where he was, and its strength from 1 to 10.' },
+      ],
+    },
   }),
   booking(MARCUS, 2, slot(0, -2), 'Panic in crowded places', 'cs-2773372ba0fb', {
     recap: {
@@ -124,6 +189,15 @@ const CURRENT: SessionRecord[] = [
         'Keep logging panic episodes.',
       ],
     },
+    aiSummary: {
+      overview:
+        'Marcus and Maya went through his panic log. Most episodes were on the morning train. They practised slow breathing and talked about how panic peaks and passes on its own.',
+      topics: [
+        { title: 'Panic log review', detail: 'Most episodes happened on the morning commute, at a strength of 6 to 8.' },
+        { title: 'Slow breathing', detail: 'They practised slow breathing, to use daily while calm so it’s easier during panic.' },
+        { title: 'How panic passes', detail: 'Panic peaks and fades on its own, even when it feels like it won’t.' },
+      ],
+    },
   }),
 
   booking(ELENA, 10, slot(-14, -1), 'Co-parenting conflict', 'cs-1aa77a35b49f', {
@@ -132,9 +206,27 @@ const CURRENT: SessionRecord[] = [
         'We talked about the back-and-forth with your ex over the holiday schedule and worked out a few phrases that keep messages short and focused on the kids.',
       nextSteps: ['Use the short-message template for the next scheduling text.'],
     },
+    aiSummary: {
+      overview:
+        'Elena and Maya talked about the back-and-forth with Elena’s ex over the holiday schedule, and worked out a few phrases that keep messages short and focused on the kids.',
+      topics: [
+        { title: 'Holiday schedule', detail: 'Long message threads about the schedule have been leaving Elena drained.' },
+        { title: 'Short-message template', detail: 'A few phrases that stick to logistics and keep the kids at the centre.' },
+      ],
+    },
   }),
-  // Just finished, so no recap has been written yet.
-  booking(ELENA, 11, slot(0, -1), 'Talking to the kids about the move', 'cs-b89e38f5e20d'),
+  // Just finished: the AI summary is ready, but no recap has been written yet.
+  booking(ELENA, 11, slot(0, -1), 'Talking to the kids about the move', 'cs-b89e38f5e20d', {
+    aiSummary: {
+      overview:
+        'Elena and Maya planned how to tell the kids about the move. They talked about what to say, when to say it, and how each child might react.',
+      topics: [
+        { title: 'What to tell the kids', detail: 'Keep it simple and honest, and focus on what stays the same.' },
+        { title: 'Timing', detail: 'Elena would like to tell them together, on a weekend, a few weeks before the move.' },
+        { title: 'Possible reactions', detail: 'The younger child may need more reassurance; the older one may want a say in their room.' },
+      ],
+    },
+  }),
 
   booking(SAM, 1, slot(0, 1), 'Getting started', 'cs-bc012c5c73a0'),
   booking(SAM, 2, at(3, '15:00'), 'Building a daily routine', 'cs-b0d993607f5f'),
@@ -147,6 +239,15 @@ const CURRENT: SessionRecord[] = [
       overview:
         'We talked about how hard it is to sleep after a night shift, with daylight and noise at home. We put together a plan: blackout curtains, a short wind-down when you get in, and the same sleep window on every work day.',
       nextSteps: ['Fill in the shift-work sleep log after each shift.'],
+    },
+    aiSummary: {
+      overview:
+        'Aisha and Maya talked about how hard it is to sleep after a night shift, with daylight and noise at home. They put together a plan for better daytime sleep.',
+      topics: [
+        { title: 'Sleeping in the day', detail: 'Daylight and household noise make it hard to fall and stay asleep.' },
+        { title: 'Sleep plan', detail: 'Blackout curtains, a short wind-down after getting home, and the same sleep window on every work day.' },
+        { title: 'Shift-work sleep log', detail: 'Aisha will log her sleep after each shift.' },
+      ],
     },
   }),
   booking(AISHA, 5, slot(0, 2), 'Winding down after a shift', 'cs-b50d8543d09a'),
@@ -208,6 +309,23 @@ const NEXT_STEPS = [
   'Keep the same bedtime on work nights.',
 ];
 
+/** What each focus covers, for the AI summaries of generated sessions. */
+const FOCUS_DETAILS: Record<string, string> = {
+  'Getting started': 'What brought them in, how sessions work, and what they hope will change.',
+  'Managing work stress': 'Where the pressure at work comes from and which parts are in their control.',
+  'Sleep and evening routines': 'What happens in the hour before bed and how to wind down sooner.',
+  'Setting boundaries': 'Where it’s hardest to say no, and a few ways to say it.',
+  'Grief and loss': 'How the loss is showing up day to day, and what has helped so far.',
+  'Anxiety at work': 'The situations that set off anxiety at work and what they do in the moment.',
+  'Communication at home': 'A recent disagreement at home and how to raise things earlier.',
+  'Building a daily routine': 'A simple structure for the day that leaves room for rest.',
+  'Parenting stress': 'The busiest parts of the day with the kids and where support would help.',
+  'Adjusting to a new role': 'What’s different in the new role and what still feels uncertain.',
+  'Money worries': 'How money worries affect sleep and mood, and one practical next step.',
+  'Coping with change': 'What has changed recently and what has stayed steady.',
+  'Confidence at work': 'Moments of self-doubt at work and the evidence against them.',
+};
+
 /** A weekly course of `count` sessions on a weekday, the last one about `lastDaysAgo` days ago. */
 function course(member: Person, count: number, lastDaysAgo: number): SessionRecord[] {
   const hour = between(8, 17) - new Date(slot(0)).getHours();
@@ -216,10 +334,21 @@ function course(member: Person, count: number, lastDaysAgo: number): SessionReco
   return Array.from({ length: count }, (_, i) => {
     const number = i + 1;
     const focus = number === 1 ? 'Getting started' : pick(FOCUSES);
-    return booking(member, number, slot(-lastDaysAgo - 7 * (count - 1 - i), hour), focus, roomName(), {
+    // Drawn in this order so the seeded history stays the same.
+    const room = roomName();
+    const opening = pick(OPENINGS);
+    const nextStep = pick(NEXT_STEPS);
+    return booking(member, number, slot(-lastDaysAgo - 7 * (count - 1 - i), hour), focus, room, {
       recap: {
-        overview: `${pick(OPENINGS)} Today’s focus was ${focus.toLowerCase()}.`,
-        nextSteps: [pick(NEXT_STEPS)],
+        overview: `${opening} Today’s focus was ${focus.toLowerCase()}.`,
+        nextSteps: [nextStep],
+      },
+      aiSummary: {
+        overview: `${member.firstName} and Maya met for session ${number}, on ${focus.toLowerCase()}.`,
+        topics: [
+          { title: focus, detail: FOCUS_DETAILS[focus] },
+          { title: 'Before next time', detail: nextStep },
+        ],
       },
     });
   });

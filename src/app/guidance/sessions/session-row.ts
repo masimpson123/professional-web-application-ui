@@ -1,7 +1,7 @@
 import { DatePipe } from '@angular/common';
 import { ChangeDetectionStrategy, Component, computed, inject, input } from '@angular/core';
 import { RouterLink } from '@angular/router';
-import { ChipComponent } from '@compsych-ui-components/angular';
+import { BadgeComponent } from '@compsych-ui-components/angular';
 import { personLabel } from '../api/models';
 import { Viewer } from '../session/viewer';
 import { GUIDANCE_SESSIONS } from '../paths';
@@ -14,7 +14,7 @@ import { ListedSession, dayLabel } from './session-listing';
  */
 @Component({
   selector: 'app-session-row',
-  imports: [ChipComponent, DatePipe, Icon, RouterLink],
+  imports: [BadgeComponent, DatePipe, Icon, RouterLink],
   template: `
     @let s = item().session;
     <a
@@ -39,7 +39,7 @@ import { ListedSession, dayLabel } from './session-listing';
       </span>
       <span class="row__status">
         @if (item().status; as status) {
-          <compsych-chip size="sm" [usage]="status.usage" [label]="status.label" />
+          <compsych-badge size="md" [variant]="status.variant" [label]="status.label" />
         }
       </span>
       <span class="row__action">

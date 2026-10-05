@@ -43,9 +43,9 @@
 <!-- The member ticks items off; the provider sees where each one stands. -->
 <ng-template #planAction let-item let-verb="verb" let-doneLabel="doneLabel">
   @if (role() === 'provider') {
-    <compsych-chip
-      size="sm"
-      [usage]="item.done ? 'positive' : 'neutral'"
+    <compsych-badge
+      size="md"
+      [variant]="item.done ? 'positive' : 'filled'"
       [label]="item.done ? doneLabel : item.progress?.completed ? 'In progress' : 'Not started'"
     />
   } @else {
