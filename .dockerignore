@@ -1,1 +1,5 @@
 /node_modules
+# Local caches and build output: the image builds its own.
+/.angular
+/dist
+/.git
