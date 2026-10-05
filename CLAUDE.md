@@ -33,7 +33,7 @@ The AI component dynamically loads other components via `NgComponentOutlet` base
 
 ### Express backend (`index.js` + `tensorflow/`)
 
-CORS allows `https://msio-u7qjhl7iia-uc.a.run.app`. Starting the server with `--local-development` also allows `http://localhost:4200`.
+Cloud Run serves `msio` at two URLs, `https://msio-u7qjhl7iia-uc.a.run.app` and `https://msio-205823180568.us-central1.run.app`; both must stay in `allowedOrigins` here and in the Spring service's `websocket.allowed-origins`. CORS applies only to the `/tensorflow-*` routes: browsers send an `Origin` header for the app's own scripts, so a site-wide check blanks the site on any unlisted URL. Starting the server with `--local-development` also allows `http://localhost:4200`.
 
 ### API URLs
 
