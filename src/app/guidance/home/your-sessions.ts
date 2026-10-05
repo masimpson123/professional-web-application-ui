@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, computed, inject, output, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
 import { rxResource } from '@angular/core/rxjs-interop';
 import { RouterLink } from '@angular/router';
 import { ButtonComponent } from '@compsych-ui-components/angular';
@@ -6,6 +6,7 @@ import { ApiService } from '../api/api.service';
 import { BookSession } from '../sessions/book-session';
 import { HomeCarePlans } from './home-care-plans';
 import { SessionSummary } from '../api/models';
+import { FocusDialog } from '../check-in/focus-dialog';
 import { Viewer } from '../session/viewer';
 import { HomeSection } from './home-section';
 import { Icon } from '../shared/icon';
@@ -22,7 +23,7 @@ const MAX_ON_HOME = 10;
  */
 @Component({
   selector: 'app-your-sessions',
-  imports: [BookSession, ButtonComponent, HomeSection, Icon, RouterLink, SessionRow],
+  imports: [BookSession, ButtonComponent, FocusDialog, HomeSection, Icon, RouterLink, SessionRow],
   templateUrl: './your-sessions.html',
   styleUrl: './your-sessions.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -36,11 +37,11 @@ export class YourSessions {
   protected readonly isMember = computed(() => this.viewer.role() === 'member');
   /** The booking dialog is open. */
   protected readonly booking = signal(false);
-  /** The member chose Pre-Session Check-In on a session; the home page runs it. */
-  readonly checkIn = output<SessionSummary>();
+  /** The session whose pre-session check-in is open. */
+  protected readonly checkingIn = signal<SessionSummary | undefined>(undefined);
 
   /** Just the first page from the server: the next few sessions, not all of them. */
-  private readonly sessions = rxResource({
+  protected readonly sessions = rxResource({
     params: () => (this.viewer.user.hasValue() ? this.viewer.user.value().id : undefined),
     stream: ({ params }) => this.api.getSessions(params, { when: 'upcoming', limit: MAX_ON_HOME }),
   });

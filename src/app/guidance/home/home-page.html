@@ -20,7 +20,7 @@
   </div>
 
   <div class="columns">
-    <app-your-sessions (checkIn)="startCheckIn($event)" />
+    <app-your-sessions />
     <app-care-plans #carePlans />
   </div>
 
@@ -51,10 +51,6 @@
     </section>
   }
 </div>
-
-@if (checkingIn(); as session) {
-  <app-focus-dialog [session]="session" [open]="true" (openChange)="setFocusOpen($event)" (saved)="continueCheckIn()" />
-}
 
 <!-- Ava, the GuidanceResources assistant. -->
 <button type="button" class="ava">

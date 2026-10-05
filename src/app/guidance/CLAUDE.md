@@ -5,6 +5,7 @@ A port of the hackathon-2026 "Sessions for GuidanceResources" prototype, mounted
 `guidance-intro.component.*` is the exception: it's the portfolio's demo page for the app, styled like the other demos.
 
 - Say **member** and **provider**, never "patient" or "therapist": in code, UI copy, comments and docs.
+- Two different check-ins; keep the names apart. The **new member check-in** is the PHQ-9 and GAD-7, done once per member (`/check-in`). The **pre-session check-in** is the focus form (topics and a note), one per session: done when booking and editable any time after.
 - Only providers upload documents. What they upload is the member's **care plan**, which the member is expected to complete.
 - All mock data lives in `api/mock/`, and only `ApiService` (`api/api.service.ts`) imports it. Everything else gets data from `ApiService`, as Observables, like HTTP responses. Lists that can grow without limit are paged on the server.
 - Never use `providedIn: 'root'`. App-wide services are provided on the route in `guidance.routes.ts`; per-page ones in the page's `providers`.

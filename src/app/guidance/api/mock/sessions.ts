@@ -1,4 +1,4 @@
-import { AiScribeConsent, CheckIn, CheckInFocus, Person, SessionFormat, Session, SessionAiSummary, SessionDoc, SessionRecap } from '../models';
+import { AiScribeConsent, CheckInFocus, Person, SessionFormat, Session, SessionAiSummary, SessionDoc, SessionRecap } from '../models';
 import { WIND_DOWN_PLAN } from './care-plans';
 import { HOUR, at, slot } from './dates';
 import { AISHA, DANIEL, ELENA, GRACE, JORDAN, MARCUS, MAYA, NOAH, PRIYA, SAM } from './people';
@@ -13,9 +13,7 @@ export interface SessionRecord extends Session {
   docs: SessionDoc[];
   recap?: SessionRecap;
   aiSummary?: SessionAiSummary;
-  /** The member's pre-session check-in, once they've done it. */
-  checkIn?: CheckIn;
-  /** What the member would like to focus on, the check-in's first step. */
+  /** The pre-session check-in: what the member would like to focus on, from booking or edited since. */
   checkInFocus?: CheckInFocus;
   /** The member's answer about AI scribe for this session, once they've given it. */
   aiScribe?: AiScribeConsent;
@@ -32,7 +30,14 @@ export function booking(
     recap,
     aiSummary,
     format = 'video',
-  }: { docs?: SessionDoc[]; recap?: SessionRecap; aiSummary?: SessionAiSummary; format?: SessionFormat } = {},
+    checkInFocus,
+  }: {
+    docs?: SessionDoc[];
+    recap?: SessionRecap;
+    aiSummary?: SessionAiSummary;
+    format?: SessionFormat;
+    checkInFocus?: CheckInFocus;
+  } = {},
 ): SessionRecord {
   return {
     id: `${member.id}-${number}`,
@@ -45,6 +50,7 @@ export function booking(
     format,
     zoomRoom,
     docs,
+    checkInFocus,
     recap,
     aiSummary,
   };
@@ -124,6 +130,8 @@ const CURRENT: SessionRecord[] = [
     },
   }),
   booking(JORDAN, 4, slot(0), 'Worry at night', 'cs-15ae0429935b', {
+    // What Jordan picked when he booked; he can change it before going in.
+    checkInFocus: { topics: ['Anxiety or worry', 'Sleep'], note: 'Lying awake planning the next shift.' },
     docs: [
       { id: 'today-agenda', title: 'Agenda for today', kind: 'summary', detail: 'Note' },
       { id: 'today-grounding', title: 'Grounding with 5-4-3-2-1', kind: 'article', detail: '3 min read' },

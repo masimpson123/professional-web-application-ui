@@ -4,6 +4,7 @@ import { Observable, map, timer } from 'rxjs';
 import {
   CARE_PLANS,
   CARE_PLAN_NOTES,
+  NEW_MEMBER_CHECK_INS,
   FORMER_MEMBERS,
   HIGHLIGHTS,
   JORDAN,
@@ -22,11 +23,12 @@ import {
   BookingRequest,
   CarePlan,
   CarePlanItem,
-  CheckIn,
   CheckInAnswers,
   CheckInFocus,
   Highlight,
   MemberSettings,
+  NewMemberCheckIn,
+  NewMemberCheckInStatus,
   Page,
   Person,
   Resource,
@@ -158,7 +160,9 @@ export class ApiService {
         memberId,
         start,
         lengthMinutes: slot.lengthMinutes,
-        focus: focus?.trim() || 'Check-in',
+        // Named after what they chose; the provider can rename it.
+        focus: focus?.topics.join(', ') || focus?.note.slice(0, 60) || 'Check-in',
+        checkInFocus: focus?.topics.length || focus?.note ? focus : undefined,
         format,
         // Every session gets a room, so a phone or in-person one can still move to video.
         zoomRoom: `cs-${crypto.randomUUID().replaceAll('-', '').slice(0, 12)}`,
@@ -179,7 +183,7 @@ export class ApiService {
     return respond(`/api/sessions/${id}`, () => {
       const record = SESSIONS.find((s) => s.id === id);
       if (!record) return undefined;
-      const { docs, recap, aiSummary, checkIn, checkInFocus, aiScribe, ...session } = record;
+      const { docs, recap, aiSummary, checkInFocus, aiScribe, ...session } = record;
 
       const series = SESSIONS.filter(
         (s) => s.memberId === session.memberId && s.providerId === session.providerId,
@@ -194,7 +198,6 @@ export class ApiService {
         recap,
         // Generated from the call's transcript, so there's none until the call has ended.
         aiSummary: sessionPhase(session) === 'ended' ? aiSummary : undefined,
-        checkIn,
         checkInFocus,
         aiScribe,
         carePlan: planFor(session.memberId),
@@ -228,20 +231,9 @@ export class ApiService {
   }
 
   /**
-   * `GET /api/members/:id/check-in-due`: the member's next session, if it's within
-   * two weeks (the questionnaires ask about the last two weeks), hasn't started, and
-   * has no check-in yet. Null when nothing is due.
-   */
-  getCheckInDue(memberId: string): Observable<SessionSummary | null> {
-    return respond(`/api/members/${memberId}/check-in-due`, () => {
-      const due = dueCheckIn(memberId);
-      return due ? toSummary(due) : null;
-    });
-  }
-
-  /**
-   * `PUT /api/sessions/:id/check-in/focus`: the check-in's first step, what the
-   * member would like to focus on. Their provider sees it before the session.
+   * `PUT /api/sessions/:id/check-in/focus`: the pre-session check-in, what the
+   * member would like to focus on. They can change it any time; their provider
+   * sees it before the session.
    */
   saveCheckInFocus(sessionId: string, focus: CheckInFocus): Observable<CheckInFocus> {
     return respond(`/api/sessions/${sessionId}/check-in/focus`, () => {
@@ -253,15 +245,27 @@ export class ApiService {
   }
 
   /**
-   * `POST /api/sessions/:id/check-in`: the member sends their pre-session check-in.
-   * Their provider sees it before the session. 404s for an unknown session.
+   * `GET /api/members/:id/new-member-check-in`: whether the member has done their
+   * new member check-in (it's done once), and their next session, which it helps with.
    */
-  submitCheckIn(sessionId: string, answers: CheckInAnswers): Observable<CheckIn> {
-    return respond(`/api/sessions/${sessionId}/check-in`, () => {
-      const record = SESSIONS.find((s) => s.id === sessionId);
-      if (!record) return undefined;
-      record.checkIn = { ...answers, sessionId, completedAt: new Date().toISOString() };
-      return record.checkIn;
+  getNewMemberCheckIn(memberId: string): Observable<NewMemberCheckInStatus> {
+    return respond(`/api/members/${memberId}/new-member-check-in`, () => {
+      const next = nextSession(memberId);
+      return {
+        completedAt: NEW_MEMBER_CHECK_INS[memberId]?.completedAt,
+        nextSession: next && toSummary(next),
+      };
+    });
+  }
+
+  /**
+   * `POST /api/members/:id/new-member-check-in`: the member sends their new member
+   * check-in. It's done once; their provider sees it before their next session.
+   */
+  submitNewMemberCheckIn(memberId: string, answers: CheckInAnswers): Observable<NewMemberCheckIn> {
+    return respond(`/api/members/${memberId}/new-member-check-in`, () => {
+      NEW_MEMBER_CHECK_INS[memberId] = { ...answers, memberId, completedAt: new Date().toISOString() };
+      return NEW_MEMBER_CHECK_INS[memberId];
     });
   }
 
@@ -429,9 +433,6 @@ function describeFile(file: File): string {
   return `${ext}, ${size}`;
 }
 
-/** How far ahead a session's check-in opens: two weeks, the period the questions ask about. */
-const CHECK_IN_WINDOW_MS = 14 * 24 * 60 * 60_000;
-
 /** How long the fake server takes to answer. */
 const LATENCY_MS = 250;
 
@@ -466,25 +467,19 @@ function isBooked(providerId: string, slot: TimeSlot): boolean {
 /** Orders sessions by start time, then id, so every session has a unique place to page from. */
 const sortKey = (s: Session) => `${s.start}|${s.id}`;
 
-function toSummary({ docs, recap, aiSummary, checkIn, checkInFocus, aiScribe, ...session }: SessionRecord): SessionSummary {
+function toSummary({ docs, recap, aiSummary, checkInFocus, aiScribe, ...session }: SessionRecord): SessionSummary {
   return {
     ...session,
     provider: person(session.providerId),
     member: person(session.memberId),
-    checkInDue: dueCheckIn(session.memberId)?.id === session.id,
     checkInFocus,
   };
 }
 
-/**
- * The session whose check-in the member should do now: their next one, if it's
- * within two weeks, hasn't started, and has no check-in yet.
- */
-function dueCheckIn(memberId: string): SessionRecord | undefined {
+/** The member's next session that hasn't started yet, if they have one. */
+function nextSession(memberId: string): SessionRecord | undefined {
   const now = Date.now();
-  const next = SESSIONS.filter((s) => s.memberId === memberId && Date.parse(s.start) > now).sort(byStart)[0];
-  const soon = next && Date.parse(next.start) - now <= CHECK_IN_WINDOW_MS;
-  return next && soon && !next.checkIn ? next : undefined;
+  return SESSIONS.filter((s) => s.memberId === memberId && Date.parse(s.start) > now).sort(byStart)[0];
 }
 
 function person(id: string): Person {

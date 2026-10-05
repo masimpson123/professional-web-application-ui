@@ -1,13 +1,11 @@
 import { formatDate } from '@angular/common';
-import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, inject } from '@angular/core';
 import { rxResource } from '@angular/core/rxjs-interop';
 import { Router } from '@angular/router';
 import { CardComponent } from '@compsych-ui-components/angular';
 import { ApiService } from '../api/api.service';
-import { SessionSummary } from '../api/models';
-import { FocusDialog } from '../check-in/focus-dialog';
 import { PageCrumbs } from '../page-crumbs';
-import { GUIDANCE_SESSIONS, checkInPath } from '../paths';
+import { GUIDANCE_NEW_MEMBER_CHECK_IN, GUIDANCE_SESSIONS } from '../paths';
 import { dayLabel } from '../sessions/session-listing';
 import { Viewer } from '../session/viewer';
 import { CarePlans } from './care-plans';
@@ -34,7 +32,7 @@ interface Banner {
  */
 @Component({
   selector: 'app-home-page',
-  imports: [CardComponent, CarePlans, FocusDialog, Highlights, YourSessions],
+  imports: [CardComponent, CarePlans, Highlights, YourSessions],
   templateUrl: './home-page.html',
   styleUrl: './home-page.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -48,15 +46,17 @@ export class HomePage {
 
   protected readonly isProvider = computed(() => this.viewer.role() === 'provider');
 
-  /** Members: their next session, when its pre-session check-in is waiting for them. */
-  private readonly checkInDue = rxResource({
+  /** Members: whether they've done their new member check-in (it's done once). */
+  private readonly newMemberCheckIn = rxResource({
     params: () =>
       !this.isProvider() && this.viewer.user.hasValue() ? this.viewer.user.value().id : undefined,
-    stream: ({ params }) => this.api.getCheckInDue(params),
+    stream: ({ params }) => this.api.getNewMemberCheckIn(params),
   });
-  private readonly dueSession = computed(() =>
-    this.checkInDue.hasValue() ? this.checkInDue.value() : null,
-  );
+  /** The session it should be done before, while it isn't done. */
+  private readonly dueSession = computed(() => {
+    const status = this.newMemberCheckIn.hasValue() ? this.newMemberCheckIn.value() : undefined;
+    return status && !status.completedAt ? status.nextSession : undefined;
+  });
 
   protected readonly banner = computed<Banner>(() => {
     const name = this.viewer.user.hasValue() ? ` ${this.viewer.user.value().firstName}` : '';
@@ -73,9 +73,10 @@ export class HomePage {
   });
 
   /**
-   * Members: the check-in for their next session, until they've done it. It takes
-   * over the banner (headline included) and names the deadline, which tightens
-   * from the date to "tomorrow" to "today", so it isn't skimmed past as a greeting.
+   * Members: the new member check-in, until they've done it (it's done once). It
+   * takes over the banner (headline included) and names the deadline, their next
+   * session, which tightens from the date to "tomorrow" to "today", so it isn't
+   * skimmed past as a greeting.
    */
   private checkInNudge(): Omit<Banner, 'image'> | undefined {
     const session = this.dueSession();
@@ -91,8 +92,8 @@ export class HomePage {
     const provider = session.provider.firstName;
     return {
       headline: `Check In Before ${whose} Session`,
-      description: `It takes about 5 minutes and saves time in your appointment: ${provider} sees your answers first, so your session with ${provider} at ${time} can start with what matters most.`,
-      action: 'Complete Your Pre-Session Check-In',
+      description: `This one-time check-in takes about 5 minutes and saves time in your appointment: ${provider} sees your answers first, so your session at ${time} can start with what matters most.`,
+      action: 'Complete Your New Member Check-In',
       actionIcon: 'clipboard-pen',
       due,
     };
@@ -138,28 +139,10 @@ export class HomePage {
     inject(PageCrumbs).trail.set([]);
   }
 
-  /** The session whose check-in the member started, while its focus step is open. */
-  protected readonly checkingIn = signal<SessionSummary | undefined>(undefined);
-
   protected onBannerAction(carePlans: CarePlans): void {
     const due = this.dueSession();
     if (this.isProvider()) this.router.navigateByUrl(GUIDANCE_SESSIONS);
-    else if (due) this.startCheckIn(due);
+    else if (due) this.router.navigateByUrl(GUIDANCE_NEW_MEMBER_CHECK_IN);
     else carePlans.focus();
-  }
-
-  /** The check-in starts with what they'd like to focus on, then carries on to its questions. */
-  protected startCheckIn(session: SessionSummary): void {
-    this.checkingIn.set(session);
-  }
-
-  protected continueCheckIn(): void {
-    const session = this.checkingIn();
-    this.checkingIn.set(undefined);
-    if (session) this.router.navigateByUrl(checkInPath(session.id));
-  }
-
-  protected setFocusOpen(open: boolean): void {
-    if (!open) this.checkingIn.set(undefined);
   }
 }

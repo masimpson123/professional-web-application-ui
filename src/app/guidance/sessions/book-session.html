@@ -125,12 +125,18 @@
             </section>
           }
 
-          <compsych-text-input
-            label="What would you like to focus on? (optional)"
-            placeholder="For example: sleep, stress at work"
-            [value]="focus()"
-            (valueChange)="focus.set($event)"
-          />
+          <section aria-labelledby="pick-focus">
+            <h3 id="pick-focus" class="step">Pre-session check-in (optional)</h3>
+            <p class="hint focus__lead">
+              What would you like to focus on? {{ provider()!.firstName }} will see this before your session.
+              Share as much or as little as you like; you can change it any time.
+            </p>
+            <app-focus-fields [field]="focus" idPrefix="book-focus" />
+            <p class="hint focus__safety">
+              If you’re in immediate danger, don’t wait for your session. Call 911, or call or text 988 to reach the
+              Suicide &amp; Crisis Lifeline.
+            </p>
+          </section>
 
           @if (error()) {
             <p class="error" role="alert">{{ error() }}</p>

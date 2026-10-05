@@ -9,24 +9,17 @@
         <compsych-button label="Try again" leadingIcon="rotate-cw" (click)="retry()" />
       </div>
     }
-    @case ('missing') {
+    @case ('members-only') {
       <div class="notice">
-        <h1 class="title">We couldn’t find that check-in</h1>
-        <p>It may be for a session that was cancelled, or one that isn’t yours.</p>
-        <a class="link" [routerLink]="homeUrl">Back to home</a>
-      </div>
-    }
-    @case ('closed') {
-      <div class="notice">
-        <h1 class="title">This check-in has closed</h1>
-        <p>Your session has started, so there’s no need to check in now. You can talk it through with {{ provider().firstName }} instead.</p>
+        <h1 class="title">The new member check-in is for members</h1>
+        <p>Members do it once, when they start. You’ll see their answers before your session.</p>
         <a class="link" [routerLink]="homeUrl">Back to home</a>
       </div>
     }
     @case ('done') {
       <div class="notice">
-        <h1 class="title">You’ve already checked in</h1>
-        <p>{{ provider().firstName }} has your answers for your session on {{ when() }}.</p>
+        <h1 class="title">You’ve done your new member check-in</h1>
+        <p>It’s only needed once, and {{ providerName() }} has your answers.</p>
         <a class="link" [routerLink]="homeUrl">Back to home</a>
       </div>
     }
@@ -35,8 +28,9 @@
         <app-icon class="thanks__icon" name="clipboard-check" [size]="28" />
         <h1 id="check-in-thanks" class="title" tabindex="-1">Thanks, {{ firstName() }}. Your check-in is saved.</h1>
         <p>
-          {{ provider().firstName }} will look it over before your session on {{ when() }}, so you can spend
-          more of it on what matters to you.
+          {{ providerName() }} will look it over before
+          {{ when() ? 'your session on ' + when() : 'your next session' }}, so you can spend more of it on what
+          matters to you. You won’t need to do this again.
         </p>
         @if (selfHarm()) {
           <ng-container *ngTemplateOutlet="crisis" />
@@ -46,11 +40,16 @@
     }
     @case ('form') {
       <header class="intro">
-        <h1 class="title">Pre-session check-in</h1>
-        <p class="intro__when">For your session with {{ providerLabel() }} on {{ when() }} · About 5 minutes</p>
+        <h1 class="title">New member check-in</h1>
+        <p class="intro__when">
+          @if (when()) {
+            Before your session with {{ providerLabel() }} on {{ when() }} ·
+          }
+          About 5 minutes, and only once
+        </p>
         <p class="intro__body">
-          These questions help {{ provider().firstName }} see how you’ve been doing, so your session can start
-          with what matters most. There are no right or wrong answers.
+          Welcome. These questions help {{ providerName() }} understand how you’ve been over the last two weeks,
+          so your sessions can start with what matters most. There are no right or wrong answers.
         </p>
       </header>
 
@@ -141,7 +140,7 @@
         Suicide &amp; Crisis Lifeline, any time, day or night. If you’re in danger right now, call
         <a href="tel:911">911</a>.
       </p>
-      <p>{{ provider().firstName }} will see this answer before your session.</p>
+      <p>{{ providerName() }} will see this answer before your session.</p>
     </div>
   </div>
 </ng-template>

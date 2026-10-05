@@ -34,6 +34,10 @@
   letter-spacing: -0.01em;
 }
 
+.room__check-in {
+  margin-top: var(--spacing-padding-sys-padding-8);
+}
+
 .room__when {
   margin-top: 2px;
   color: var(--ink-muted);

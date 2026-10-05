@@ -33,8 +33,8 @@ export const routes: Routes = [
         loadComponent: () => import('./profile/profile-page').then((m) => m.ProfilePage),
       },
       {
-        path: 'sessions/:id/check-in',
-        title: 'Pre-session check-in | GuidanceResources',
+        path: 'check-in',
+        title: 'New member check-in | GuidanceResources',
         loadComponent: () => import('./check-in/check-in-page').then((m) => m.CheckInPage),
       },
       {

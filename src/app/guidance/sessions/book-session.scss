@@ -184,3 +184,11 @@
     grid-template-columns: minmax(0, 1fr);
   }
 }
+
+.focus__lead {
+  margin-bottom: var(--spacing-padding-sys-padding-12);
+}
+
+.focus__safety {
+  margin-top: var(--spacing-padding-sys-padding-12);
+}

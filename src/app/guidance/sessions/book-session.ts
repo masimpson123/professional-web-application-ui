@@ -10,9 +10,11 @@ import {
   signal,
 } from '@angular/core';
 import { rxResource } from '@angular/core/rxjs-interop';
-import { ButtonComponent, DialogComponent, TextInputComponent } from '@compsych-ui-components/angular';
+import { form } from '@angular/forms/signals';
+import { ButtonComponent, DialogComponent } from '@compsych-ui-components/angular';
 import { ApiService } from '../api/api.service';
 import { SessionFormat, SessionSummary, TimeSlot, directionsUrl, officeAddress, personLabel } from '../api/models';
+import { FocusFields, focusSchema, fromFocusModel, toFocusModel } from '../check-in/focus-fields';
 import { Icon } from '../shared/icon';
 import { SESSION_FORMATS } from './session-format';
 import { Viewer } from '../session/viewer';
@@ -26,12 +28,12 @@ interface Day {
 /**
  * How a member books a session with their provider, like Calendly: choose how to
  * meet (video, phone, or in person), pick a day and one of the provider's open
- * times, optionally say what to focus on, and confirm. The new session shows up
- * in their sessions.
+ * times, optionally do the pre-session check-in (what they'd like to focus on,
+ * which they can change any time), and confirm. The new session shows up in their sessions.
  */
 @Component({
   selector: 'app-book-session',
-  imports: [ButtonComponent, DatePipe, DialogComponent, Icon, TextInputComponent],
+  imports: [ButtonComponent, DatePipe, DialogComponent, FocusFields, Icon],
   templateUrl: './book-session.html',
   styleUrl: './book-session.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -77,7 +79,8 @@ export class BookSession {
     source: this.dayKey,
     computation: () => undefined,
   });
-  protected readonly focus = signal('');
+  private readonly focusModel = signal(toFocusModel());
+  protected readonly focus = form(this.focusModel, focusSchema);
 
   protected readonly formats = SESSION_FORMATS;
   /** Video unless they choose otherwise, as booking worked before there was a choice. */
@@ -119,11 +122,11 @@ export class BookSession {
     const memberId = this.memberId();
     const provider = this.provider();
     const start = this.time();
-    if (!memberId || !provider || !start || this.booking()) return;
+    if (!memberId || !provider || !start || this.booking() || this.focus().invalid()) return;
     this.booking.set(true);
     this.error.set('');
     this.api
-      .bookSession({ memberId, providerId: provider.id, start, format: this.format(), focus: this.focus() })
+      .bookSession({ memberId, providerId: provider.id, start, format: this.format(), focus: fromFocusModel(this.focusModel()) })
       .subscribe({
         next: (session) => {
           this.booking.set(false);
@@ -150,7 +153,7 @@ export class BookSession {
   /** Closes and starts fresh next time. */
   protected close(): void {
     this.open.set(false);
-    this.focus.set('');
+    this.focusModel.set(toFocusModel());
     this.format.set('video');
     this.error.set('');
     this.confirmed.set(undefined);

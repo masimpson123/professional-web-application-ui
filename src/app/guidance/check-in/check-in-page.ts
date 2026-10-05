@@ -6,20 +6,18 @@ import {
   Injector,
   afterNextRender,
   computed,
-  effect,
   inject,
   signal,
-  untracked,
 } from '@angular/core';
-import { rxResource, toSignal } from '@angular/core/rxjs-interop';
+import { rxResource } from '@angular/core/rxjs-interop';
 import { Field, applyEach, form, required, submit } from '@angular/forms/signals';
-import { ActivatedRoute, RouterLink } from '@angular/router';
-import { firstValueFrom, map } from 'rxjs';
+import { RouterLink } from '@angular/router';
+import { firstValueFrom } from 'rxjs';
 import { ButtonComponent, CardComponent } from '@compsych-ui-components/angular';
 import { ApiService } from '../api/api.service';
-import { Frequency, PHQ9_SELF_HARM, personLabel, sessionPhase } from '../api/models';
+import { Frequency, PHQ9_SELF_HARM, personLabel } from '../api/models';
 import { PageCrumbs } from '../page-crumbs';
-import { GUIDANCE_HOME, GUIDANCE_SESSIONS } from '../paths';
+import { GUIDANCE_HOME } from '../paths';
 import { Viewer } from '../session/viewer';
 import { Icon } from '../shared/icon';
 import { DIFFICULTY, FREQUENCIES, GAD7, PHQ9 } from './questionnaires';
@@ -46,8 +44,10 @@ const SAMPLE_ANSWERS: CheckInModel = {
 };
 
 /**
- * The member's pre-session check-in: the PHQ-9 and GAD-7, sent to their provider
- * before the session so it can start with what matters. Built on signal forms:
+ * The new member check-in: the PHQ-9 and GAD-7, done once when someone starts,
+ * and sent to their provider before their next session so it can start with what
+ * matters. (The pre-session check-in, what to focus on, is per session and lives
+ * with each session.) Built on signal forms:
  * every question is required, and the closing one only once a problem is
  * reported. Members don't see scores; an answer about self-harm brings up crisis
  * resources straight away.
@@ -74,15 +74,13 @@ export class CheckInPage {
   /** Mock-up only: the shortcut that fills in the form. */
   protected readonly demo = this.api.demo;
 
-  /** The session id, from `/sessions/:id/check-in` (the portfolio has no input binding). */
-  private readonly id = toSignal(
-    inject(ActivatedRoute).paramMap.pipe(map((params) => params.get('id') ?? '')),
-    { requireSync: true },
+  /** Members only: providers don't check in. */
+  private readonly memberId = computed(() =>
+    this.viewer.role() === 'member' && this.viewer.user.hasValue() ? this.viewer.user.value().id : undefined,
   );
-
-  private readonly detail = rxResource({
-    params: () => this.id(),
-    stream: ({ params }) => this.api.getSession(params),
+  private readonly status = rxResource({
+    params: () => this.memberId(),
+    stream: ({ params }) => this.api.getNewMemberCheckIn(params),
   });
 
   // ---- The form ----------------------------------------------------------------
@@ -126,42 +124,32 @@ export class CheckInPage {
   // ---- What the page shows -----------------------------------------------------
 
   protected readonly view = computed(() => {
-    const error = this.detail.error() ?? this.viewer.user.error();
-    if (error) return (error as { status?: number }).status === 404 ? 'missing' : 'failed';
-    if (!this.detail.hasValue() || !this.viewer.user.hasValue()) return 'loading';
-    const { session, member, checkIn } = this.detail.value();
-    // Only the member checks in; the demo API serves any session, so that's checked here.
-    if (this.viewer.user.value().id !== member.id) return 'missing';
+    if (this.viewer.user.error() || this.status.error()) return 'failed';
+    if (!this.viewer.user.hasValue()) return 'loading';
+    if (this.viewer.role() !== 'member') return 'members-only';
+    if (!this.status.hasValue()) return 'loading';
     if (this.submitted()) return 'thanks';
-    if (checkIn) return 'done';
-    return sessionPhase(session) === 'upcoming' ? 'form' : 'closed';
+    return this.status.value().completedAt ? 'done' : 'form';
   });
 
-  protected readonly provider = computed(() => this.detail.value()!.provider);
-  protected readonly providerLabel = computed(() => personLabel(this.provider()));
+  /** The session it helps with, when they have one booked. */
+  private readonly nextSession = computed(() => (this.status.hasValue() ? this.status.value().nextSession : undefined));
+  protected readonly providerName = computed(() => this.nextSession()?.provider.firstName ?? 'Your provider');
+  protected readonly providerLabel = computed(() => {
+    const provider = this.nextSession()?.provider;
+    return provider ? personLabel(provider) : '';
+  });
   protected readonly firstName = computed(() =>
     this.viewer.user.hasValue() ? this.viewer.user.value().firstName : '',
   );
-  /** "Monday, October 12 at 12:30 PM" */
+  /** "Monday, October 12 at 12:30 PM", for their next session; empty if none is booked. */
   protected readonly when = computed(() => {
-    const start = this.detail.value()!.session.start;
-    return `${formatDate(start, 'EEEE, MMMM d', 'en-US')} at ${formatDate(start, 'h:mm a', 'en-US')}`;
+    const start = this.nextSession()?.start;
+    return start ? `${formatDate(start, 'EEEE, MMMM d', 'en-US')} at ${formatDate(start, 'h:mm a', 'en-US')}` : '';
   });
 
   constructor() {
-    const crumbs = inject(PageCrumbs);
-    effect(() => {
-      const detail = this.detail.hasValue() ? this.detail.value() : undefined;
-      untracked(() =>
-        crumbs.trail.set([
-          { id: GUIDANCE_SESSIONS, label: 'Sessions', kind: 'link' },
-          ...(detail
-            ? [{ id: `${GUIDANCE_SESSIONS}/${detail.session.id}`, label: `Session ${detail.session.number}`, kind: 'link' as const }]
-            : []),
-          { id: 'current', label: 'Pre-session check-in', kind: 'current' },
-        ]),
-      );
-    });
+    inject(PageCrumbs).trail.set([{ id: 'current', label: 'New member check-in', kind: 'current' }]);
   }
 
   /** Mock-up only: answers every question, so the demo can get to the end quickly. */
@@ -178,7 +166,7 @@ export class CheckInPage {
       const score = (answer: string) => Number(answer) as Frequency;
       try {
         await firstValueFrom(
-          this.api.submitCheckIn(this.id(), {
+          this.api.submitNewMemberCheckIn(this.memberId()!, {
             phq9: phq9.map(score),
             gad7: gad7.map(score),
             difficulty: this.anyProblem() ? score(difficulty) : undefined,
@@ -202,6 +190,6 @@ export class CheckInPage {
 
   protected retry(): void {
     if (this.viewer.user.error()) this.viewer.user.reload();
-    this.detail.reload();
+    this.status.reload();
   }
 }

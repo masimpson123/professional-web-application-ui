@@ -1,7 +1,7 @@
 import { Injectable, computed, inject, signal } from '@angular/core';
 import { Observable, tap, throwError } from 'rxjs';
 import { ApiService } from '../api/api.service';
-import { AiScribeConsent, CarePlanItem, SessionDetail, SessionRecap } from '../api/models';
+import { AiScribeConsent, CarePlanItem, CheckInFocus, SessionDetail, SessionRecap } from '../api/models';
 import { DONE_WORDS } from '../documents/doc-kinds';
 import { Viewer } from './viewer';
 
@@ -29,6 +29,9 @@ export class SessionStore {
   private readonly savedAiScribe = signal<AiScribeConsent | undefined>(undefined);
   /** Whether the member lets the provider use AI scribe in this session, once they've said. */
   readonly aiScribe = this.savedAiScribe.asReadonly();
+  private readonly savedFocus = signal<CheckInFocus | undefined>(undefined);
+  /** The pre-session check-in: what the member would like to focus on, from booking or edited since. */
+  readonly focus = this.savedFocus.asReadonly();
   /** What was said in the call, summarized by AI once it has ended. */
   readonly aiSummary = computed(() => this.require().aiSummary);
   /** The provider's short message at the top of the care plan. */
@@ -55,7 +58,14 @@ export class SessionStore {
     this.carePlan.set(detail.carePlan);
     this.savedRecap.set(detail.recap);
     this.savedAiScribe.set(detail.aiScribe);
+    this.savedFocus.set(detail.checkInFocus);
     this.announcement.set('');
+  }
+
+  /** The member saved a new focus (FocusDialog saves it; this keeps the room in step). */
+  focusSaved(focus: CheckInFocus): void {
+    this.savedFocus.set(focus);
+    this.announcement.set('Your pre-session check-in is saved.');
   }
 
   /** Member action: allow or decline AI scribe for this session. They can change it during the call. */

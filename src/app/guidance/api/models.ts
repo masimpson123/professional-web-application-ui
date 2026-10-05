@@ -80,8 +80,8 @@ export interface BookingRequest {
   /** ISO date-time, one of the provider's open `TimeSlot`s. */
   start: string;
   format: SessionFormat;
-  /** What the member would like to focus on, if they said. */
-  focus?: string;
+  /** What the member would like to focus on, if they said. They can edit it until the session. */
+  focus?: CheckInFocus;
 }
 
 /** Which sessions to list: in progress and upcoming, or finished. */
@@ -108,9 +108,7 @@ export interface Page<T> {
 export interface SessionSummary extends Session {
   provider: Person;
   member: Person;
-  /** The member's pre-session check-in for this session is waiting for them. */
-  checkInDue: boolean;
-  /** What the member said they'd like to focus on, the first step of the check-in. */
+  /** What the member said they'd like to focus on, when they booked or since. */
   checkInFocus?: CheckInFocus;
 }
 
@@ -125,9 +123,7 @@ export interface SessionDetail {
   recap?: SessionRecap;
   /** What was said in the call, summarized by AI once the session has ended. */
   aiSummary?: SessionAiSummary;
-  /** The member's pre-session check-in, once they've done it. */
-  checkIn?: CheckIn;
-  /** What the member would like to focus on, the first step of the check-in. */
+  /** What the member would like to focus on, from booking or edited since. */
   checkInFocus?: CheckInFocus;
   /** Whether the member lets the provider use AI scribe in this session, once they've said. */
   aiScribe?: AiScribeConsent;
@@ -168,7 +164,7 @@ export interface SessionAiSummary {
 export type Frequency = 0 | 1 | 2 | 3;
 
 /**
- * A member's answers to the pre-session check-in: the PHQ-9 (mood) and GAD-7
+ * A member's answers to the new member check-in: the PHQ-9 (mood) and GAD-7
  * (anxiety) questionnaires, in question order.
  */
 export interface CheckInAnswers {
@@ -182,16 +178,28 @@ export interface CheckInAnswers {
   difficulty?: Frequency;
 }
 
-/** A completed check-in, for one session. Only the member's provider reads the answers. */
-export interface CheckIn extends CheckInAnswers {
-  sessionId: string;
+/**
+ * The new member check-in, done once, when someone starts with GuidanceResources.
+ * Only the member's provider reads the answers.
+ */
+export interface NewMemberCheckIn extends CheckInAnswers {
+  memberId: string;
   /** ISO date-time. */
   completedAt: string;
 }
 
+/** Where a member's new member check-in stands, as the member sees it (never the answers). */
+export interface NewMemberCheckInStatus {
+  /** ISO date-time, once they've done it. */
+  completedAt?: string;
+  /** Their next session that hasn't started, which the check-in helps with. */
+  nextSession?: SessionSummary;
+}
+
 /**
- * The first step of the pre-session check-in: what the member would like to
- * focus on, shared with their provider before the session.
+ * The pre-session check-in: what the member would like to focus on in one
+ * session. Done when they book (or later), editable any time, and shared with
+ * their provider beforehand.
  */
 export interface CheckInFocus {
   /** Topics they chose, by label ("Sleep", "Something else"). */

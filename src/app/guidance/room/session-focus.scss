@@ -1,0 +1,29 @@
+:host {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--spacing-padding-sys-padding-4) var(--spacing-padding-sys-padding-8);
+}
+
+.label {
+  color: var(--ink-muted);
+}
+
+.value {
+  font-weight: 500;
+}
+
+.edit {
+  padding: var(--spacing-padding-sys-padding-2) var(--spacing-padding-sys-padding-12);
+  border: 1px solid var(--outline-sys-outline);
+  border-radius: var(--border-radius-sys-radius-full);
+  background: transparent;
+  color: var(--accent-primary-sys-primary);
+  font: inherit;
+  font-weight: 500;
+  cursor: pointer;
+
+  &:hover {
+    background: var(--transparent-primary-sys-primary-08);
+  }
+}

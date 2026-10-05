@@ -14,8 +14,8 @@ import { ListedSession, dayLabel } from './session-listing';
  * phone or in-person session, who calls whom or where to go. By default the
  * row opens the session: its room, or its summary once it's over. With `actions`
  * (the home page) it has buttons instead: Join Now for a video session, which opens
- * from 30 minutes before the start until the end, and, for the member's next
- * session until it's done, Pre-Session Check-In.
+ * from 30 minutes before the start until the end, and, for members, the session's
+ * pre-session check-in: "Pre-Session Check-In" until it's done, "Edit Check-In" after.
  */
 /** How early Join Now opens. */
 const JOIN_OPENS_MS = 30 * 60_000;
@@ -29,8 +29,13 @@ const JOIN_OPENS_MS = 30 * 60_000;
       <div class="row" [class.row--day]="showDay()" [class.row--live]="item().phase === 'live'">
         <ng-container *ngTemplateOutlet="details" />
         <span class="row__buttons">
-          @if (checkInDue()) {
-            <compsych-button variant="outlined" size="small" label="Pre-Session Check-In" (click)="checkIn.emit(s)" />
+          @if (canCheckIn()) {
+            <compsych-button
+              variant="outlined"
+              size="small"
+              [label]="s.checkInFocus ? 'Edit Check-In' : 'Pre-Session Check-In'"
+              (click)="checkIn.emit(s)"
+            />
           }
           @if (s.format === 'video') {
             <compsych-button
@@ -85,10 +90,6 @@ const JOIN_OPENS_MS = 30 * 60_000;
         @if (item().status; as status) {
           <compsych-badge size="md" [variant]="status.variant" [label]="status.label" />
         }
-        <!-- So the member sees it wherever the session is listed; on the home page the button says it. -->
-        @if (checkInDue() && !actions()) {
-          <compsych-badge size="md" variant="warning" label="Check-in due" />
-        }
       </span>
     </ng-template>
   `,
@@ -106,7 +107,7 @@ export class SessionRow {
   readonly now = input(Date.now());
   /** Buttons instead of a link to the session (the home page). */
   readonly actions = input(false);
-  /** The member chose Pre-Session Check-In. */
+  /** The member chose the session's pre-session check-in (to do or edit it). */
   readonly checkIn = output<SessionSummary>();
 
   private readonly router = inject(Router);
@@ -116,9 +117,9 @@ export class SessionRow {
     this.viewer.role() === 'provider' ? this.item().session.member : this.item().session.provider,
   );
   protected readonly withWhomLabel = computed(() => personLabel(this.withWhom()));
-  /** Members: this session's pre-session check-in is waiting for them. */
-  protected readonly checkInDue = computed(
-    () => this.viewer.role() === 'member' && this.item().session.checkInDue,
+  /** Members can do or edit a session's pre-session check-in any time before it ends. */
+  protected readonly canCheckIn = computed(
+    () => this.viewer.role() === 'member' && this.item().phase !== 'ended',
   );
   protected readonly day = computed(() => dayLabel(this.item().session.start, this.now(), 'EEE, MMM d'));
   /** From 30 minutes before the start until the session ends. */

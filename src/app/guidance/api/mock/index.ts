@@ -3,6 +3,7 @@
  * else gets data from the service, as Observables, the way it would from a server.
  */
 export { CARE_PLANS, CARE_PLAN_NOTES } from './care-plans';
+export { NEW_MEMBER_CHECK_INS } from './check-ins';
 export { day, localDate } from './dates';
 export { HIGHLIGHTS } from './highlights';
 export { JORDAN, MAYA, PEOPLE } from './people';

@@ -4,6 +4,9 @@
       <div class="room__intro">
         <h1 class="room__title">{{ title() }}</h1>
         <p class="room__when">{{ when() }} · {{ store.session().focus }}</p>
+        @if (!store.isProvider()) {
+          <app-session-focus class="room__check-in" />
+        }
       </div>
 
       @if (store.session().format === 'video') {

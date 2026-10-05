@@ -29,7 +29,7 @@
       @if (shown().length) {
         <ul class="list">
           @for (item of shown(); track item.session.id) {
-            <li><app-session-row [item]="item" [showDay]="true" [now]="now()" [actions]="true" (checkIn)="checkIn.emit($event)" /></li>
+            <li><app-session-row [item]="item" [showDay]="true" [now]="now()" [actions]="true" (checkIn)="checkingIn.set($event)" /></li>
           }
         </ul>
         @if (more()) {
@@ -47,4 +47,16 @@
 
 @if (isMember()) {
   <app-book-session [(open)]="booking" (booked)="onBooked()" />
+}
+
+<!-- The pre-session check-in for one session: what they'd like to focus on. -->
+@if (checkingIn(); as session) {
+  <app-focus-dialog
+    [open]="true"
+    (openChange)="$event || checkingIn.set(undefined)"
+    [sessionId]="session.id"
+    [provider]="session.provider.firstName"
+    [focus]="session.checkInFocus"
+    (saved)="sessions.reload()"
+  />
 }

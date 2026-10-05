@@ -1,76 +1,8 @@
 /* Dialogs render in the CDK overlay; these styles are this component's own. */
 
 .lead {
+  margin-bottom: var(--spacing-padding-sys-padding-16);
   color: var(--ink-muted);
-}
-
-.label {
-  display: block;
-  padding: 0;
-  font-size: var(--label-large-sys-font-size);
-  line-height: var(--label-large-sys-line-height);
-  font-weight: 500;
-}
-
-.topics {
-  margin: var(--spacing-padding-sys-padding-20) 0;
-  padding: 0;
-  border: 0;
-}
-
-/* Each topic is a checkbox drawn as a chip; ComPsych's chip has no selected state. */
-.topics__list {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--spacing-padding-sys-padding-8);
-  margin-top: var(--spacing-padding-sys-padding-8);
-}
-
-.topic {
-  position: relative;
-  display: inline-flex;
-  align-items: center;
-  min-height: 40px;
-  padding: var(--spacing-padding-sys-padding-6) var(--spacing-padding-sys-padding-16);
-  border: 1px solid var(--outline-sys-outline);
-  border-radius: var(--border-radius-sys-radius-full);
-  font-size: var(--label-large-sys-font-size);
-  cursor: pointer;
-  transition: background-color 120ms ease, border-color 120ms ease;
-
-  &:hover {
-    background: var(--transparent-primary-sys-primary-08);
-  }
-
-  input {
-    position: absolute;
-    opacity: 0;
-    width: 1px;
-    height: 1px;
-  }
-
-  &:has(input:checked) {
-    border-color: var(--accent-primary-sys-primary);
-    background: var(--custom-info-sys-info-container);
-    color: var(--custom-info-sys-on-info-container);
-  }
-
-  &:has(input:focus-visible) {
-    box-shadow: var(--focus-ring);
-  }
-}
-
-.note {
-  width: 100%;
-  box-sizing: border-box;
-  margin-top: var(--spacing-padding-sys-padding-8);
-  padding: var(--spacing-padding-sys-padding-12) var(--spacing-padding-sys-padding-16);
-  border: 1px solid var(--outline-sys-outline);
-  border-radius: var(--border-radius-sys-radius-sm);
-  background: var(--surface-surface-container-sys-surface-container-lowest);
-  color: var(--ink);
-  font: inherit;
-  resize: vertical;
 }
 
 .safety {
@@ -80,10 +12,7 @@
   line-height: var(--body-small-sys-line-height);
 }
 
-.message {
+.error {
   margin-top: var(--spacing-padding-sys-padding-8);
-}
-
-.message--error {
   color: var(--error-sys-error);
 }
