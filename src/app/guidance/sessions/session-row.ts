@@ -88,7 +88,7 @@ const JOIN_OPENS_MS = 30 * 60_000;
       </span>
       <span class="row__status">
         @if (item().status; as status) {
-          <compsych-badge size="md" [variant]="status.variant" [label]="status.label" />
+          <compsych-badge size="lg" [variant]="status.variant" [label]="status.label" />
         }
       </span>
     </ng-template>
