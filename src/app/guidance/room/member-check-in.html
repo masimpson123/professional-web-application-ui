@@ -1,0 +1,69 @@
+<span class="label">New member check-in:</span>
+@switch (view()) {
+  @case ('loading') {
+    <span class="value">Loading…</span>
+  }
+  @case ('not-done') {
+    <span class="value">Not done yet</span>
+  }
+  @case ('failed') {
+    <span class="value">Couldn’t load</span>
+    <button type="button" class="action" (click)="checkIn.reload()">Try again</button>
+  }
+  @case ('done') {
+    @for (q of results(); track q.id) {
+      <span class="value">{{ q.instrument }} {{ q.score.total }}, {{ q.score.severity | lowercase }}</span>
+      @if (!$last) {
+        <span class="sep" aria-hidden="true">·</span>
+      }
+    }
+    <button type="button" class="action" (click)="reading.set(true)">View answers</button>
+  }
+}
+
+@if (checkIn.hasValue()) {
+  <compsych-dialog
+    variant="modal-leading-icon"
+    icon="clipboard-list"
+    width="min(640px, 94vw)"
+    [title]="store.member().firstName + '’s new member check-in'"
+    [open]="reading()"
+    (closed)="reading.set(false)"
+  >
+    <p class="lead">
+      Sent {{ checkIn.value().completedAt | date: 'MMMM d, y' }}. Answers are about the 2 weeks before then.
+    </p>
+
+    @for (q of results(); track q.id) {
+      <section class="result" [attr.aria-labelledby]="q.id + '-answers'">
+        <h3 [id]="q.id + '-answers'" class="result__title">
+          {{ q.title }} <span class="result__instrument">{{ q.instrument }}</span>
+        </h3>
+        <p class="result__score">
+          <strong>{{ q.score.total }}</strong> of {{ q.score.max }} · {{ q.score.severity }}
+        </p>
+        <ol class="answers">
+          @for (a of q.answers; track $index) {
+            <li class="answer">
+              <span class="answer__text">{{ a.text }}</span>
+              <span class="answer__value">{{ a.answer }}</span>
+            </li>
+          }
+        </ol>
+      </section>
+    }
+
+    @if (difficulty(); as answer) {
+      <section class="result">
+        <p class="answer answer--difficulty">
+          <span class="answer__text">{{ difficultyQuestion }}</span>
+          <span class="answer__value">{{ answer }}</span>
+        </p>
+      </section>
+    }
+
+    <p class="note">Scores are for screening, not diagnosis.</p>
+
+    <compsych-button cmpDialogActions variant="filled" fullWidth label="Close" (click)="reading.set(false)" />
+  </compsych-dialog>
+}

@@ -4,7 +4,9 @@
       <div class="room__intro">
         <h1 class="room__title">{{ title() }}</h1>
         <p class="room__when">{{ when() }} · {{ store.session().focus }}</p>
-        @if (!store.isProvider()) {
+        @if (store.isProvider()) {
+          <app-member-check-in class="room__check-in" />
+        } @else {
           <app-session-focus class="room__check-in" />
         }
       </div>

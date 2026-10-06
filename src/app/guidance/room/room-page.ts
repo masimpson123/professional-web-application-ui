@@ -18,6 +18,7 @@ import { CarePlanPanel } from '../care-plan/care-plan-panel';
 import { PageCrumbs } from '../page-crumbs';
 import { GUIDANCE_SESSIONS } from '../paths';
 import { PastSessionView } from '../past-session/past-session-view';
+import { MemberCheckIn } from './member-check-in';
 import { SessionFocus } from './session-focus';
 import { SessionPlace } from './session-place';
 import { ApiService } from '../api/api.service';
@@ -33,7 +34,7 @@ import { VideoStage } from '../video-stage/video-stage';
  */
 @Component({
   selector: 'app-room-page',
-  imports: [ButtonComponent, CarePlanPanel, PastSessionView, RouterLink, SessionFocus, SessionPlace, VideoStage],
+  imports: [ButtonComponent, CarePlanPanel, MemberCheckIn, PastSessionView, RouterLink, SessionFocus, SessionPlace, VideoStage],
   templateUrl: './room-page.html',
   styleUrl: './room-page.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,

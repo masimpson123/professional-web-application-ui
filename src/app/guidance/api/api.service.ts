@@ -259,6 +259,15 @@ export class ApiService {
   }
 
   /**
+   * `GET /api/members/:id/new-member-check-in/answers`: the member's answers, for
+   * their provider. Only the member's provider may read them; the server refuses
+   * anyone else, the member included. 404s until the member has done it.
+   */
+  getNewMemberCheckInAnswers(memberId: string): Observable<NewMemberCheckIn> {
+    return respond(`/api/members/${memberId}/new-member-check-in/answers`, () => NEW_MEMBER_CHECK_INS[memberId]);
+  }
+
+  /**
    * `POST /api/members/:id/new-member-check-in`: the member sends their new member
    * check-in. It's done once; their provider sees it before their next session.
    */

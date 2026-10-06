@@ -72,3 +72,23 @@ export const DIFFICULTY = {
     { value: 3, label: 'Extremely difficult' },
   ] satisfies { value: Frequency; label: string }[],
 };
+
+/** A questionnaire's total, out of the most it can be, and the severity band it falls in. */
+export interface Score {
+  total: number;
+  max: number;
+  severity: string;
+}
+
+/** The published severity bands, highest first: each starts at its lowest total. */
+const BANDS: Record<Questionnaire['id'], [from: number, severity: string][]> = {
+  phq9: [[20, 'Severe'], [15, 'Moderately severe'], [10, 'Moderate'], [5, 'Mild'], [0, 'Minimal']],
+  gad7: [[15, 'Severe'], [10, 'Moderate'], [5, 'Mild'], [0, 'Minimal']],
+};
+
+/** Scores one questionnaire: the sum of its answers, banded. */
+export function score(questionnaire: Questionnaire, answers: Frequency[]): Score {
+  const total = answers.reduce<number>((sum, answer) => sum + answer, 0);
+  const severity = BANDS[questionnaire.id].find(([from]) => total >= from)![1];
+  return { total, max: questionnaire.items.length * 3, severity };
+}
